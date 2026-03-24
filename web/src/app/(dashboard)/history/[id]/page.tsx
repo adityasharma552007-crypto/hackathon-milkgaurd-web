@@ -1,0 +1,177 @@
+import { createClient } from "@/lib/supabase/server"
+import { notFound } from "next/navigation"
+import { 
+  Shield, 
+  AlertCircle, 
+  AlertTriangle, 
+  ChevronLeft, 
+  Info, 
+  FileText, 
+  Share2,
+  ChevronDown,
+  Building2,
+  Calendar
+} from "lucide-react"
+import Link from "next/link"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+
+import SpectralChart from "@/components/SpectralChart"
+import PDFButton from "@/components/PDFButton"
+import ReportButton from "@/components/ReportButton"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+
+export default async function ScanResultPage({ params }: { params: { id: string } }) {
+  const supabase = createClient()
+  const { data: scan } = await supabase
+    .from('scans')
+    .select('*, vendors(name), adulterant_results(*), fssai_reports(id)')
+    .eq('id', params.id)
+    .single()
+
+  if (!scan) notFound()
+
+  const tierColors = {
+    safe: "bg-[#1A6B4A] text-white",
+    warning: "bg-amber-500 text-white",
+    danger: "bg-red-500 text-white",
+    hazard: "bg-black text-rose-500"
+  }
+
+  const tierIcons = {
+    safe: Shield,
+    warning: AlertTriangle,
+    danger: AlertCircle,
+    hazard: AlertCircle
+  }
+
+  const StatusIcon = tierIcons[scan.result_tier as keyof typeof tierIcons]
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#F7F9F8]">
+      {/* Top Banner */}
+      <div className={cn("p-6 pt-12 text-center relative overflow-hidden", tierColors[scan.result_tier as keyof typeof tierColors])}>
+        <div className="relative z-10">
+          <div className="flex justify-between items-center mb-6">
+            <Link href="/home" className="p-2 bg-white/10 rounded-full">
+              <ChevronLeft size={20} />
+            </Link>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em]">Scan Report</p>
+            <div className="p-2 bg-white/10 rounded-full">
+               <Share2 size={16} />
+            </div>
+          </div>
+
+          <div className="mb-4 inline-flex flex-col items-center">
+             <div className="text-7xl font-black tracking-tighter leading-none mb-1">{scan.safety_score}%</div>
+             <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Purity Score</p>
+          </div>
+
+          <h1 className="text-2xl font-black uppercase tracking-tighter mb-2">
+            {scan.result_tier === 'safe' ? 'MILK IS SAFE' : 'ADULTERATION DETECTED'}
+          </h1>
+          <p className="text-xs font-medium opacity-80 max-w-[280px] mx-auto leading-relaxed">
+            {scan.recommendation}
+          </p>
+        </div>
+        <div className="absolute top-[-50px] right-[-50px] w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
+      </div>
+
+      <main className="p-4 -mt-4 relative z-20 space-y-4 pb-12">
+        {/* Info Card */}
+        <Card className="rounded-3xl border-none shadow-lg">
+          <CardContent className="p-5 flex justify-between items-center">
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                  <Building2 size={20} className="text-slate-400" />
+               </div>
+               <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Source</p>
+                  <p className="font-bold text-slate-800 leading-none">{scan.vendors?.name || 'Home/Unlisted Sample'}</p>
+               </div>
+             </div>
+             <div className="text-right">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Confidence</p>
+                <Badge variant="secondary" className="bg-green-50 text-[#1A6B4A] border-none font-black">{scan.ai_confidence}%</Badge>
+             </div>
+          </CardContent>
+        </Card>
+
+        {/* Spectral Chart */}
+        <Card className="rounded-3xl border-none shadow-lg overflow-hidden">
+          <CardHeader className="p-5 pb-0">
+             <CardTitle className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+               <Activity size={14} className="text-[#1A6B4A]" />
+               Spectral Fingerprint
+             </CardTitle>
+          </CardHeader>
+          <CardContent className="p-5 pt-0">
+             <SpectralChart data={scan.wavelength_data} />
+             <div className="mt-4 p-3 bg-slate-50 rounded-2xl flex items-center gap-3">
+                <Info size={16} className="text-slate-400 shrink-0" />
+                <p className="text-[10px] text-slate-500 font-medium leading-tight">
+                  Our sensors analyzed 18 spectral channels. Spikes in the chart indicate deviations from the pure milk baseline.
+                </p>
+             </div>
+          </CardContent>
+        </Card>
+
+        {/* Adulterant Breakdown */}
+        <div className="space-y-3">
+          <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Detailed Findings</h3>
+          {scan.adulterant_results?.map((res: any) => (
+            <Card key={res.id} className="rounded-2xl border-none shadow-sm overflow-hidden">
+              <CardContent className="p-0">
+                <div className="p-4 flex justify-between items-center">
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center",
+                      res.status === 'clear' ? "bg-green-50 text-green-500" : "bg-red-50 text-red-500"
+                    )}>
+                      {res.status === 'clear' ? <Shield size={16} /> : <AlertTriangle size={16} />}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 leading-none mb-1">{res.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 tracking-wider">
+                        {res.status === 'clear' ? 'NOT DETECTED' : `DETECTED: ${res.detected_value}${res.unit}`}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown size={16} className="text-slate-300" />
+                </div>
+                {res.detected && (
+                  <div className="px-4 pb-4 pt-0">
+                    <Separator className="mb-3 opacity-50" />
+                    <p className="text-[10px] font-medium text-slate-600 leading-relaxed italic bg-amber-50 p-2 rounded-xl border border-amber-100/50 text-center">
+                      "{res.analogy}"
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* FSSAI Notice - PDF Export */}
+        <div className="space-y-3">
+          {['hazard', 'danger'].includes(scan.result_tier) && scan.vendor_id && (
+            <ReportButton 
+              scanId={scan.id} 
+              isHazard={scan.result_tier === 'hazard'} 
+              isReported={(scan.fssai_reports?.length ?? 0) > 0} 
+            />
+          )}
+
+          <PDFButton scan={scan} />
+        </div>
+
+        <Button variant="ghost" className="w-full text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+           Terms of Service & Regulatory Basis
+        </Button>
+      </main>
+    </div>
+  )
+}

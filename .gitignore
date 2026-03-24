@@ -1,58 +1,54 @@
 # dependencies
 node_modules/
-.pnpm-store/
+.pnp/
+.pnp.js
 
-# Next.js
+# testing
+coverage/
+
+# next.js
 .next/
 out/
-next-env.d.ts
-.vercel/
 
-# Expo & Mobile
+# production
+build/
+dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# expo
 .expo/
 dist/
 web-build/
-expo-env.d.ts
-/ios
-/android
 
-# Native & Binary Secrets
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.pem
-*.keystore
+# android
+android/app/build/
+*.apk
+*.aab
 
-# Local Env
-.env
-.env.local
-.env.production
-.env.development
-.env.*.local
+# ios
+ios/build/
+*.ipa
 
-# AI & Editor specific
-.claude/
+# custom
+/tmp/
 .gemini/
-.idea/
-.vscode/
-*.log
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# Large Binary Assets & Pitch Decks (Do not upload to git)
-*.pptx
-*.png
-*.jpg
-*.jpeg
-*.mp4
-*.pdf
-!src/assets/**/*.png
-!src/assets/**/*.jpg
-!milkguard-web/public/**/*.png
-
-# OS specific
-.DS_Store
-Thumbs.db
+/brain/
