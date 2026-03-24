@@ -1,41 +1,58 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
+.pnpm-store/
 
-# Expo
+# Next.js
+.next/
+out/
+next-env.d.ts
+.vercel/
+
+# Expo & Mobile
 .expo/
 dist/
 web-build/
 expo-env.d.ts
+/ios
+/android
 
-# Native
-.kotlin/
-*.orig.*
+# Native & Binary Secrets
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.pem
+*.keystore
 
-# Metro
-.metro-health-check*
+# Local Env
+.env
+.env.local
+.env.production
+.env.development
+.env.*.local
 
-# debug
+# AI & Editor specific
+.claude/
+.gemini/
+.idea/
+.vscode/
+*.log
 npm-debug.*
 yarn-debug.*
 yarn-error.*
 
-# macOS
+# Large Binary Assets & Pitch Decks (Do not upload to git)
+*.pptx
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.pdf
+!src/assets/**/*.png
+!src/assets/**/*.jpg
+!milkguard-web/public/**/*.png
+
+# OS specific
 .DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android
+Thumbs.db
