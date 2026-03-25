@@ -1,0 +1,10 @@
+src/components/PDFButton.tsx(26,16): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: PDFDownloadLinkProps): PDFDownloadLink', gave the following error.
+    Type '({ loading }: any) => React.JSX.Element' is not assignable to type 'ReactNode | ReactElement<BlobProviderParams, string | JSXElementConstructor<any>>'.
+  Overload 2 of 2, '(props: PDFDownloadLinkProps, context: any): PDFDownloadLink', gave the following error.
+    Type '({ loading }: any) => React.JSX.Element' is not assignable to type 'ReactNode | ReactElement<BlobProviderParams, string | JSXElementConstructor<any>>'.
+src/components/ui/toaster.tsx(3,26): error TS2307: Cannot find module '@/components/hooks/use-toast' or its corresponding type declarations.
+src/components/ui/toaster.tsx(18,31): error TS7031: Binding element 'id' implicitly has an 'any' type.
+src/components/ui/toaster.tsx(18,35): error TS7031: Binding element 'title' implicitly has an 'any' type.
+src/components/ui/toaster.tsx(18,42): error TS7031: Binding element 'description' implicitly has an 'any' type.
+src/components/ui/toaster.tsx(18,55): error TS7031: Binding element 'action' implicitly has an 'any' type.

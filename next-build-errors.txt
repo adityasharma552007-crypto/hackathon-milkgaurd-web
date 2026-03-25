@@ -1,0 +1,22 @@
+   ▲ Next.js 14.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/components/PDFButton.tsx:26:16
+Type error: No overload matches this call.
+  Overload 1 of 2, '(props: PDFDownloadLinkProps): PDFDownloadLink', gave the following error.
+    Type '({ loading }: any) => React.JSX.Element' is not assignable to type 'ReactNode | ReactElement<BlobProviderParams, string | JSXElementConstructor<any>>'.
+  Overload 2 of 2, '(props: PDFDownloadLinkProps, context: any): PDFDownloadLink', gave the following error.
+    Type '({ loading }: any) => React.JSX.Element' is not assignable to type 'ReactNode | ReactElement<BlobProviderParams, string | JSXElementConstructor<any>>'.
+
+[0m [90m 24 |[39m       document[33m=[39m{[33m<[39m[33mScanReportPDF[39m scan[33m=[39m{scan} [33m/[39m[33m>[39m}[0m
+[0m [90m 25 |[39m       fileName[33m=[39m{[32m`MilkGuard_Report_${scan.id.substring(0, 8)}.pdf`[39m}[0m
+[0m[31m[1m>[22m[39m[90m 26 |[39m       children[33m=[39m{({ loading }[33m:[39m any) [33m=>[39m ([0m
+[0m [90m    |[39m                [31m[1m^[22m[39m[0m
+[0m [90m 27 |[39m         [33m<[39m[33mButton[39m variant[33m=[39m[32m"outline"[39m disabled[33m=[39m{loading} className[33m=[39m[32m"w-full h-16 rounded-3xl border-slate-200 text-slate-400 font-black uppercase tracking-tighter gap-3 bg-white"[39m[33m>[39m[0m
+[0m [90m 28 |[39m           {loading [33m?[39m ([0m
+[0m [90m 29 |[39m             [33m<[39m[33m>[39m[0m

@@ -23,7 +23,9 @@ export default function PDFButton({ scan }: PDFButtonProps) {
     <PDFDownloadLink
       document={<ScanReportPDF scan={scan} />}
       fileName={`MilkGuard_Report_${scan.id.substring(0, 8)}.pdf`}
-      children={({ loading }: any) => (
+    >
+      {/* @ts-ignore */}
+      {({ loading }: any) => (
         <Button variant="outline" disabled={loading} className="w-full h-16 rounded-3xl border-slate-200 text-slate-400 font-black uppercase tracking-tighter gap-3 bg-white">
           {loading ? (
             <>
@@ -38,6 +40,6 @@ export default function PDFButton({ scan }: PDFButtonProps) {
           )}
         </Button>
       )}
-    />
+    </PDFDownloadLink>
   )
 }
