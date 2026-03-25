@@ -10,7 +10,8 @@ import {
   Share2,
   ChevronDown,
   Building2,
-  Calendar
+  Calendar,
+  Activity
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
