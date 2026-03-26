@@ -18,9 +18,10 @@ export function SignOutButton() {
     <Button 
       variant="outline" 
       onClick={handleSignOut}
-      className="w-full mt-6 h-14 rounded-full border-red-500 text-red-500 hover:bg-red-50 font-black uppercase tracking-widest bg-transparent"
+      className="w-full h-14 rounded-full border border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 font-bold uppercase tracking-widest bg-transparent flex items-center justify-center gap-2"
     >
-      Sign Out
+      <LogOut size={18} />
+      SIGN OUT
     </Button>
   )
 }
