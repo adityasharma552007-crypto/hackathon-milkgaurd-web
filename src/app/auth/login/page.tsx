@@ -39,7 +39,7 @@ export default function LoginPage() {
     setIsLoading(true)
     setError(null)
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password,
     })
@@ -47,10 +47,26 @@ export default function LoginPage() {
     if (authError) {
       setError(authError.message)
       setIsLoading(false)
-    } else {
-      router.push('/home')
-      router.refresh()
+      return
     }
+
+    if (authData?.user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single()
+      
+      if (profileError || !profile) {
+        setError("User profile not found in database.")
+        setIsLoading(false)
+        await supabase.auth.signOut()
+        return
+      }
+    }
+
+    router.push('/home')
+    router.refresh()
   }
 
   const handleGithubLogin = async () => {

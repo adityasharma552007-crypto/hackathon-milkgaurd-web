@@ -8,11 +8,22 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createClient()
-    const { error } = await supabase.auth
+    const { data: authData, error } = await supabase.auth
       .exchangeCodeForSession(code)
     
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`)
+    if (!error && authData?.user) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (!profileError && profile) {
+        return NextResponse.redirect(`${origin}${next}`)
+      } else {
+        // If not explicitly found in DB, redirect back
+        return NextResponse.redirect(`${origin}/auth/login?error=profile_not_found`)
+      }
     }
   }
 
