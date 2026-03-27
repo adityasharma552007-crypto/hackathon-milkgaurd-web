@@ -60,12 +60,13 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
 
   // Calculated values
   const initials = user.fullName
-    .split(' ')
-    .filter(Boolean)
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || (user.email ? user.email[0].toUpperCase() : "U")
+    ? user.fullName
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : user.email[0]?.toUpperCase() ?? 'U'
 
   // Handlers
   const handleSaveProfile = async () => {
