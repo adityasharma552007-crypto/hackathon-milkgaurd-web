@@ -56,21 +56,28 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // unprotected routes
-  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const isPublicRoute = request.nextUrl.pathname === '/'
+  const { pathname } = request.nextUrl
 
-  // 1. Dashboard protection
-  if (request.nextUrl.pathname.startsWith('/(dashboard)') || 
-      ['/home', '/scan', '/map', '/history', '/profile'].some(path => request.nextUrl.pathname.startsWith(path))) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
-    }
+  // Public routes — never redirect to login
+  const isLandingPage = pathname === '/'
+  const isAuthPage = pathname.startsWith('/auth')
+  const isPublicRoute = isLandingPage || isAuthPage
+
+  // 1. Landing page — always let through (server component handles logged-in redirect to /home)
+  if (isLandingPage) {
+    return response
   }
 
-  // 2. Auth page logic (redirect if logged in)
+  // 2. Auth pages — if already logged in, go to /home
   if (isAuthPage && user) {
     return NextResponse.redirect(new URL('/home', request.url))
+  }
+
+  // 3. Protected dashboard routes — redirect to login if not authenticated
+  const protectedPaths = ['/home', '/scan', '/map', '/history', '/profile', '/learn']
+  const isProtected = protectedPaths.some(path => pathname.startsWith(path))
+  if (isProtected && !user) {
+    return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
   return response
