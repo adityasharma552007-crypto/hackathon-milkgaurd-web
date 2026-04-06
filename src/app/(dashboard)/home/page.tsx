@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { Shield, ArrowRight, Activity, MapPin, Zap } from "lucide-react"
+import { Shield, ArrowRight, Activity, MapPin, Zap, Bot } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -44,9 +44,9 @@ export default async function HomePage() {
             {profile?.full_name?.split(' ')[0] || 'User'}
           </h1>
         </div>
-        <div className="w-12 h-12 bg-[#F3F6F4] rounded-2xl flex items-center justify-center border border-slate-100">
-           <Zap className="text-[#F5A623]" size={24} fill="#F5A623" />
-        </div>
+        <Link href="/chat" className="w-12 h-12 bg-[#F3F6F4] rounded-2xl flex items-center justify-center border border-slate-100 hover:bg-slate-100 transition-colors">
+           <Bot className="text-[#F5A623]" size={24} />
+        </Link>
       </header>
 
       <main className="flex-1 p-6 space-y-6">

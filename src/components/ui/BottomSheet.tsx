@@ -23,13 +23,13 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
     <>
       {/* Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 bg-black/50 z-[100] transition-opacity duration-300 ${isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         onClick={onClose}
       />
       
       {/* Sheet */}
       <div 
-        className={`fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white z-50 rounded-t-[24px] p-6 shadow-2xl transition-transform duration-300 transform ${isOpen ? "translate-y-0" : "translate-y-full"}`}
+        className={`fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white z-[100] rounded-t-[24px] p-6 shadow-2xl transition-transform duration-300 transform ${isOpen ? "translate-y-0" : "translate-y-full"}`}
         style={{ maxHeight: "85vh", overflowY: "auto" }}
       >
         <div className="flex items-center justify-between mb-6">

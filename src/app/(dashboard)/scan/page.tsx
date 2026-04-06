@@ -9,6 +9,8 @@ import { runScan } from '@/lib/ai/scanEngine'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
+import { useDeviceStore } from '@/store/useDeviceStore'
+import Link from 'next/link'
 
 const SCAN_DURATION = 8000 // 8 seconds
 
@@ -19,6 +21,9 @@ export default function ScanPage() {
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState<'idle' | 'scanning' | 'analyzing' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
+  
+  const connState = useDeviceStore((s) => s.connState)
+  const isConnected = connState === 'connected'
 
   useEffect(() => {
     let interval: NodeJS.Timeout
@@ -128,12 +133,24 @@ export default function ScanPage() {
       {/* Bottom Controls */}
       <div className="w-full space-y-6">
         {status === 'idle' ? (
-          <Button 
-            onClick={handleStartScan}
-            className="w-full h-20 bg-[#1A6B4A] hover:bg-[#145339] text-white font-black text-xl rounded-full shadow-2xl shadow-green-100 uppercase tracking-tighter"
-          >
-            Start Scan
-          </Button>
+          !isConnected ? (
+            <div className="space-y-4 text-center">
+               <p className="text-red-500 font-bold uppercase tracking-widest text-sm">Hardware Disconnected</p>
+               <Button 
+                asChild
+                className="w-full h-20 bg-amber-500 hover:bg-amber-600 text-white font-black text-xl rounded-full shadow-lg uppercase tracking-tighter"
+               >
+                 <Link href="/hardware">Connect Device</Link>
+               </Button>
+            </div>
+          ) : (
+            <Button 
+              onClick={handleStartScan}
+              className="w-full h-20 bg-[#1A6B4A] hover:bg-[#145339] text-white font-black text-xl rounded-full shadow-2xl shadow-green-100 uppercase tracking-tighter"
+            >
+              Start Scan
+            </Button>
+          )
         ) : status === 'error' ? (
           <div className="space-y-4">
             <p className="text-red-500 text-center font-bold">{error}</p>

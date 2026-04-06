@@ -274,10 +274,17 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                 </div>
                 <ChevronRight size={18} className="text-slate-300" />
               </div>
-              <div onClick={() => setSheetOpen('fssai')} className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-50 transition-colors mb-2">
+              <div onClick={() => setSheetOpen('fssai')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-4">
                   <BookOpen size={20} className="text-slate-700 fill-slate-700" />
                   <span className="font-bold text-[15px] text-slate-900">FSSAI Guidelines</span>
+                </div>
+                <ChevronRight size={18} className="text-slate-300" />
+              </div>
+              <div onClick={() => router.push('/learn')} className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-50 transition-colors mb-2">
+                <div className="flex items-center gap-4">
+                  <BookOpen size={20} className="text-slate-700" />
+                  <span className="font-bold text-[15px] text-slate-900">EduGuard Learning Center</span>
                 </div>
                 <div className="w-6 h-6 rounded flex items-center justify-center border border-slate-200 bg-slate-50 hover:bg-slate-100">
                    <ChevronRight size={14} className="text-slate-400" />

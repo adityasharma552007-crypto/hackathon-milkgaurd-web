@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils"
 import SpectralChart from "@/components/SpectralChart"
 import PDFButton from "@/components/PDFButton"
 import ReportButton from "@/components/ReportButton"
+import ExplainWithAI from "@/components/ExplainWithAI"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -155,6 +156,16 @@ export default async function ScanResultPage({ params }: { params: { id: string 
             </Card>
           ))}
         </div>
+
+        {/* AI Explanation */}
+        <ExplainWithAI
+          safetyScore={scan.safety_score}
+          resultTier={scan.result_tier}
+          recommendation={scan.recommendation}
+          vendorName={scan.vendors?.name}
+          aiConfidence={scan.ai_confidence}
+          adulterantResults={scan.adulterant_results ?? []}
+        />
 
         {/* FSSAI Notice - PDF Export */}
         <div className="space-y-3">

@@ -114,7 +114,7 @@ export default function LearnPage() {
         <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-white/10 rounded-full blur-[60px]" />
       </div>
 
-      <main className="p-4 -mt-10 relative z-10 space-y-8">
+      <main className="p-4 -mt-8 relative z-10 space-y-8">
         {/* Featured Fact Card */}
         <Card className="rounded-3xl border-none shadow-xl bg-gradient-to-br from-[#1A6B4A] to-green-800 text-white overflow-hidden relative">
           <CardContent className="p-6">
@@ -122,19 +122,19 @@ export default function LearnPage() {
               <Info size={16} />
               <span className="text-[10px] font-black uppercase tracking-widest">Did You Know?</span>
             </div>
-            <div className="min-h-[80px] flex items-center">
+            <div className="min-h-[80px] flex items-center relative z-10 pb-2 pr-4">
               <p className="text-xl font-bold leading-tight transition-opacity duration-500">
                 "{FACTS[factIndex]}"
               </p>
             </div>
             {/* Dots */}
-            <div className="flex gap-2 mt-6">
+            <div className="flex gap-2 mt-4 relative z-10">
               {FACTS.map((_, idx) => (
                 <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === factIndex ? 'w-6 bg-white' : 'w-2 bg-white/30'}`} />
               ))}
             </div>
           </CardContent>
-          <BookOpen className="absolute bottom-[-20px] right-[-20px] w-32 h-32 text-white opacity-5" />
+          <BookOpen className="absolute bottom-[-10px] right-[-10px] w-40 h-40 text-white opacity-5 pointer-events-none z-0" />
         </Card>
 
         {/* What's In Your Milk? */}
