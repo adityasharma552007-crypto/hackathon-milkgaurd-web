@@ -3,10 +3,14 @@ import { Shield, ArrowRight, Activity, MapPin, Zap, Bot } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { Metadata } from "next"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { homeMetadata } from "@/app/page.metadata"
+
+export const metadata: Metadata = homeMetadata
 
 export default async function HomePage() {
   const supabase = createClient()
@@ -44,8 +48,14 @@ export default async function HomePage() {
             {profile?.full_name?.split(' ')[0] || 'User'}
           </h1>
         </div>
-        <Link href="/chat" className="w-12 h-12 bg-[#F3F6F4] rounded-2xl flex items-center justify-center border border-slate-100 hover:bg-slate-100 transition-colors">
-           <Bot className="text-[#F5A623]" size={24} />
+        <Link href="/chat" className="flex items-center gap-2 bg-gradient-to-br from-green-50 to-emerald-50 px-4 py-2 rounded-2xl shadow-sm border border-green-100 hover:shadow-md hover:scale-105 transition-all group">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1A6B4A] to-[#124b33] flex items-center justify-center shrink-0 shadow-inner">
+            <Bot className="text-[#F5A623]" size={16} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[9px] font-black uppercase tracking-widest text-[#1A6B4A]/60 leading-none mb-0.5">MilkGuard</span>
+            <span className="text-xs font-black uppercase tracking-wider text-[#1A6B4A] leading-none">Ask AI</span>
+          </div>
         </Link>
       </header>
 

@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { useDeviceStore } from '@/store/useDeviceStore'
 import Link from 'next/link'
+import { trackTestInitiation } from '@/components/analytics/GoogleAnalytics'
 
 const SCAN_DURATION = 8000 // 8 seconds
 
@@ -40,6 +41,9 @@ export default function ScanPage() {
 
   const handleStartScan = async () => {
     if (!user) return
+
+    // Track conversion event for Google Analytics
+    trackTestInitiation('hardware')
 
     setIsScanning(true)
     setStatus('scanning')

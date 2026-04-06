@@ -1,16 +1,26 @@
+/**
+ * Bottom Navigation Component
+ *
+ * Primary navigation for mobile-first experience.
+ * Uses semantic HTML with proper link structure for SEO crawlability.
+ * Internal linking helps search engines discover and rank all important pages.
+ */
+
 'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Scan, Map, History, User, Bot, Cpu } from 'lucide-react'
+import { Home, Scan, Map, History, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+// Navigation tabs with SEO-friendly link structure
+// Each href is a crawlable internal link that helps search engine discovery
 const tabs = [
-  { name: 'Home',     href: '/home',     icon: Home    },
-  { name: 'Scan',     href: '/scan',     icon: Scan    },
-  { name: 'Map',      href: '/map',      icon: Map     },
-  { name: 'History',  href: '/history',  icon: History },
-  { name: 'Profile',  href: '/profile',  icon: User    },
+  { name: 'Home',     href: '/home',     icon: Home,     label: 'Dashboard' },
+  { name: 'Scan',     href: '/scan',     icon: Scan,     label: 'Test Milk' },
+  { name: 'Map',      href: '/map',      icon: Map,      label: 'Vendors' },
+  { name: 'History',  href: '/history',  icon: History,  label: 'Results' },
+  { name: 'Profile',  href: '/profile',  icon: User,     label: 'Account' },
 ]
 
 export function BottomNav() {

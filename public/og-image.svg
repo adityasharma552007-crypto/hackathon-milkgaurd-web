@@ -1,0 +1,76 @@
+<!--
+  MilkGuard OG Image (Open Graph Image)
+  Dimensions: 1200x630px (Facebook/Twitter recommended ratio)
+
+  This is a placeholder SVG. For production, replace with an actual PNG/JPEG image.
+
+  DESIGN RECOMMENDATIONS for production og-image.png:
+  - Size: 1200x630 pixels (1.91:1 ratio)
+  - Include: MilkGuard logo, tagline, and a milk-related visual
+  - Text: Keep minimal and large enough to read on mobile previews
+  - Colors: Use brand colors (#1A6B4A green, #F5A623 amber accent)
+
+  TOOLS TO CREATE OG IMAGE:
+  - Figma: Create 1200x630 frame, export as PNG
+  - Canva: Search "Social Media Banner" templates
+  - Vercel OG Image: https://vercel.com/templates/og-image
+  - Adobe Express: Free social media image templates
+-->
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A6B4A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#134f37;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)" />
+
+  <!-- Decorative circles -->
+  <circle cx="1000" cy="100" r="200" fill="rgba(46,204,138,0.1)" />
+  <circle cx="150" cy="500" r="150" fill="rgba(255,255,255,0.05)" />
+
+  <!-- Main content container -->
+  <g transform="translate(100, 150)">
+    <!-- Logo placeholder -->
+    <rect x="0" y="0" width="100" height="100" rx="24" fill="rgba(255,255,255,0.15)" />
+    <text x="50" y="70" text-anchor="middle" font-size="60" fill="#ffffff">🥛</text>
+
+    <!-- Title -->
+    <text x="0" y="160" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#ffffff">
+      MilkGuard
+    </text>
+
+    <!-- Tagline -->
+    <text x="0" y="220" font-family="Arial, sans-serif" font-size="36" font-weight="500" fill="#2ECC8A">
+      Pure Milk. Scanned in Seconds.
+    </text>
+
+    <!-- Description -->
+    <text x="0" y="290" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.8)">
+      AI-powered milk adulteration detection
+    </text>
+    <text x="0" y="330" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.8)">
+      • Contactless testing
+    </text>
+    <text x="0" y="370" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.8)">
+      • 8-second results
+    </text>
+    <text x="0" y="410" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.8)">
+      • FSSAI compliant
+    </text>
+
+    <!-- CTA button visual -->
+    <rect x="0" y="460" width="280" height="60" rx="30" fill="#F5A623" />
+    <text x="140" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#ffffff">
+      Start Free Test
+    </text>
+  </g>
+
+  <!-- Footer branding -->
+  <text x="1100" y="590" text-anchor="end" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.5)">
+    Built by Team API Avengers 🇮🇳
+  </text>
+</svg>

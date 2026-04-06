@@ -1,0 +1,127 @@
+# =============================================================================
+# ROBOTS.TXT FOR MILKGUARD
+# =============================================================================
+# This file tells search engines which pages they can and cannot crawl.
+#
+# SITEMAP SUBMISSION:
+# - Google Search Console: https://search.google.com/search-console
+# - Bing Webmaster Tools: https://www.bing.com/webmasters
+#
+# TODO: Update sitemap URL to your production domain before deploying
+# =============================================================================
+
+# Sitemap location (update domain for production)
+Sitemap: https://milkguard.vercel.app/sitemap.xml
+
+# =============================================================================
+# RULES FOR ALL SEARCH ENGINES
+# =============================================================================
+User-agent: *
+
+# Allow all public pages
+Allow: /
+Allow: /$
+Allow: /about
+Allow: /how-it-works
+Allow: /faq
+Allow: /learn
+Allow: /auth/login
+Allow: /auth/signup
+
+# Allow dashboard pages (authenticated users, but search engines can crawl)
+Allow: /home
+Allow: /scan
+Allow: /history
+Allow: /hardware
+Allow: /profile
+Allow: /chat
+Allow: /map
+
+# =============================================================================
+# DISALLOWED PATHS
+# =============================================================================
+# API routes - never crawl these
+Disallow: /api/
+Disallow: /api
+Disallow: /api/*
+
+# Admin routes - internal only
+Disallow: /admin/
+Disallow: /admin
+
+# Private routes - internal only
+Disallow: /private/
+Disallow: /private
+
+# Next.js internal files
+Disallow: /_next/
+Disallow: /_next/*
+
+# Auth callback - dynamic handling
+Disallow: /auth/callback
+
+# Static files directory
+Disallow: /static/
+
+# =============================================================================
+# CRAWL DELAY (Optional - prevents server overload)
+# =============================================================================
+# Some search engines respect this, Google typically ignores it
+Crawl-delay: 1
+
+# =============================================================================
+# SPECIFIC RULES FOR GOOGLE BOT
+# =============================================================================
+User-agent: Googlebot
+Allow: /
+Allow: /api/groq-status
+Disallow: /api/*
+Disallow: /_next/
+
+# Google supports additional parameters
+# max-snippet: Maximum length of snippet in search results
+# max-image-preview: Size of image preview in search results
+# max-video-preview: Maximum length of video preview
+
+# =============================================================================
+# SPECIFIC RULES FOR BING
+# =============================================================================
+User-agent: Bingbot
+Allow: /
+Disallow: /api/
+Disallow: /_next/
+
+# =============================================================================
+# BLOCK BAD BOTS AND SCRAPERS
+# =============================================================================
+# Block common bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: Ezooms
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+# =============================================================================
+# NOTES FOR DEVELOPERS
+# =============================================================================
+# 1. Test robots.txt with Google's robots.txt Tester:
+#    https://www.google.com/webmasters/tools/robots-testing-tool
+#
+# 2. After deploying, verify in Google Search Console that:
+#    - Sitemap is discovered
+#    - No important pages are blocked
+#    - Crawl stats look healthy
+#
+# 3. For staging/development environments, consider:
+#    User-agent: *
+#    Disallow: /
+#    This prevents indexing of non-production sites.
