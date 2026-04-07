@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 
 // Fix for default Leaflet markers in Next.js
 const customIcon = (tier: string) => {
-  const color = tier === 'safe' ? '#1C75E8' : tier === 'warning' ? '#F5A623' : '#EF4444'
+  const color = tier === 'safe' ? '#60A5FA' : tier === 'warning' ? '#F5A623' : '#EF4444'
   return L.divIcon({
     className: 'custom-div-icon',
     html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); display: flex; items-center; justify-content: center;">
@@ -75,7 +75,7 @@ export default function VendorMap({ vendors }: VendorMapProps) {
                    <h3 className="font-black text-slate-800 text-sm">{vendor.name}</h3>
                    <Badge className={cn(
                      "text-[8px] h-4 uppercase font-black",
-                     vendor.safety_tier === 'safe' ? "bg-blue-100 text-[#1C75E8]" : "bg-red-100 text-red-500"
+                     vendor.safety_tier === 'safe' ? "bg-blue-100 text-[#60A5FA]" : "bg-red-100 text-red-500"
                    )}>
                      {vendor.safety_tier}
                    </Badge>
@@ -92,7 +92,7 @@ export default function VendorMap({ vendors }: VendorMapProps) {
                       </div>
                       <div>{vendor.total_scans} SCANS</div>
                    </div>
-                   <button className="w-full h-8 bg-[#1C75E8] text-white rounded-lg text-xs font-bold uppercase tracking-tighter mt-1">
+                   <button className="w-full h-8 bg-[#60A5FA] text-white rounded-lg text-xs font-bold uppercase tracking-tighter mt-1">
                       View Profile
                    </button>
                 </div>
@@ -104,7 +104,7 @@ export default function VendorMap({ vendors }: VendorMapProps) {
 
       {/* Map Controls Floating Overlay */}
       <div className="absolute top-4 right-4 z-[1000] space-y-2">
-         <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#1C75E8]">
+         <button className="w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-[#60A5FA]">
             <Navigation size={18} />
          </button>
       </div>
@@ -114,7 +114,7 @@ export default function VendorMap({ vendors }: VendorMapProps) {
             <CardContent className="p-4 flex items-center justify-between">
                <div className="flex gap-4">
                   <div className="flex items-center gap-1">
-                     <div className="w-3 h-3 bg-[#1C75E8] rounded-full" />
+                     <div className="w-3 h-3 bg-[#60A5FA] rounded-full" />
                      <span className="text-[9px] font-black uppercase text-slate-500">Safe</span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -126,7 +126,7 @@ export default function VendorMap({ vendors }: VendorMapProps) {
                      <span className="text-[9px] font-black uppercase text-slate-500">Danger</span>
                   </div>
                </div>
-               <p className="text-[9px] font-bold text-[#1C75E8] uppercase italic underline underline-offset-2">Filter By Tier</p>
+               <p className="text-[9px] font-bold text-[#60A5FA] uppercase italic underline underline-offset-2">Filter By Tier</p>
             </CardContent>
          </Card>
       </div>

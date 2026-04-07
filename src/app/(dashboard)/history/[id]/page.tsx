@@ -37,7 +37,7 @@ export default async function ScanResultPage({ params }: { params: { id: string 
   if (!scan) notFound()
 
   const tierColors = {
-    safe: "bg-[#1C75E8] text-white",
+    safe: "bg-[#60A5FA] text-white",
     warning: "bg-amber-500 text-white",
     danger: "bg-red-500 text-white",
     hazard: "bg-black text-rose-500"
@@ -97,7 +97,7 @@ export default async function ScanResultPage({ params }: { params: { id: string 
              </div>
              <div className="text-right">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Confidence</p>
-                <Badge variant="secondary" className="bg-blue-50 text-[#1C75E8] border-none font-black">{scan.ai_confidence}%</Badge>
+                <Badge variant="secondary" className="bg-blue-50 text-[#60A5FA] border-none font-black">{scan.ai_confidence}%</Badge>
              </div>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ export default async function ScanResultPage({ params }: { params: { id: string 
         <Card className="rounded-3xl border-none shadow-lg overflow-hidden">
           <CardHeader className="p-5 pb-0">
              <CardTitle className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-               <Activity size={14} className="text-[#1C75E8]" />
+               <Activity size={14} className="text-[#60A5FA]" />
                Spectral Fingerprint
              </CardTitle>
           </CardHeader>
@@ -131,7 +131,7 @@ export default async function ScanResultPage({ params }: { params: { id: string 
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       "w-8 h-8 rounded-lg flex items-center justify-center",
-                      res.status === 'clear' ? "bg-blue-50 text-blue-500" : "bg-red-50 text-red-500"
+                      res.status === 'clear' ? "bg-blue-50 text-blue-400" : "bg-red-50 text-red-500"
                     )}>
                       {res.status === 'clear' ? <Shield size={16} /> : <AlertTriangle size={16} />}
                     </div>

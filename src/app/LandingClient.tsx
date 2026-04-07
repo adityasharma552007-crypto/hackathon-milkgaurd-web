@@ -34,7 +34,7 @@ export default function LandingClient() {
       <section
         style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1C75E8 0%, #0A4BB5 100%)',
+          background: 'linear-gradient(160deg, #60A5FA 0%, #3B82F6 100%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -270,7 +270,7 @@ export default function LandingClient() {
             {
               icon: '🔬',
               iconBg: '#EAF2FF',
-              iconColor: '#1C75E8',
+              iconColor: '#60A5FA',
               title: 'Contactless Detection',
               desc: 'NIR spectral analysis reads through the container — no touching, no contamination.',
               delay: 0,
@@ -286,7 +286,7 @@ export default function LandingClient() {
             {
               icon: '🛡️',
               iconBg: '#EAF2FF',
-              iconColor: '#1C75E8',
+              iconColor: '#60A5FA',
               title: 'FSSAI Certified Standards',
               desc: 'Every result compared against official FSSAI 2025-26 safety limits.',
               delay: 0.16,
@@ -357,7 +357,7 @@ export default function LandingClient() {
       {/* ── STATS SECTION ── */}
       <section
         style={{
-          background: 'linear-gradient(135deg, #1C75E8 0%, #0A4BB5 100%)',
+          background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
           padding: '44px 24px',
         }}
       >
@@ -457,14 +457,14 @@ export default function LandingClient() {
             {[
               {
                 num: '1',
-                numBg: '#1C75E8',
+                numBg: '#60A5FA',
                 title: 'Pour a small sample',
                 desc: 'Just 20ml of milk into the transparent cup provided.',
                 delay: 0,
               },
               {
                 num: '2',
-                numBg: '#1C75E8',
+                numBg: '#60A5FA',
                 title: 'Place in the Pod cradle',
                 desc: 'Set the cup next to the MilkGuard Pod sensor.',
                 delay: 0.1,
@@ -542,7 +542,7 @@ export default function LandingClient() {
       {/* ── BOTTOM CTA SECTION ── */}
       <section
         style={{
-          background: 'linear-gradient(160deg, #1C75E8 0%, #0A4BB5 100%)',
+          background: 'linear-gradient(160deg, #60A5FA 0%, #3B82F6 100%)',
           padding: '56px 32px',
           textAlign: 'center',
           position: 'relative',

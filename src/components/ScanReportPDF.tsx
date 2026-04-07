@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1C75E8',
+    color: '#60A5FA',
   },
   subtitle: {
     fontSize: 10,
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   scoreValue: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#1C75E8',
+    color: '#60A5FA',
   },
   scoreLabel: {
     fontSize: 10,
@@ -140,7 +140,7 @@ export default function ScanReportPDF({ scan }: ScanReportPDFProps) {
         <View style={styles.scoreCard}>
           <Text style={styles.scoreValue}>{scan.safety_score}%</Text>
           <Text style={styles.scoreLabel}>Safety Purity Score</Text>
-          <Text style={{ fontSize: 14, fontWeight: 'bold', color: scan.result_tier === 'safe' ? '#1C75E8' : '#EF4444', marginTop: 10 }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: scan.result_tier === 'safe' ? '#60A5FA' : '#EF4444', marginTop: 10 }}>
             Status: {scan.result_tier.toUpperCase()}
           </Text>
         </View>
@@ -176,7 +176,7 @@ export default function ScanReportPDF({ scan }: ScanReportPDFProps) {
             <View key={res.id} style={styles.tableRow}>
               <Text style={[styles.td, styles.col1]}>{res.name}</Text>
               <Text style={[styles.td, styles.col2]}>{res.detected ? `${res.detected_value}${res.unit}` : 'Clear'}</Text>
-              <Text style={[styles.td, styles.col3, { color: res.status === 'clear' ? '#1C75E8' : '#EF4444' }]}>
+              <Text style={[styles.td, styles.col3, { color: res.status === 'clear' ? '#60A5FA' : '#EF4444' }]}>
                 {res.status.toUpperCase()}
               </Text>
             </View>
@@ -186,7 +186,7 @@ export default function ScanReportPDF({ scan }: ScanReportPDFProps) {
         {/* Recommendation */}
         <View style={{ marginTop: 30, backgroundColor: '#F0FDF4', padding: 15, borderRadius: 8 }}>
           <Text style={styles.label}>Recommendation</Text>
-          <Text style={{ fontSize: 10, color: '#1C75E8', marginTop: 5, lineHeight: 1.5 }}>
+          <Text style={{ fontSize: 10, color: '#60A5FA', marginTop: 5, lineHeight: 1.5 }}>
             {scan.recommendation}
           </Text>
         </View>

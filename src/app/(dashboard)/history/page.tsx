@@ -57,9 +57,9 @@ export default async function HistoryPage() {
       <header className="p-6 pb-4 pt-12 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <Link href="/home" className="p-2 bg-white rounded-full shadow-sm">
-            <ChevronLeft size={20} className="text-[#1C75E8]" />
+            <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
-          <h1 className="text-xl font-black text-[#1C75E8] uppercase tracking-tighter">Scan History</h1>
+          <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Scan History</h1>
           <div className="p-2 bg-white rounded-full shadow-sm opacity-0 pointer-events-none">
              <SlidersHorizontal size={20} />
           </div>
@@ -71,18 +71,18 @@ export default async function HistoryPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
             <Input 
               placeholder="Search vendors..." 
-              className="pl-10 h-12 rounded-2xl border-none shadow-sm focus-visible:ring-[#1C75E8]" 
+              className="pl-10 h-12 rounded-2xl border-none shadow-sm focus-visible:ring-[#60A5FA]" 
             />
           </div>
           <Button variant="outline" className="h-12 w-12 rounded-2xl p-0 border-none shadow-sm bg-white">
-            <Filter size={20} className="text-[#1C75E8]" />
+            <Filter size={20} className="text-[#60A5FA]" />
           </Button>
         </div>
       </header>
 
       <main className="px-6 space-y-6">
         {/* Trend Summary */}
-        <Card className="rounded-3xl border-none shadow-lg bg-[#1C75E8] overflow-hidden relative">
+        <Card className="rounded-3xl border-none shadow-lg bg-[#60A5FA] overflow-hidden relative">
           <CardHeader className="p-6 pb-0">
              <CardTitle className="text-[10px] font-black text-white/60 uppercase tracking-widest flex items-center gap-2">
                 <TrendingUp size={14} className="text-[#F5A623]" />
@@ -104,7 +104,7 @@ export default async function HistoryPage() {
                     <CardContent className="p-4 flex items-center gap-4">
                        <div className={cn(
                          "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                         scan.result_tier === 'safe' ? "bg-blue-50 text-[#1C75E8]" : "bg-red-50 text-red-500"
+                         scan.result_tier === 'safe' ? "bg-blue-50 text-[#60A5FA]" : "bg-red-50 text-red-500"
                        )}>
                          {scan.result_tier === 'safe' ? <Shield size={24} /> : <AlertTriangle size={24} />}
                        </div>
@@ -118,13 +118,13 @@ export default async function HistoryPage() {
                        <div className="text-right">
                           <span className={cn(
                              "text-lg font-black leading-none block",
-                             scan.result_tier === 'safe' ? "text-[#1C75E8]" : "text-red-500"
+                             scan.result_tier === 'safe' ? "text-[#60A5FA]" : "text-red-500"
                           )}>
                              {scan.safety_score}%
                           </span>
                           <Badge variant="outline" className={cn(
                             "text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black",
-                            scan.result_tier === 'safe' ? "border-[#1C75E8] text-[#1C75E8]" : "border-red-500 text-red-500"
+                            scan.result_tier === 'safe' ? "border-[#60A5FA] text-[#60A5FA]" : "border-red-500 text-red-500"
                           )}>
                             {scan.result_tier}
                           </Badge>

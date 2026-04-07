@@ -106,9 +106,9 @@ function CopyButton({ text }: { text: string }) {
         setCopied(true)
         setTimeout(() => setCopied(false), 2000)
       }}
-      className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-[#1C75E8] transition-colors uppercase tracking-widest"
+      className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 hover:text-[#60A5FA] transition-colors uppercase tracking-widest"
     >
-      {copied ? <Check size={11} className="text-blue-500" /> : <Copy size={11} />}
+      {copied ? <Check size={11} className="text-blue-400" /> : <Copy size={11} />}
       {copied ? 'Copied!' : 'Copy'}
     </button>
   )
@@ -222,7 +222,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.98 }}
         onClick={explain}
-        className="w-full flex items-center justify-center gap-3 py-4 px-5 bg-gradient-to-r from-[#1C75E8] to-[#1e8259] text-white rounded-2xl shadow-lg shadow-green-900/20 font-bold text-sm tracking-tight"
+        className="w-full flex items-center justify-center gap-3 py-4 px-5 bg-gradient-to-r from-[#60A5FA] to-[#1e8259] text-white rounded-2xl shadow-lg shadow-green-900/20 font-bold text-sm tracking-tight"
       >
         <Sparkles size={18} className="text-[#F5A623]" />
         Explain with AI
@@ -240,7 +240,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
       className="rounded-3xl border border-slate-100 bg-white shadow-lg overflow-hidden"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-[#1C75E8] to-[#1e8259] text-white">
+      <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-[#60A5FA] to-[#1e8259] text-white">
         <div className="flex items-center gap-2">
           <Sparkles size={16} className="text-[#F5A623]" />
           <p className="font-black text-sm tracking-tight">AI Explanation</p>
@@ -271,7 +271,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
               {/* Loading state */}
               {phase === 'loading' && (
                 <div className="flex items-center gap-3 py-4">
-                  <Loader2 size={20} className="animate-spin text-[#1C75E8]" />
+                  <Loader2 size={20} className="animate-spin text-[#60A5FA]" />
                   <p className="text-sm text-slate-500 font-medium">Analyzing your scan results…</p>
                 </div>
               )}
@@ -292,7 +292,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
                     onClick={explain}
                     variant="outline"
                     size="sm"
-                    className="text-[#1C75E8] border-[#1C75E8]/30 font-bold rounded-xl"
+                    className="text-[#60A5FA] border-[#60A5FA]/30 font-bold rounded-xl"
                   >
                     <RefreshCw size={13} className="mr-1.5" /> Retry
                   </Button>
@@ -306,7 +306,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
                   <div className="prose prose-sm prose-slate max-w-none text-slate-700 [&>p]:mb-2 [&>ul]:mb-2 [&>ul>li]:mb-1 [&_strong]:text-slate-900 [&_strong]:font-bold">
                     <ReactMarkdown>{explanation}</ReactMarkdown>
                     {phase === 'streaming' && (
-                      <span className="inline-block w-1 h-4 bg-[#1C75E8] ml-0.5 animate-pulse rounded-sm align-text-bottom" />
+                      <span className="inline-block w-1 h-4 bg-[#60A5FA] ml-0.5 animate-pulse rounded-sm align-text-bottom" />
                     )}
                   </div>
 
@@ -325,7 +325,7 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
                           <span
                             className={`inline-block px-3 py-2 rounded-xl max-w-[85%] ${
                               msg.role === 'user'
-                                ? 'bg-[#1C75E8] text-white font-medium'
+                                ? 'bg-[#60A5FA] text-white font-medium'
                                 : 'bg-slate-100 text-slate-700'
                             }`}
                           >
@@ -355,12 +355,12 @@ export default function ExplainWithAI(props: ExplainWithAIProps) {
                         onKeyDown={(e) => e.key === 'Enter' && sendFollowUp()}
                         placeholder="Ask a follow-up question…"
                         disabled={followUpLoading}
-                        className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#1C75E8] bg-slate-50 placeholder:text-slate-300 disabled:opacity-50"
+                        className="flex-1 text-xs px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-[#60A5FA] bg-slate-50 placeholder:text-slate-300 disabled:opacity-50"
                       />
                       <button
                         onClick={sendFollowUp}
                         disabled={!followUp.trim() || followUpLoading}
-                        className="px-3 py-2 bg-[#1C75E8] disabled:bg-slate-200 text-white text-xs font-bold rounded-xl transition-colors"
+                        className="px-3 py-2 bg-[#60A5FA] disabled:bg-slate-200 text-white text-xs font-bold rounded-xl transition-colors"
                       >
                         {followUpLoading ? <Loader2 size={13} className="animate-spin" /> : 'Ask'}
                       </button>

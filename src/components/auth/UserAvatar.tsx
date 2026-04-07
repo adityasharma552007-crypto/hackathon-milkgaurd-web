@@ -16,7 +16,7 @@ export function UserAvatar({ avatarUrl, name, size = 40, className = '' }: UserA
 
   return (
     <div 
-      className={`relative rounded-full overflow-hidden flex items-center justify-center bg-[#1C75E8] text-white font-bold shrink-0 ${className}`}
+      className={`relative rounded-full overflow-hidden flex items-center justify-center bg-[#60A5FA] text-white font-bold shrink-0 ${className}`}
       style={{ width: size, height: size }}
     >
       {avatarUrl ? (

@@ -72,7 +72,7 @@ export default function ScanPage() {
     <div className="flex flex-col items-center justify-between min-h-screen p-6 py-12 bg-white">
       {/* Top Section */}
       <div className="w-full text-center">
-        <h1 className="text-2xl font-black text-[#1C75E8] uppercase tracking-tighter mb-2">
+        <h1 className="text-2xl font-black text-[#60A5FA] uppercase tracking-tighter mb-2">
           {status === 'idle' ? 'Ready to Scan' : status === 'scanning' ? 'Scanning Milk...' : 'AI Analysis...'}
         </h1>
         <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">
@@ -91,7 +91,7 @@ export default function ScanPage() {
                 animate={{ scale: 1.5, opacity: 0.2 }}
                 exit={{ scale: 2, opacity: 0 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                className="absolute w-full h-full border-4 border-[#1C75E8] rounded-full"
+                className="absolute w-full h-full border-4 border-[#60A5FA] rounded-full"
               />
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -110,7 +110,7 @@ export default function ScanPage() {
           transition={{ duration: 1.5, repeat: Infinity }}
           className={cn(
             "z-10 w-40 h-40 rounded-full flex items-center justify-center shadow-2xl transition-colors duration-500",
-            status === 'error' ? "bg-red-500" : "bg-[#1C75E8]"
+            status === 'error' ? "bg-red-500" : "bg-[#60A5FA]"
           )}
         >
           {status === 'error' ? (
@@ -127,7 +127,7 @@ export default function ScanPage() {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute -bottom-12 font-black text-2xl text-[#1C75E8]"
+            className="absolute -bottom-12 font-black text-2xl text-[#60A5FA]"
           >
             {Math.round(progress)}%
           </motion.div>
@@ -150,7 +150,7 @@ export default function ScanPage() {
           ) : (
             <Button 
               onClick={handleStartScan}
-              className="w-full h-20 bg-[#1C75E8] hover:bg-[#0A4BB5] text-white font-black text-xl rounded-full shadow-2xl shadow-blue-100 uppercase tracking-tighter"
+              className="w-full h-20 bg-[#60A5FA] hover:bg-[#3B82F6] text-white font-black text-xl rounded-full shadow-2xl shadow-blue-100 uppercase tracking-tighter"
             >
               Start Scan
             </Button>
@@ -170,7 +170,7 @@ export default function ScanPage() {
           <div className="space-y-4">
             <Progress value={progress} className="h-3 bg-slate-100" />
             <p className="text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-              <Loader2 size={12} className="animate-spin text-[#1C75E8]" />
+              <Loader2 size={12} className="animate-spin text-[#60A5FA]" />
               {status === 'scanning' ? 'Connecting to spectral pod...' : 'AI computing adulterants...'}
             </p>
           </div>
@@ -178,11 +178,11 @@ export default function ScanPage() {
 
         <div className="flex items-center justify-center gap-6 text-slate-400">
            <div className="flex items-center gap-1">
-             <CheckCircle2 size={14} className="text-[#1C75E8]" />
+             <CheckCircle2 size={14} className="text-[#60A5FA]" />
              <span className="text-[10px] font-bold uppercase tracking-wider italic">FSSAI Compliant</span>
            </div>
            <div className="flex items-center gap-1">
-             <CheckCircle2 size={14} className="text-[#1C75E8]" />
+             <CheckCircle2 size={14} className="text-[#60A5FA]" />
              <span className="text-[10px] font-bold uppercase tracking-wider italic">Cloud Verified</span>
            </div>
         </div>

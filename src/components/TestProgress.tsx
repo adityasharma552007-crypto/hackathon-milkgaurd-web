@@ -27,7 +27,7 @@ function ProgressRing({ progress, size = 160 }: { progress: number; size?: numbe
       <motion.circle
         cx={size / 2} cy={size / 2} r={radius}
         fill="none" strokeWidth={12} strokeLinecap="round"
-        stroke="#1C75E8"
+        stroke="#60A5FA"
         strokeDasharray={circumference}
         initial={{ strokeDashoffset: circumference }}
         animate={{ strokeDashoffset: offset }}
@@ -59,7 +59,7 @@ function AdulterantBar({ cfg, value }: { cfg: typeof ADULTERANTS[number]; value:
         <span className="text-[10px] font-black text-slate-600 uppercase tracking-wider">
           {cfg.label}
         </span>
-        <span className={`text-[10px] font-black ${isDanger ? 'text-red-500' : 'text-blue-600'}`}>
+        <span className={`text-[10px] font-black ${isDanger ? 'text-red-500' : 'text-blue-400'}`}>
           {value.toFixed(2)}%{isDanger && ' ⚠'}
         </span>
       </div>
@@ -97,7 +97,7 @@ export function TestProgress() {
       className="bg-white rounded-3xl border border-slate-100 shadow-lg overflow-hidden"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#1C75E8] to-[#1e8259] px-5 py-4 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-[#60A5FA] to-[#1e8259] px-5 py-4 flex items-center justify-between">
         <div>
           <p className="text-white font-black text-sm tracking-tight">Live Test</p>
           <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">
@@ -120,7 +120,7 @@ export function TestProgress() {
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {testPhase === 'running' ? (
                 <>
-                  <span className="text-3xl font-black text-[#1C75E8] leading-none">
+                  <span className="text-3xl font-black text-[#60A5FA] leading-none">
                     {Math.round(progress)}%
                   </span>
                   <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">
@@ -128,7 +128,7 @@ export function TestProgress() {
                   </span>
                 </>
               ) : (
-                <Loader2 size={28} className="animate-spin text-[#1C75E8]" />
+                <Loader2 size={28} className="animate-spin text-[#60A5FA]" />
               )}
             </div>
           </div>

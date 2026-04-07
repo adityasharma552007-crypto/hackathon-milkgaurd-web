@@ -92,7 +92,7 @@ export default function LoginPage() {
           <div className="w-20 h-20 mb-4 relative overflow-hidden">
              <Image src="/logo.png" alt="MilkGuard Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
           </div>
-          <h2 className="text-2xl font-bold text-[#1C75E8] mb-8">MilkGuard</h2>
+          <h2 className="text-2xl font-bold text-[#60A5FA] mb-8">MilkGuard</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
             <div className="space-y-1">
@@ -129,7 +129,7 @@ export default function LoginPage() {
             </div>
 
             <div className="text-right">
-              <Link href="#" className="text-xs font-semibold text-[#1C75E8] hover:underline">
+              <Link href="#" className="text-xs font-semibold text-[#60A5FA] hover:underline">
                 Forgot password?
               </Link>
             </div>
@@ -171,7 +171,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-slate-500 pt-4">
               Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-[#1C75E8] font-bold hover:underline">
+              <Link href="/auth/signup" className="text-[#60A5FA] font-bold hover:underline">
                 Sign up
               </Link>
             </p>

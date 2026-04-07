@@ -145,9 +145,9 @@ export default function HardwarePage() {
       <header className="px-5 pt-12 pb-4 bg-white">
         <div className="flex items-center justify-between mb-1">
           <Link href="/home" className="p-2 bg-slate-100 rounded-full">
-            <ChevronLeft size={20} className="text-[#1C75E8]" />
+            <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
-          <h1 className="text-xl font-black text-[#1C75E8] uppercase tracking-tighter">Device</h1>
+          <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Device</h1>
           <ConnectionStatus showLabel={false} />
         </div>
 
@@ -163,7 +163,7 @@ export default function HardwarePage() {
               onClick={() => setTab(t.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${
                 tab === t.id
-                  ? 'bg-white text-[#1C75E8] shadow-sm'
+                  ? 'bg-white text-[#60A5FA] shadow-sm'
                   : 'text-slate-400 hover:text-slate-600'
               }`}
             >
@@ -201,7 +201,7 @@ export default function HardwarePage() {
                   </div>
                   <button
                     onClick={() => setTab('scanner')}
-                    className="flex items-center gap-2 px-5 py-3 bg-[#1C75E8] text-white text-sm font-black rounded-2xl hover:bg-[#0A4BB5] transition-colors"
+                    className="flex items-center gap-2 px-5 py-3 bg-[#60A5FA] text-white text-sm font-black rounded-2xl hover:bg-[#3B82F6] transition-colors"
                   >
                     <ScanLine size={15} /> Scan for Devices
                   </button>
@@ -212,7 +212,7 @@ export default function HardwarePage() {
                   <div className="rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                     {/* Coloured header */}
                     <div className={`px-5 py-4 flex items-center justify-between ${
-                      isConnected ? 'bg-[#1C75E8]' : 'bg-slate-700'
+                      isConnected ? 'bg-[#60A5FA]' : 'bg-slate-700'
                     }`}>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -252,7 +252,7 @@ export default function HardwarePage() {
                       whileTap={{ scale: 0.97 }}
                       onClick={startTest}
                       disabled={!isConnected}
-                      className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#1C75E8] disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-2xl font-black text-base tracking-tight hover:bg-[#0A4BB5] transition-colors shadow-lg shadow-green-900/20"
+                      className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#60A5FA] disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-2xl font-black text-base tracking-tight hover:bg-[#3B82F6] transition-colors shadow-lg shadow-green-900/20"
                     >
                       {isConnecting ? (
                         <><Loader2 size={20} className="animate-spin" /> Connecting…</>
@@ -303,7 +303,7 @@ export default function HardwarePage() {
               <button
                 onClick={scanNetwork}
                 disabled={scanLoading}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-[#1C75E8]/30 text-[#1C75E8] font-black text-sm hover:bg-[#1C75E8]/5 transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-dashed border-[#60A5FA]/30 text-[#60A5FA] font-black text-sm hover:bg-[#60A5FA]/5 transition-colors disabled:opacity-60"
               >
                 {scanLoading ? (
                   <><Loader2 size={16} className="animate-spin" /> Scanning {settings.prefix}.{settings.start}–{settings.end}…</>
@@ -322,7 +322,7 @@ export default function HardwarePage() {
               {/* Hint */}
               <div className="flex items-start gap-2 bg-blue-50 px-3 py-2 rounded-xl">
                 <Info size={14} className="text-blue-400 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-blue-600 font-medium leading-relaxed">
+                <p className="text-[10px] text-blue-400 font-medium leading-relaxed">
                   Your ESP device and this phone must be on the same Wi-Fi network.
                   Scanning range: <strong>{settings.prefix}.{settings.start}–{settings.end}</strong>
                 </p>
@@ -382,7 +382,7 @@ export default function HardwarePage() {
                   value={settings.prefix}
                   onChange={(e) => settings.setPrefix(e.target.value)}
                   placeholder="192.168.1"
-                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#1C75E8]"
+                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
                 />
                 <p className="text-[10px] text-slate-400">e.g. 192.168.1 or 192.168.0</p>
               </div>
@@ -397,7 +397,7 @@ export default function HardwarePage() {
                     type="number" min={1} max={254}
                     value={settings.start}
                     onChange={(e) => settings.setStart(Number(e.target.value))}
-                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#1C75E8]"
+                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
                   />
                 </div>
                 <div className="space-y-1">
@@ -408,7 +408,7 @@ export default function HardwarePage() {
                     type="number" min={1} max={254}
                     value={settings.end}
                     onChange={(e) => settings.setEnd(Number(e.target.value))}
-                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#1C75E8]"
+                    className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
                   />
                 </div>
               </div>
@@ -423,14 +423,14 @@ export default function HardwarePage() {
                   value={settings.port}
                   onChange={(e) => settings.setPort(Number(e.target.value))}
                   placeholder="8080"
-                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#1C75E8]"
+                  className="w-full h-11 bg-slate-50 border border-slate-200 rounded-xl px-3 text-sm font-bold focus:outline-none focus:border-[#60A5FA]"
                 />
               </div>
 
               {/* Save */}
               <button
                 onClick={() => { settings.save(); setTab('scanner') }}
-                className="w-full py-3 bg-[#1C75E8] text-white rounded-xl font-black text-sm hover:bg-[#0A4BB5] transition-colors"
+                className="w-full py-3 bg-[#60A5FA] text-white rounded-xl font-black text-sm hover:bg-[#3B82F6] transition-colors"
               >
                 Save & Scan
               </button>
@@ -456,9 +456,9 @@ export default function HardwarePage() {
               </div>
 
               {/* Demo mode info */}
-              <div className="flex items-start gap-2 bg-[#1C75E8]/5 px-3 py-2.5 rounded-xl">
-                <Zap size={14} className="text-[#1C75E8] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#1C75E8] font-medium leading-relaxed">
+              <div className="flex items-start gap-2 bg-[#60A5FA]/5 px-3 py-2.5 rounded-xl">
+                <Zap size={14} className="text-[#60A5FA] shrink-0 mt-0.5" />
+                <p className="text-[10px] text-[#60A5FA] font-medium leading-relaxed">
                   <strong>No device yet?</strong> The scan will still show the UI. Connect a real ESP or add a demo device via the scanner to preview the test flow.
                 </p>
               </div>

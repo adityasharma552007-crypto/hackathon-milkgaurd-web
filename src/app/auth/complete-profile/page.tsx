@@ -100,7 +100,7 @@ export default function CompleteProfilePage() {
   if (isInitializing) {
     return (
       <div className="min-h-screen bg-[#F7F9F8] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#1C75E8]" size={32} />
+        <Loader2 className="animate-spin text-[#60A5FA]" size={32} />
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function CompleteProfilePage() {
     <div className="min-h-screen bg-[#F7F9F8] flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-[500px] border-none shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardHeader className="text-center pb-2">
-          <CardTitle className="text-2xl font-bold text-[#1C75E8]">Complete Your Profile</CardTitle>
+          <CardTitle className="text-2xl font-bold text-[#60A5FA]">Complete Your Profile</CardTitle>
           <CardDescription>We just need a few more details to set up your account.</CardDescription>
         </CardHeader>
         <CardContent className="p-8 pt-4 flex flex-col items-center">
@@ -179,7 +179,7 @@ export default function CompleteProfilePage() {
 
             <Button
               type="submit"
-              className="w-full h-14 bg-[#1C75E8] hover:bg-[#0A4BB5] text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-blue-100 mt-6"
+              className="w-full h-14 bg-[#60A5FA] hover:bg-[#3B82F6] text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-blue-100 mt-6"
               disabled={isLoading}
             >
               {isLoading ? <Loader2 className="animate-spin" /> : 'Complete Profile'}

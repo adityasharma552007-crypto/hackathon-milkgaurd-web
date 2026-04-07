@@ -104,14 +104,14 @@ export default function SignupPage() {
     <div className="min-h-screen bg-[#F7F9F8] flex flex-col items-center justify-center p-4 py-12">
       <Card className="w-full max-w-[400px] border-none shadow-sm rounded-2xl overflow-hidden bg-white">
         <CardContent className="p-8 flex flex-col items-center">
-          <Link href="/auth/login" className="self-start text-slate-400 mb-4 hover:text-[#1C75E8]">
+          <Link href="/auth/login" className="self-start text-slate-400 mb-4 hover:text-[#60A5FA]">
             <ArrowLeft size={20} />
           </Link>
           
           <div className="w-20 h-20 mb-4 relative overflow-hidden">
              <Image src="/logo.png" alt="MilkGuard Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
           </div>
-          <h2 className="text-2xl font-bold text-[#1C75E8] mb-8">Create Account</h2>
+          <h2 className="text-2xl font-bold text-[#60A5FA] mb-8">Create Account</h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
             <div className="space-y-1">
@@ -238,7 +238,7 @@ export default function SignupPage() {
 
             <p className="text-center text-sm text-slate-500 pt-4">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-[#1C75E8] font-bold hover:underline">
+              <Link href="/auth/login" className="text-[#60A5FA] font-bold hover:underline">
                 Sign in
               </Link>
             </p>

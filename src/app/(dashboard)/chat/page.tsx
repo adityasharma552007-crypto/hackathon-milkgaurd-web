@@ -89,7 +89,7 @@ function CopyButton({ text }: { text: string }) {
       className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-slate-200"
       title="Copy"
     >
-      {copied ? <Check size={11} className="text-blue-500" /> : <Copy size={11} className="text-slate-400" />}
+      {copied ? <Check size={11} className="text-blue-400" /> : <Copy size={11} className="text-slate-400" />}
     </button>
   )
 }
@@ -101,7 +101,7 @@ function TypingDots() {
       {[0, 1, 2].map(i => (
         <motion.div
           key={i}
-          className="w-2 h-2 rounded-full bg-[#1C75E8]"
+          className="w-2 h-2 rounded-full bg-[#60A5FA]"
           animate={{ y: [0, -5, 0], opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 0.9, repeat: Infinity, delay: i * 0.2 }}
         />
@@ -121,14 +121,14 @@ function Bubble({ msg, onRetry }: { msg: Message; onRetry?: () => void }) {
       className={`flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'} group`}
     >
       {!isUser && (
-        <div className="w-7 h-7 rounded-full bg-[#1C75E8] flex items-center justify-center shrink-0 mb-1">
+        <div className="w-7 h-7 rounded-full bg-[#60A5FA] flex items-center justify-center shrink-0 mb-1">
           <Bot size={14} className="text-white" />
         </div>
       )}
 
       <div className={`max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
         isUser
-          ? 'bg-[#1C75E8] text-white rounded-br-sm'
+          ? 'bg-[#60A5FA] text-white rounded-br-sm'
           : msg.error
           ? 'bg-red-50 text-red-600 border border-red-100 rounded-bl-sm'
           : 'bg-slate-100 text-slate-800 rounded-bl-sm'
@@ -262,7 +262,7 @@ export default function ChatPage() {
     <div className="flex flex-col h-screen bg-white">
 
       {/* ── Header ── */}
-      <div className="bg-[#1C75E8] text-white px-5 pt-14 pb-5 shrink-0">
+      <div className="bg-[#60A5FA] text-white px-5 pt-14 pb-5 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
@@ -329,7 +329,7 @@ export default function ChatPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center h-full pb-10 text-center"
           >
-            <Loader2 size={28} className="animate-spin text-[#1C75E8]/40 mb-3" />
+            <Loader2 size={28} className="animate-spin text-[#60A5FA]/40 mb-3" />
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Connecting to AI…</p>
           </motion.div>
         )}
@@ -352,7 +352,7 @@ export default function ChatPage() {
             </div>
             <button
               onClick={() => setShowSetupModal(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-[#1C75E8] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#0A4BB5] transition-colors shadow-lg shadow-green-900/20"
+              className="flex items-center gap-2 px-5 py-3 bg-[#60A5FA] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#3B82F6] transition-colors shadow-lg shadow-green-900/20"
             >
               <Sparkles size={15} className="text-[#F5A623]" />
               View Setup Guide
@@ -367,8 +367,8 @@ export default function ChatPage() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center h-full pb-10 text-center"
           >
-            <div className="w-16 h-16 bg-[#1C75E8]/10 rounded-3xl flex items-center justify-center mb-4">
-              <Sparkles size={28} className="text-[#1C75E8]" />
+            <div className="w-16 h-16 bg-[#60A5FA]/10 rounded-3xl flex items-center justify-center mb-4">
+              <Sparkles size={28} className="text-[#60A5FA]" />
             </div>
             <h2 className="font-black text-slate-800 text-lg tracking-tight mb-1">Ask MilkGuard AI</h2>
             <p className="text-slate-400 text-xs font-medium max-w-[240px] leading-relaxed mb-6">
@@ -379,7 +379,7 @@ export default function ChatPage() {
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}
-                  className="w-full text-left text-xs font-medium px-4 py-3 rounded-2xl bg-slate-50 hover:bg-[#1C75E8]/5 border border-slate-100 hover:border-[#1C75E8]/20 text-slate-600 hover:text-[#1C75E8] transition-all"
+                  className="w-full text-left text-xs font-medium px-4 py-3 rounded-2xl bg-slate-50 hover:bg-[#60A5FA]/5 border border-slate-100 hover:border-[#60A5FA]/20 text-slate-600 hover:text-[#60A5FA] transition-all"
                 >
                   {s}
                 </button>
@@ -414,7 +414,7 @@ export default function ChatPage() {
             Setup Groq API Key to enable chat
           </button>
         ) : (
-          <div className="flex items-end gap-2 bg-white rounded-2xl border border-slate-200 px-4 py-2.5 focus-within:border-[#1C75E8] transition-colors shadow-sm">
+          <div className="flex items-end gap-2 bg-white rounded-2xl border border-slate-200 px-4 py-2.5 focus-within:border-[#60A5FA] transition-colors shadow-sm">
             <textarea
               ref={textareaRef}
               rows={1}
@@ -428,7 +428,7 @@ export default function ChatPage() {
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || isChecking || isDisabled}
-              className="w-9 h-9 bg-[#1C75E8] disabled:bg-slate-200 text-white rounded-xl flex items-center justify-center shrink-0 transition-all hover:bg-[#0A4BB5] active:scale-95"
+              className="w-9 h-9 bg-[#60A5FA] disabled:bg-slate-200 text-white rounded-xl flex items-center justify-center shrink-0 transition-all hover:bg-[#3B82F6] active:scale-95"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             </button>

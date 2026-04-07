@@ -52,3 +52,5 @@ ios/build/
 /tmp/
 .gemini/
 /brain/
+client_secret.json
+*.json
