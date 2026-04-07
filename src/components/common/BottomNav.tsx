@@ -39,12 +39,12 @@ export function BottomNav() {
               href={tab.href}
               className={cn(
                 "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300",
-                isActive ? "text-[#1A6B4A]" : "text-slate-400 hover:text-slate-600"
+                isActive ? "text-[#1C75E8]" : "text-slate-400 hover:text-slate-600"
               )}
             >
               <div className={cn(
                 "p-2 rounded-xl transition-all duration-300",
-                isActive ? "bg-[#1A6B4A]/10 scale-110" : "bg-transparent"
+                isActive ? "bg-[#1C75E8]/10 scale-110" : "bg-transparent"
               )}>
                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
               </div>

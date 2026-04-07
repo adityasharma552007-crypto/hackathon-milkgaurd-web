@@ -68,8 +68,9 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // 2. Auth pages — if already logged in, go to /home
-  if (isAuthPage && user) {
+  // 2. Auth pages — if already logged in, go to /home (except profile completion)
+  const isProfileCompletion = pathname === '/auth/complete-profile';
+  if (isAuthPage && user && !isProfileCompletion) {
     return NextResponse.redirect(new URL('/home', request.url))
   }
 

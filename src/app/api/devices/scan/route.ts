@@ -13,6 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
 
 const DEFAULT_PREFIX  = process.env.NEXT_PUBLIC_DEVICE_IP_PREFIX ?? '192.168.1'
 const DEFAULT_PORT    = Number(process.env.NEXT_PUBLIC_DEVICE_PORT ?? 8080)
@@ -20,6 +21,13 @@ const DEFAULT_TIMEOUT = Number(process.env.NEXT_PUBLIC_DEVICE_TIMEOUT_MS ?? 2500
 const CONCURRENCY     = 20   // IPs probed simultaneously
 
 export async function GET(req: NextRequest) {
+  // Check rate limit FIRST
+  const rateLimitCheck = await checkAndLogRateLimit('/api/devices/scan', req)
+
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response
+  }
+
   const { searchParams } = req.nextUrl
   const prefix  = searchParams.get('prefix') ?? DEFAULT_PREFIX
   const start   = Math.max(1,   Number(searchParams.get('start')  ?? 1))
@@ -28,7 +36,13 @@ export async function GET(req: NextRequest) {
   const timeout = DEFAULT_TIMEOUT
 
   if (start > end) {
-    return NextResponse.json({ error: 'start must be ≤ end' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'start must be ≤ end' },
+      {
+        status: 400,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
   }
 
   // Build the list of IPs to probe
@@ -64,5 +78,14 @@ export async function GET(req: NextRequest) {
     found.push(...results.filter(Boolean))
   }
 
-  return NextResponse.json({ devices: found, scanned: ips.length })
+  return NextResponse.json(
+    {
+      devices: found,
+      scanned: ips.length,
+      remaining: rateLimitCheck.remaining
+    },
+    {
+      headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+    }
+  )
 }

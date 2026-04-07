@@ -121,9 +121,9 @@ function CopyBtn({ text, label = 'Copy' }: { text: string; label?: string }) {
   return (
     <button
       onClick={copy}
-      className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-[#1A6B4A]/40 hover:text-[#1A6B4A] transition-all text-slate-500 shadow-sm"
+      className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-[#1C75E8]/40 hover:text-[#1C75E8] transition-all text-slate-500 shadow-sm"
     >
-      {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
+      {copied ? <Check size={12} className="text-blue-500" /> : <Copy size={12} />}
       {copied ? 'Copied!' : label}
     </button>
   )
@@ -148,7 +148,7 @@ function StepCard({
     >
       {/* Timeline */}
       <div className="flex flex-col items-center shrink-0">
-        <div className="w-8 h-8 rounded-full bg-[#1A6B4A]/10 border-2 border-[#1A6B4A]/20 flex items-center justify-center text-base">
+        <div className="w-8 h-8 rounded-full bg-[#1C75E8]/10 border-2 border-[#1C75E8]/20 flex items-center justify-center text-base">
           {step.icon}
         </div>
         {index < total - 1 && <div className="w-px flex-1 bg-slate-200 mt-1 mb-1 min-h-[16px]" />}
@@ -157,7 +157,7 @@ function StepCard({
       {/* Content */}
       <div className="pb-4 flex-1 min-w-0">
         <p className="text-sm font-black text-slate-800 tracking-tight">
-          <span className="text-[#1A6B4A] mr-1">Step {step.number}.</span>
+          <span className="text-[#1C75E8] mr-1">Step {step.number}.</span>
           {step.title}
         </p>
         <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{step.description}</p>
@@ -167,7 +167,7 @@ function StepCard({
             href={step.action.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#1A6B4A] px-3 py-1.5 rounded-lg hover:bg-[#145339] transition-colors"
+            className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#1C75E8] px-3 py-1.5 rounded-lg hover:bg-[#0A4BB5] transition-colors"
           >
             {step.action.label}
             {step.action.external && <ExternalLink size={11} />}
@@ -240,14 +240,14 @@ export default function GroqSetupGuide({
 
       {/* ── Feature callout ── */}
       <div className="px-5 pt-4 pb-2 flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1A6B4A] to-[#27ae70] flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#1C75E8] to-[#27ae70] flex items-center justify-center shrink-0">
           <Sparkles size={15} className="text-[#F5A623]" />
         </div>
         <div>
           <p className="text-xs font-black text-slate-800 tracking-tight">Why do we need this?</p>
           <p className="text-[11px] text-slate-400 leading-snug">
             Groq powers real-time AI explanations of your milk scan results. It's{' '}
-            <span className="font-bold text-[#1A6B4A]">free to use</span> — no credit card required.
+            <span className="font-bold text-[#1C75E8]">free to use</span> — no credit card required.
           </p>
         </div>
       </div>
@@ -285,7 +285,7 @@ export default function GroqSetupGuide({
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={onRecheck}
-            className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-[#1A6B4A] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#145339] transition-colors shadow-lg shadow-green-900/20"
+            className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-[#1C75E8] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#0A4BB5] transition-colors shadow-lg shadow-green-900/20"
           >
             <RefreshCw size={15} />
             I've set it up — check again

@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk'
 import { NextRequest } from 'next/server'
+import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
 
 const SYSTEM_PROMPT = `You are a helpful AI assistant for MilkGuard, a milk adulteration detection app.
 Explain test results in simple, non-technical language for milk vendors and consumers.
@@ -15,6 +16,13 @@ const groq = new Groq({
 })
 
 export async function POST(req: NextRequest) {
+  // Check rate limit FIRST
+  const rateLimitCheck = await checkAndLogRateLimit('/api/chat', req)
+
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response
+  }
+
   // Check API key — also catch the placeholder value
   const apiKey = process.env.GROQ_API_KEY
   const isPlaceholder = !apiKey || apiKey === 'your_groq_api_key_here' || apiKey.startsWith('your_')
@@ -28,7 +36,13 @@ export async function POST(req: NextRequest) {
           '3. Add it to your .env.local file:\n   GROQ_API_KEY=gsk_your_actual_key_here\n' +
           '4. Restart the dev server',
       }),
-      { status: 503, headers: { 'Content-Type': 'application/json' } }
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'application/json',
+          ...getRateLimitHeaders(rateLimitCheck)
+        }
+      }
     )
   }
 
@@ -96,6 +110,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
+        ...getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
       },
     })
   } catch (err: any) {
@@ -109,7 +124,10 @@ export async function POST(req: NextRequest) {
 
     return new Response(JSON.stringify({ error: message }), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      },
     })
   }
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -33,7 +34,7 @@ export default function LandingClient() {
       <section
         style={{
           minHeight: '100vh',
-          background: 'linear-gradient(160deg, #1A6B4A 0%, #134f37 100%)',
+          background: 'linear-gradient(160deg, #1C75E8 0%, #0A4BB5 100%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -52,7 +53,7 @@ export default function LandingClient() {
             width: 280,
             height: 280,
             borderRadius: '50%',
-            background: 'rgba(46,204,138,0.07)',
+            background: 'rgba(28,117,232,0.1)',
             pointerEvents: 'none',
           }}
         />
@@ -85,12 +86,13 @@ export default function LandingClient() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 42,
             marginBottom: 28,
             boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
-          🥛
+          <Image src="/logo.png" alt="MilkGuard Logo" width={88} height={88} style={{ objectFit: 'contain' }} priority />
         </motion.div>
 
         {/* App name */}
@@ -119,7 +121,7 @@ export default function LandingClient() {
           animate="visible"
           variants={fadeUp}
           style={{
-            color: '#2ECC8A',
+            color: '#65A4FF',
             fontSize: 17,
             fontWeight: 500,
             margin: 0,
@@ -194,7 +196,7 @@ export default function LandingClient() {
           <button
             onClick={goToLogin}
             style={{
-              color: '#2ECC8A',
+              color: '#65A4FF',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
@@ -267,8 +269,8 @@ export default function LandingClient() {
           {[
             {
               icon: '🔬',
-              iconBg: '#E8F5EF',
-              iconColor: '#1A6B4A',
+              iconBg: '#EAF2FF',
+              iconColor: '#1C75E8',
               title: 'Contactless Detection',
               desc: 'NIR spectral analysis reads through the container — no touching, no contamination.',
               delay: 0,
@@ -283,8 +285,8 @@ export default function LandingClient() {
             },
             {
               icon: '🛡️',
-              iconBg: '#E8F5EF',
-              iconColor: '#1A6B4A',
+              iconBg: '#EAF2FF',
+              iconColor: '#1C75E8',
               title: 'FSSAI Certified Standards',
               desc: 'Every result compared against official FSSAI 2025-26 safety limits.',
               delay: 0.16,
@@ -355,7 +357,7 @@ export default function LandingClient() {
       {/* ── STATS SECTION ── */}
       <section
         style={{
-          background: 'linear-gradient(135deg, #1A6B4A 0%, #145c3d 100%)',
+          background: 'linear-gradient(135deg, #1C75E8 0%, #0A4BB5 100%)',
           padding: '44px 24px',
         }}
       >
@@ -399,7 +401,7 @@ export default function LandingClient() {
                     margin: 0,
                     marginTop: 4,
                     fontSize: 11,
-                    color: '#2ECC8A',
+                    color: '#65A4FF',
                     textAlign: 'center',
                     whiteSpace: 'pre-line',
                     lineHeight: 1.45,
@@ -455,14 +457,14 @@ export default function LandingClient() {
             {[
               {
                 num: '1',
-                numBg: '#1A6B4A',
+                numBg: '#1C75E8',
                 title: 'Pour a small sample',
                 desc: 'Just 20ml of milk into the transparent cup provided.',
                 delay: 0,
               },
               {
                 num: '2',
-                numBg: '#1A6B4A',
+                numBg: '#1C75E8',
                 title: 'Place in the Pod cradle',
                 desc: 'Set the cup next to the MilkGuard Pod sensor.',
                 delay: 0.1,
@@ -540,7 +542,7 @@ export default function LandingClient() {
       {/* ── BOTTOM CTA SECTION ── */}
       <section
         style={{
-          background: 'linear-gradient(160deg, #1A6B4A 0%, #134f37 100%)',
+          background: 'linear-gradient(160deg, #1C75E8 0%, #0A4BB5 100%)',
           padding: '56px 32px',
           textAlign: 'center',
           position: 'relative',
@@ -632,7 +634,7 @@ export default function LandingClient() {
       {/* ── FOOTER ── */}
       <footer
         style={{
-          backgroundColor: '#0F4A33',
+          backgroundColor: '#073380',
           padding: '28px 24px',
           textAlign: 'center',
         }}

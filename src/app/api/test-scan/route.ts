@@ -1,12 +1,26 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { checkAndLogRateLimit, getRateLimitHeaders } from "@/lib/supabase/protectedRoute"
 
 export async function GET() {
+  // Check rate limit FIRST
+  const rateLimitCheck = await checkAndLogRateLimit('/api/test/start')
+
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response
+  }
+
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+    return NextResponse.json(
+      { error: "Not authenticated" },
+      {
+        status: 401,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
   }
 
   const testWavelengths = [
@@ -33,9 +47,23 @@ export async function GET() {
 
   if (!res.ok) {
     const err = await res.json()
-    return NextResponse.json(err, { status: res.status })
+    return NextResponse.json(
+      err,
+      {
+        status: res.status,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
   }
 
   const data = await res.json()
-  return NextResponse.json(data)
+  return NextResponse.json(
+    {
+      ...data,
+      remaining: rateLimitCheck.remaining
+    },
+    {
+      headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+    }
+  )
 }

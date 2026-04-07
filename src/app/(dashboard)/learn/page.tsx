@@ -108,7 +108,7 @@ export default function LearnPage() {
   return (
     <div className="min-h-screen bg-[#F7F9F8] pb-32">
       {/* Header */}
-      <div className="bg-[#1A6B4A] text-white p-6 pt-12 pb-16 relative overflow-hidden">
+      <div className="bg-[#1C75E8] text-white p-6 pt-12 pb-16 relative overflow-hidden">
         <h1 className="text-2xl font-black uppercase tracking-tighter mb-2">EduGuard</h1>
         <p className="text-sm font-medium opacity-90">Your sanctuary for milk purity knowledge.</p>
         <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-white/10 rounded-full blur-[60px]" />
@@ -116,7 +116,7 @@ export default function LearnPage() {
 
       <main className="p-4 -mt-8 relative z-10 space-y-8">
         {/* Featured Fact Card */}
-        <Card className="rounded-3xl border-none shadow-xl bg-gradient-to-br from-[#1A6B4A] to-green-800 text-white overflow-hidden relative">
+        <Card className="rounded-3xl border-none shadow-xl bg-gradient-to-br from-[#1C75E8] to-green-800 text-white overflow-hidden relative">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4 opacity-80">
               <Info size={16} />
@@ -171,7 +171,7 @@ export default function LearnPage() {
                   <div className="mt-8 space-y-6">
                     <div>
                       <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <Info size={14} className="text-[#1A6B4A]" /> What it is
+                        <Info size={14} className="text-[#1C75E8]" /> What it is
                       </h4>
                       <p className="text-sm font-medium text-slate-700">{adulterant.what}</p>
                     </div>
@@ -187,11 +187,11 @@ export default function LearnPage() {
                       </h4>
                       <p className="text-sm font-medium text-slate-700">{adulterant.health}</p>
                     </div>
-                    <div className="bg-[#F8FBF9] p-4 rounded-2xl border border-green-100">
+                    <div className="bg-[#F8FBF9] p-4 rounded-2xl border border-blue-100">
                       <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <Shield size={14} className="text-[#1A6B4A]" /> FSSAI Safe Limit
+                        <Shield size={14} className="text-[#1C75E8]" /> FSSAI Safe Limit
                       </h4>
-                      <p className="text-sm font-bold text-[#1A6B4A]">{adulterant.fssai}</p>
+                      <p className="text-sm font-bold text-[#1C75E8]">{adulterant.fssai}</p>
                     </div>
                   </div>
                 </SheetContent>
@@ -214,7 +214,7 @@ export default function LearnPage() {
                   <SheetTrigger asChild>
                     <Card className="rounded-2xl border-none shadow-sm cursor-pointer hover:bg-slate-50 transition-colors">
                       <CardContent className="p-4 flex flex-col items-center text-center">
-                        <div className="w-12 h-12 bg-[#F8FBF9] rounded-xl flex items-center justify-center text-[#1A6B4A] mb-3">
+                        <div className="w-12 h-12 bg-[#F8FBF9] rounded-xl flex items-center justify-center text-[#1C75E8] mb-3">
                           <Icon size={24} />
                         </div>
                         <h3 className="font-bold text-sm text-slate-800 mb-1 leading-tight">{test.name}</h3>
@@ -227,7 +227,7 @@ export default function LearnPage() {
                   </SheetTrigger>
                   <SheetContent side="bottom" className="rounded-t-[2rem] max-h-[90vh] pb-10">
                      <SheetHeader className="text-center mt-2">
-                       <div className="w-16 h-16 bg-[#F8FBF9] rounded-2xl flex items-center justify-center text-[#1A6B4A] mx-auto mb-4">
+                       <div className="w-16 h-16 bg-[#F8FBF9] rounded-2xl flex items-center justify-center text-[#1C75E8] mx-auto mb-4">
                          <Icon size={32} />
                        </div>
                        <SheetTitle className="text-2xl font-black">{test.name}</SheetTitle>
@@ -239,7 +239,7 @@ export default function LearnPage() {
                        <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b pb-2">Step by Step Guide</h4>
                        {test.steps.map((step, idx) => (
                          <div key={idx} className="flex gap-4">
-                           <div className="w-6 h-6 rounded-full bg-[#1A6B4A] text-white flex items-center justify-center text-xs font-black shrink-0">
+                           <div className="w-6 h-6 rounded-full bg-[#1C75E8] text-white flex items-center justify-center text-xs font-black shrink-0">
                              {idx + 1}
                            </div>
                            <p className="text-sm font-medium text-slate-700 pt-0.5 leading-relaxed">{step}</p>
@@ -275,7 +275,7 @@ export default function LearnPage() {
                         <Badge variant="secondary" className={`border-none text-[10px] px-2 py-0 ${
                           std.risk === 'Severe' ? 'bg-red-50 text-red-600' :
                           std.risk === 'High' ? 'bg-amber-50 text-amber-600' :
-                          'bg-green-50 text-[#1A6B4A]'
+                          'bg-blue-50 text-[#1C75E8]'
                         }`}>
                           {std.risk}
                         </Badge>

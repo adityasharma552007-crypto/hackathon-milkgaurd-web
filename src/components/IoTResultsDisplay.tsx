@@ -27,7 +27,7 @@ function getTier(score: number): 'safe' | 'warning' | 'danger' | 'hazard' {
 }
 
 const TIER_CONFIG = {
-  safe:    { label: 'Safe',    bg: 'bg-green-500',  ring: 'ring-green-200',  text: 'text-green-700',  light: 'bg-green-50',  icon: <Shield    size={32} className="text-white" /> },
+  safe:    { label: 'Safe',    bg: 'bg-blue-500',  ring: 'ring-green-200',  text: 'text-green-700',  light: 'bg-blue-50',  icon: <Shield    size={32} className="text-white" /> },
   warning: { label: 'Caution', bg: 'bg-amber-500',  ring: 'ring-amber-200',  text: 'text-amber-700',  light: 'bg-amber-50',  icon: <AlertTriangle size={32} className="text-white" /> },
   danger:  { label: 'Danger',  bg: 'bg-red-500',    ring: 'ring-red-200',    text: 'text-red-700',    light: 'bg-red-50',    icon: <XCircle   size={32} className="text-white" /> },
   hazard:  { label: 'Hazard',  bg: 'bg-rose-700',   ring: 'ring-rose-300',   text: 'text-rose-800',   light: 'bg-rose-50',   icon: <Skull     size={32} className="text-white" /> },
@@ -45,13 +45,13 @@ function AdulterantCard({ name, value }: { name: string; value: number }) {
   const cfg      = ADULTERANT_LABELS[name] ?? { label: name, safeLimit: 1, unit: '%' }
   const detected  = value > cfg.safeLimit
   return (
-    <div className={`rounded-2xl p-3 ${detected ? 'bg-red-50 border border-red-100' : 'bg-green-50 border border-green-100'}`}>
+    <div className={`rounded-2xl p-3 ${detected ? 'bg-red-50 border border-red-100' : 'bg-blue-50 border border-blue-100'}`}>
       <p className="text-[9px] font-black uppercase tracking-widest text-slate-500">{cfg.label}</p>
       <p className={`text-xl font-black leading-tight ${detected ? 'text-red-600' : 'text-green-700'}`}>
         {value.toFixed(2)}
         <span className="text-xs ml-0.5">{cfg.unit}</span>
       </p>
-      <p className={`text-[9px] font-bold mt-0.5 ${detected ? 'text-red-500' : 'text-green-600'}`}>
+      <p className={`text-[9px] font-bold mt-0.5 ${detected ? 'text-red-500' : 'text-blue-600'}`}>
         {detected ? '⚠ Detected' : '✓ Clear'}
       </p>
     </div>
@@ -172,7 +172,7 @@ export function IoTResultsDisplay() {
           whileTap={{ scale: 0.97 }}
           onClick={() => handleSave(testResult)}
           disabled={saveState === 'saving'}
-          className="w-full flex items-center justify-center gap-2 py-4 bg-[#1A6B4A] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#145339] transition-colors disabled:opacity-60 shadow-lg shadow-green-900/20"
+          className="w-full flex items-center justify-center gap-2 py-4 bg-[#1C75E8] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#0A4BB5] transition-colors disabled:opacity-60 shadow-lg shadow-green-900/20"
         >
           {saveState === 'saving' ? (
             <><Loader2 size={16} className="animate-spin" /> Saving to Cloud…</>
@@ -185,7 +185,7 @@ export function IoTResultsDisplay() {
       )}
 
       {saveState === 'saved' && (
-        <div className="flex items-center justify-center gap-2 py-3 bg-green-50 rounded-2xl text-green-700 text-sm font-black">
+        <div className="flex items-center justify-center gap-2 py-3 bg-blue-50 rounded-2xl text-green-700 text-sm font-black">
           <Check size={16} /> Saved to your history
         </div>
       )}
@@ -196,7 +196,7 @@ export function IoTResultsDisplay() {
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={() => setShowAI(true)}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-[#1A6B4A] to-[#1e8259] text-white rounded-2xl font-black text-sm tracking-tight hover:opacity-90 transition-opacity shadow-lg shadow-green-900/20"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-to-r from-[#1C75E8] to-[#1e8259] text-white rounded-2xl font-black text-sm tracking-tight hover:opacity-90 transition-opacity shadow-lg shadow-green-900/20"
           >
             <Sparkles size={16} className="text-[#F5A623]" />
             Explain with AI

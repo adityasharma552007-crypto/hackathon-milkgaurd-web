@@ -8,12 +8,25 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
 
-    if (!error) {
+    if (!error && data?.user) {
+      // Check if profile is complete
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('profile_complete')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profile && !profile.profile_complete) {
+        // Redirect to profile completion if not explicitly complete
+        return NextResponse.redirect(`${origin}/auth/complete-profile`)
+      }
+
       return NextResponse.redirect(`${origin}${next}`)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login`)
+  // Failed to exchange code or user canceled
+  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`)
 }

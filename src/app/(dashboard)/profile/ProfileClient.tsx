@@ -101,7 +101,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
     <div className="min-h-screen bg-[#F7F9F8] pb-32">
       {/* Header Bar */}
       <header className="flex items-center justify-center p-6 pb-4 bg-[#F7F9F8]">
-        <h1 className="text-lg font-bold text-[#1A6B4A]">My Profile</h1>
+        <h1 className="text-lg font-bold text-[#1C75E8]">My Profile</h1>
       </header>
 
       <main className="px-4 space-y-4">
@@ -111,25 +111,25 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
             <div className="w-full px-6 flex flex-col gap-3 text-left">
               <h3 className="font-bold text-slate-900 mb-2">Edit Profile</h3>
               <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1A6B4A] focus:outline-none"
+                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1C75E8] focus:outline-none"
                 placeholder="Full Name" 
                 value={editForm.fullName} 
                 onChange={e => setEditForm({...editForm, fullName: e.target.value})} 
               />
               <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1A6B4A] focus:outline-none"
+                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1C75E8] focus:outline-none"
                 placeholder="Phone" 
                 value={editForm.phone} 
                 onChange={e => setEditForm({...editForm, phone: e.target.value})} 
               />
               <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1A6B4A] focus:outline-none"
+                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1C75E8] focus:outline-none"
                 placeholder="City" 
                 value={editForm.city} 
                 onChange={e => setEditForm({...editForm, city: e.target.value})} 
               />
               <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1A6B4A] focus:outline-none"
+                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#1C75E8] focus:outline-none"
                 placeholder="Area" 
                 value={editForm.area} 
                 onChange={e => setEditForm({...editForm, area: e.target.value})} 
@@ -141,13 +141,13 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                 >Cancel</button>
                 <button 
                   onClick={handleSaveProfile}
-                  className="flex-1 py-3 rounded-xl bg-[#1A6B4A] text-white font-bold hover:bg-[#124b33] transition-colors"
+                  className="flex-1 py-3 rounded-xl bg-[#1C75E8] text-white font-bold hover:bg-[#0A4BB5] transition-colors"
                 >Save</button>
               </div>
             </div>
           ) : (
             <>
-              <div className="w-[64px] h-[64px] rounded-full bg-[#1A6B4A] text-white flex items-center justify-center font-bold text-xl tracking-wider shadow-md">
+              <div className="w-[64px] h-[64px] rounded-full bg-[#1C75E8] text-white flex items-center justify-center font-bold text-xl tracking-wider shadow-md">
                 {initials}
               </div>
               <h2 className="text-[20px] font-bold text-slate-900 mt-4 leading-tight">
@@ -157,16 +157,16 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                 {user.email}
               </p>
               {(user.city || user.area) && (
-                <div className="flex items-center justify-center gap-1 mt-2 text-[#1A6B4A]">
-                  <MapPin size={13} className="fill-[#1A6B4A] text-white" />
-                  <span className="text-[13px] uppercase font-bold tracking-widest text-[#1A6B4A]">
+                <div className="flex items-center justify-center gap-1 mt-2 text-[#1C75E8]">
+                  <MapPin size={13} className="fill-[#1C75E8] text-white" />
+                  <span className="text-[13px] uppercase font-bold tracking-widest text-[#1C75E8]">
                     {[user.area, user.city].filter(Boolean).join(", ")}
                   </span>
                 </div>
               )}
               <button 
                 onClick={() => setIsEditing(true)}
-                className="mt-6 px-6 py-2 rounded-full border border-[#1A6B4A] text-[#1A6B4A] text-[13px] font-bold tracking-wide hover:bg-green-50 transition-colors"
+                className="mt-6 px-6 py-2 rounded-full border border-[#1C75E8] text-[#1C75E8] text-[13px] font-bold tracking-wide hover:bg-blue-50 transition-colors"
               >
                 Edit Profile
               </button>
@@ -181,7 +181,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
             <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">TOTAL SCANS</span>
           </Card>
           <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
-            <span className="text-[22px] font-black text-[#1A6B4A] leading-none">{user.safeScans}</span>
+            <span className="text-[22px] font-black text-[#1C75E8] leading-none">{user.safeScans}</span>
             <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">SAFE</span>
           </Card>
           <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
@@ -194,7 +194,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
         <section className="mt-8">
           <div className="flex items-center justify-between px-2 mb-4">
             <h3 className="font-bold text-slate-900 text-lg">My FSSAI Reports 📋</h3>
-            <button className="text-[13px] font-bold text-[#1A6B4A] hover:underline">View All</button>
+            <button className="text-[13px] font-bold text-[#1C75E8] hover:underline">View All</button>
           </div>
           <div className="space-y-3">
             {reports.length === 0 ? (
@@ -211,11 +211,11 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
               reports.map(report => (
                 <Card key={report.id} className="rounded-[24px] border-none shadow-sm p-4 flex items-center justify-between bg-white">
                   <div className="flex items-center gap-4">
-                    <div className={`w-[52px] h-[52px] rounded-[18px] flex items-center justify-center ${report.status === 'resolved' ? 'bg-[#3ff790] text-[#1A6B4A]' : 'bg-amber-100 text-amber-600'}`}>
-                      {report.status === 'resolved' ? <Shield size={24} className="fill-[#1A6B4A] text-[#3ff790]" /> : <FileText size={24} className="fill-amber-600 text-amber-100" />}
+                    <div className={`w-[52px] h-[52px] rounded-[18px] flex items-center justify-center ${report.status === 'resolved' ? 'bg-[#3ff790] text-[#1C75E8]' : 'bg-amber-100 text-amber-600'}`}>
+                      {report.status === 'resolved' ? <Shield size={24} className="fill-[#1C75E8] text-[#3ff790]" /> : <FileText size={24} className="fill-amber-600 text-amber-100" />}
                     </div>
                     <div>
-                      <p className="font-bold text-[15px] text-[#1A6B4A]">{report.complaint_ref || `MG-2026-${report.id.slice(0,5)}`}</p>
+                      <p className="font-bold text-[15px] text-[#1C75E8]">{report.complaint_ref || `MG-2026-${report.id.slice(0,5)}`}</p>
                       <p className="text-[12px] text-slate-500 font-medium">
                         {report.vendors?.name ?? 'Unknown vendor'} · {report.vendors?.area || 'Unknown area'}
                       </p>
@@ -227,7 +227,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                   <Badge className={`border-none font-bold text-[10px] uppercase tracking-widest px-3 py-1 ${
                     report.status === 'submitted' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
                     report.status === 'under_review' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                    'bg-[#3ff790] text-[#1A6B4A] hover:bg-[#3ff790]'
+                    'bg-[#3ff790] text-[#1C75E8] hover:bg-[#3ff790]'
                   }`}>
                     {report.status.replace('_', ' ')}
                   </Badge>
@@ -257,7 +257,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                   <span className="font-bold text-[15px] text-slate-900">Language</span>
                 </div>
                 <div className="flex items-center gap-2 bg-[#EAF8F1] px-3 py-1 rounded-full">
-                  <span className="text-[#1A6B4A] text-[12px] font-bold">{language}</span>
+                  <span className="text-[#1C75E8] text-[12px] font-bold">{language}</span>
                 </div>
               </div>
               <div onClick={() => setSheetOpen('privacy')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
@@ -306,15 +306,15 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <span className="font-medium text-slate-900">Area adulteration alerts</span>
-            <input type="checkbox" checked={notifPrefs.area} onChange={e => {setNotifPrefs({...notifPrefs, area: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, area: e.target.checked}))}} className="w-5 h-5 accent-[#1A6B4A]" />
+            <input type="checkbox" checked={notifPrefs.area} onChange={e => {setNotifPrefs({...notifPrefs, area: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, area: e.target.checked}))}} className="w-5 h-5 accent-[#1C75E8]" />
           </div>
           <div className="flex items-center justify-between">
             <span className="font-medium text-slate-900">Scan reminders</span>
-            <input type="checkbox" checked={notifPrefs.scan} onChange={e => {setNotifPrefs({...notifPrefs, scan: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, scan: e.target.checked}))}} className="w-5 h-5 accent-[#1A6B4A]" />
+            <input type="checkbox" checked={notifPrefs.scan} onChange={e => {setNotifPrefs({...notifPrefs, scan: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, scan: e.target.checked}))}} className="w-5 h-5 accent-[#1C75E8]" />
           </div>
           <div className="flex items-center justify-between">
             <span className="font-medium text-slate-900">FSSAI report updates</span>
-            <input type="checkbox" checked={notifPrefs.fssai} onChange={e => {setNotifPrefs({...notifPrefs, fssai: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, fssai: e.target.checked}))}} className="w-5 h-5 accent-[#1A6B4A]" />
+            <input type="checkbox" checked={notifPrefs.fssai} onChange={e => {setNotifPrefs({...notifPrefs, fssai: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, fssai: e.target.checked}))}} className="w-5 h-5 accent-[#1C75E8]" />
           </div>
         </div>
       </BottomSheet>
@@ -330,7 +330,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
                  alert("Language preference saved")
                  setSheetOpen(null)
                }}
-               className="p-4 rounded-xl border border-slate-200 text-[#1A6B4A] font-bold hover:bg-green-50 hover:border-green-300 cursor-pointer transition-colors"
+               className="p-4 rounded-xl border border-slate-200 text-[#1C75E8] font-bold hover:bg-blue-50 hover:border-green-300 cursor-pointer transition-colors"
              >
                🇮🇳 {lang}
              </div>
@@ -350,7 +350,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
             <h4 className="font-bold text-slate-900 mb-3">Change Password</h4>
             <div className="flex flex-col gap-3">
               <input readOnly value={user.email} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm focus:outline-none" />
-              <button onClick={handleResetPassword} className="w-full h-12 rounded-xl bg-[#1A6B4A] text-white font-bold tracking-wide hover:bg-[#124b33] transition-colors">
+              <button onClick={handleResetPassword} className="w-full h-12 rounded-xl bg-[#1C75E8] text-white font-bold tracking-wide hover:bg-[#0A4BB5] transition-colors">
                 Send Reset Link
               </button>
             </div>
@@ -360,11 +360,11 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
 
       <BottomSheet isOpen={sheetOpen === 'about'} onClose={() => setSheetOpen(null)} title="About MilkGuard">
         <div className="flex flex-col items-center text-center space-y-4 pt-4">
-          <div className="w-20 h-20 bg-[#1A6B4A] rounded-full flex items-center justify-center shadow-md">
+          <div className="w-20 h-20 bg-[#1C75E8] rounded-full flex items-center justify-center shadow-md">
             <Shield className="text-white" size={40} />
           </div>
           <div>
-            <h3 className="text-xl font-black text-[#1A6B4A]">MilkGuard</h3>
+            <h3 className="text-xl font-black text-[#1C75E8]">MilkGuard</h3>
             <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Version 1.0.0 (Hackathon Edition)</p>
           </div>
           <p className="text-[15px] text-slate-600 leading-relaxed px-4 py-2">
@@ -374,7 +374,7 @@ export default function ProfileClient({ user, reports }: ProfileClientProps) {
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Built with</p>
             <p className="text-sm font-bold text-slate-800">Next.js 14 | Supabase | Vercel</p>
           </div>
-          <p className="text-sm font-bold text-[#1A6B4A] pt-4 leading-relaxed">
+          <p className="text-sm font-bold text-[#1C75E8] pt-4 leading-relaxed">
             Protecting families from adulterated milk — one scan at a time. 🥛
           </p>
         </div>

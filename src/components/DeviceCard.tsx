@@ -18,7 +18,7 @@ interface DeviceCardProps {
 }
 
 function BatteryBadge({ level }: { level: number }) {
-  const color = level > 50 ? 'text-green-500' : level > 20 ? 'text-amber-500' : 'text-red-500'
+  const color = level > 50 ? 'text-blue-500' : level > 20 ? 'text-amber-500' : 'text-red-500'
   return (
     <span className={`flex items-center gap-0.5 text-[10px] font-bold ${color}`}>
       <Battery size={12} />
@@ -79,7 +79,7 @@ export function DeviceCard({
       {...wrapperProps}
       className={`rounded-2xl border p-4 bg-white transition-all duration-300 ${
         isConnected
-          ? 'border-green-200 shadow-md shadow-green-50'
+          ? 'border-green-200 shadow-md shadow-blue-50'
           : isConnecting
           ? 'border-amber-200'
           : 'border-slate-100 shadow-sm'
@@ -89,9 +89,9 @@ export function DeviceCard({
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
-            isConnected ? 'bg-green-50' : 'bg-slate-50'
+            isConnected ? 'bg-blue-50' : 'bg-slate-50'
           }`}>
-            <Cpu size={20} className={isConnected ? 'text-green-600' : 'text-slate-400'} />
+            <Cpu size={20} className={isConnected ? 'text-blue-600' : 'text-slate-400'} />
           </div>
           <div>
             <p className="font-black text-slate-800 text-sm tracking-tight leading-none">
@@ -105,7 +105,7 @@ export function DeviceCard({
 
         {/* Online dot */}
         <div className={`w-2.5 h-2.5 rounded-full mt-1 ${
-          isConnected  ? 'bg-green-500 shadow-sm shadow-green-400' :
+          isConnected  ? 'bg-blue-500 shadow-sm shadow-green-400' :
           isConnecting ? 'bg-amber-400 animate-pulse' :
           'bg-slate-200'
         }`} />
@@ -125,7 +125,7 @@ export function DeviceCard({
         )}
         {device.battery !== undefined && <BatteryBadge level={device.battery} />}
         {isConnected && (
-          <span className="text-[9px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-black uppercase tracking-wider flex items-center gap-1">
+          <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-black uppercase tracking-wider flex items-center gap-1">
             <Wifi size={9} /> Live
           </span>
         )}
@@ -154,7 +154,7 @@ export function DeviceCard({
         ) : (
           <button
             onClick={handleConnect}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1A6B4A] text-white text-xs font-black hover:bg-[#145339] transition-colors active:scale-95"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1C75E8] text-white text-xs font-black hover:bg-[#0A4BB5] transition-colors active:scale-95"
           >
             <PlugZap size={13} />
             {isThisDevice && connState === 'failed' ? 'Retry' : 'Connect'}

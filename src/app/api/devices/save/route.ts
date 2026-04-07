@@ -8,15 +8,37 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
 
 export async function POST(req: NextRequest) {
+  // Check rate limit FIRST
+  const rateLimitCheck = await checkAndLogRateLimit('/api/devices/connect', req)
+
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response
+  }
+
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      {
+        status: 401,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
+  }
 
   const body = await req.json().catch(() => null)
   if (!body?.ip_address || !body?.device_id) {
-    return NextResponse.json({ error: 'ip_address and device_id are required' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'ip_address and device_id are required' },
+      {
+        status: 400,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
   }
 
   const { error } = await supabase.from('iot_devices').upsert(
@@ -33,17 +55,54 @@ export async function POST(req: NextRequest) {
     { onConflict: 'user_id,ip_address' }
   )
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      {
+        status: 500,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
+  }
+
+  return NextResponse.json(
+    { ok: true, remaining: rateLimitCheck.remaining },
+    {
+      headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+    }
+  )
 }
 
 export async function DELETE(req: NextRequest) {
+  // Check rate limit FIRST
+  const rateLimitCheck = await checkAndLogRateLimit('/api/devices/connect', req)
+
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response
+  }
+
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      {
+        status: 401,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
+  }
 
   const { ip_address } = await req.json().catch(() => ({}))
-  if (!ip_address) return NextResponse.json({ error: 'ip_address required' }, { status: 400 })
+  if (!ip_address) {
+    return NextResponse.json(
+      { error: 'ip_address required' },
+      {
+        status: 400,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
+  }
 
   const { error } = await supabase
     .from('iot_devices')
@@ -51,6 +110,20 @@ export async function DELETE(req: NextRequest) {
     .eq('user_id', user.id)
     .eq('ip_address', ip_address)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ok: true })
+  if (error) {
+    return NextResponse.json(
+      { error: error.message },
+      {
+        status: 500,
+        headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+      }
+    )
+  }
+
+  return NextResponse.json(
+    { ok: true, remaining: rateLimitCheck.remaining },
+    {
+      headers: getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
+    }
+  )
 }

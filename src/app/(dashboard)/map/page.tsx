@@ -24,11 +24,11 @@ export default async function MapPage() {
       <header className="p-6 pb-4 pt-12 space-y-4 shrink-0 z-50">
         <div className="flex items-center justify-between">
           <Link href="/home" className="p-2 bg-slate-100 rounded-full">
-            <ChevronLeft size={20} className="text-[#1A6B4A]" />
+            <ChevronLeft size={20} className="text-[#1C75E8]" />
           </Link>
-          <h1 className="text-xl font-black text-[#1A6B4A] uppercase tracking-tighter">Vendor Map</h1>
+          <h1 className="text-xl font-black text-[#1C75E8] uppercase tracking-tighter">Vendor Map</h1>
           <div className="p-2 bg-slate-100 rounded-full">
-             <SlidersHorizontal size={20} className="text-[#1A6B4A]" />
+             <SlidersHorizontal size={20} className="text-[#1C75E8]" />
           </div>
         </div>
 
@@ -37,7 +37,7 @@ export default async function MapPage() {
           <input 
             type="text" 
             placeholder="Search Jaipur area or vendor..." 
-            className="w-full h-12 bg-slate-50 border-none rounded-2xl pl-10 pr-4 text-sm font-bold focus:ring-[#1A6B4A]"
+            className="w-full h-12 bg-slate-50 border-none rounded-2xl pl-10 pr-4 text-sm font-bold focus:ring-[#1C75E8]"
           />
         </div>
       </header>

@@ -35,7 +35,7 @@ export default async function HomePage() {
 
   const stats = [
     { label: "Total Scans", value: profile?.total_scans || 0, icon: Activity, color: "text-blue-500" },
-    { label: "Safe Milk", value: profile?.safe_scans || 0, icon: Shield, color: "text-[#1A6B4A]" },
+    { label: "Safe Milk", value: profile?.safe_scans || 0, icon: Shield, color: "text-[#1C75E8]" },
   ]
 
   return (
@@ -44,24 +44,24 @@ export default async function HomePage() {
       <header className="p-6 pb-2 pt-12 flex items-center justify-between">
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Welcome back</p>
-          <h1 className="text-2xl font-black text-[#1A6B4A] tracking-tighter uppercase leading-none">
+          <h1 className="text-2xl font-black text-[#1C75E8] tracking-tighter uppercase leading-none">
             {profile?.full_name?.split(' ')[0] || 'User'}
           </h1>
         </div>
-        <Link href="/chat" className="flex items-center gap-2 bg-gradient-to-br from-green-50 to-emerald-50 px-4 py-2 rounded-2xl shadow-sm border border-green-100 hover:shadow-md hover:scale-105 transition-all group">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1A6B4A] to-[#124b33] flex items-center justify-center shrink-0 shadow-inner">
+        <Link href="/chat" className="flex items-center gap-2 bg-gradient-to-br from-blue-50 to-indigo-50 px-4 py-2 rounded-2xl shadow-sm border border-blue-100 hover:shadow-md hover:scale-105 transition-all group">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1C75E8] to-[#0A4BB5] flex items-center justify-center shrink-0 shadow-inner">
             <Bot className="text-[#F5A623]" size={16} />
           </div>
           <div className="flex flex-col">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#1A6B4A]/60 leading-none mb-0.5">MilkGuard</span>
-            <span className="text-xs font-black uppercase tracking-wider text-[#1A6B4A] leading-none">Ask AI</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-[#1C75E8]/60 leading-none mb-0.5">MilkGuard</span>
+            <span className="text-xs font-black uppercase tracking-wider text-[#1C75E8] leading-none">Ask AI</span>
           </div>
         </Link>
       </header>
 
       <main className="flex-1 p-6 space-y-6">
         {/* Quick Action Card */}
-        <Card className="bg-[#1A6B4A] border-none shadow-xl shadow-green-100/50 rounded-3xl overflow-hidden relative">
+        <Card className="bg-[#1C75E8] border-none shadow-xl shadow-blue-100/50 rounded-3xl overflow-hidden relative">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
               <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
@@ -102,7 +102,7 @@ export default async function HomePage() {
         <div className="space-y-4">
           <div className="flex justify-between items-end">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Recent Activity</h3>
-            <Link href="/history" className="text-[10px] font-bold text-[#1A6B4A] uppercase underline underline-offset-4">View All</Link>
+            <Link href="/history" className="text-[10px] font-bold text-[#1C75E8] uppercase underline underline-offset-4">View All</Link>
           </div>
           
           <div className="space-y-3">
@@ -113,7 +113,7 @@ export default async function HomePage() {
                     <CardContent className="p-4 flex items-center gap-4">
                       <div className={cn(
                         "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                        scan.result_tier === 'safe' ? "bg-green-50 text-[#1A6B4A]" : "bg-red-50 text-red-500"
+                        scan.result_tier === 'safe' ? "bg-blue-50 text-[#1C75E8]" : "bg-red-50 text-red-500"
                       )}>
                         {scan.result_tier === 'safe' ? <Shield size={24} /> : <Activity size={24} />}
                       </div>
@@ -124,7 +124,7 @@ export default async function HomePage() {
                       <div className="text-right">
                         <span className={cn(
                           "text-lg font-black leading-none block",
-                          scan.result_tier === 'safe' ? "text-[#1A6B4A]" : "text-red-500"
+                          scan.result_tier === 'safe' ? "text-[#1C75E8]" : "text-red-500"
                         )}>
                           {scan.safety_score}%
                         </span>
