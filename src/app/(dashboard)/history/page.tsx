@@ -28,7 +28,7 @@ export default async function HistoryPage() {
   // Fetch all scans for the user
   const { data: scans } = await supabase
     .from('scans')
-    .select('*, vendors(name)')
+    .select('*, vendors(name), tx_hash')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -99,39 +99,61 @@ export default async function HistoryPage() {
         <div className="space-y-4">
            {scans && scans.length > 0 ? (
              scans.map((scan) => (
-                <Link key={scan.id} href={`/history/${scan.id}`}>
-                  <Card className="rounded-2xl border-none shadow-sm overflow-hidden hover:bg-slate-50 transition-colors">
-                    <CardContent className="p-4 flex items-center gap-4">
-                       <div className={cn(
-                         "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                         scan.result_tier === 'safe' ? "bg-blue-50 text-[#60A5FA]" : "bg-red-50 text-red-500"
-                       )}>
-                         {scan.result_tier === 'safe' ? <Shield size={24} /> : <AlertTriangle size={24} />}
-                       </div>
-                       <div className="flex-1 min-w-0">
-                          <p className="font-bold text-slate-800 truncate">{scan.vendors?.name || 'Home Sample'}</p>
-                          <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                             <Calendar size={10} />
-                             {format(new Date(scan.created_at), 'MMM dd, yyyy')}
-                          </div>
-                       </div>
-                       <div className="text-right">
-                          <span className={cn(
-                             "text-lg font-black leading-none block",
-                             scan.result_tier === 'safe' ? "text-[#60A5FA]" : "text-red-500"
-                          )}>
-                             {scan.safety_score}%
-                          </span>
-                          <Badge variant="outline" className={cn(
-                            "text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black",
-                            scan.result_tier === 'safe' ? "border-[#60A5FA] text-[#60A5FA]" : "border-red-500 text-red-500"
-                          )}>
-                            {scan.result_tier}
-                          </Badge>
-                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <div key={scan.id} className="relative">
+                  <Link href={`/history/${scan.id}`}>
+                    <Card className="rounded-2xl border-none shadow-sm overflow-hidden hover:bg-slate-50 transition-colors">
+                      <CardContent className="p-4 flex items-center gap-4">
+                         <div className={cn(
+                           "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                           scan.result_tier === 'safe' ? "bg-blue-50 text-[#60A5FA]" : "bg-red-50 text-red-500"
+                         )}>
+                           {scan.result_tier === 'safe' ? <Shield size={24} /> : <AlertTriangle size={24} />}
+                         </div>
+                         <div className="flex-1 min-w-0">
+                            <p className="font-bold text-slate-800 truncate">{scan.vendors?.name || 'Home Sample'}</p>
+                            <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                               <Calendar size={10} />
+                               {format(new Date(scan.created_at), 'MMM dd, yyyy')}
+                            </div>
+                         </div>
+                         <div className="text-right">
+                            <span className={cn(
+                               "text-lg font-black leading-none block",
+                               scan.result_tier === 'safe' ? "text-[#60A5FA]" : "text-red-500"
+                            )}>
+                               {scan.safety_score}%
+                            </span>
+                            <Badge variant="outline" className={cn(
+                              "text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black",
+                              scan.result_tier === 'safe' ? "border-[#60A5FA] text-[#60A5FA]" : "border-red-500 text-red-500"
+                            )}>
+                              {scan.result_tier}
+                            </Badge>
+                         </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                  {/* Action Badges — outside Link to avoid nested <a> */}
+                  <div className="absolute top-1/2 -translate-y-1/2 right-4 z-10 flex flex-col items-end gap-1.5">
+                    {scan.tx_hash && (
+                      <a
+                        href={`https://amoy.polygonscan.com/tx/${scan.tx_hash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                      >
+                        ⛓ On Chain
+                      </a>
+                    )}
+                    <Link 
+                      href={`/history/${scan.id}?report=true`}
+                      className="inline-flex items-center gap-1.5 px-2 py-1 bg-white text-slate-500 hover:bg-[#60A5FA] hover:text-white transition-all rounded-lg border border-slate-200 shadow-sm text-[10px] font-bold uppercase"
+                    >
+                       📄 Report
+                    </Link>
+                  </div>
+                </div>
              ))
            ) : (
              <div className="py-20 text-center flex flex-col items-center">

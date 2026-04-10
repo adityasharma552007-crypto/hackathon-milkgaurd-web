@@ -11,7 +11,8 @@ import { Metadata } from 'next'
 import { aboutMetadata } from '@/app/page.metadata'
 import { PageTitle, PageSubtitle } from '@/components/seo/PageTitle'
 import { SEOParagraph } from '@/components/seo/MetaDescription'
-import { Shield, Zap, Users, Target, Heart, Award } from 'lucide-react'
+import { Shield, Zap, Users, Target, Heart, Award, Link2, ShieldCheck } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = aboutMetadata
 
@@ -30,7 +31,15 @@ const organizationJsonLd = {
   ],
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  // Fetch total on-chain verified scan count server-side
+  const supabase = createClient()
+  const { count: onChainCount } = await supabase
+    .from('scans')
+    .select('id', { count: 'exact', head: true })
+    .not('tx_hash', 'is', null)
+
+  const totalScans = onChainCount ?? 0
   return (
     <div className="min-h-screen bg-[#F7F9F8] pb-24">
       <div className="max-w-md mx-auto bg-white shadow-xl">
@@ -180,6 +189,44 @@ export default function AboutPage() {
               <li>• Ammonium Sulphate</li>
               <li>• And more...</li>
             </ul>
+          </div>
+        </section>
+
+        {/* ── BLOCKCHAIN TRANSPARENCY SECTION ─────────────────────────────── */}
+        <section className="py-8 px-6 bg-gradient-to-br from-[#f5f0ff] to-white">
+          <h2 className="text-2xl font-black text-[#1A6B4A] mb-4 tracking-tight flex items-center gap-2">
+            <ShieldCheck className="w-6 h-6 text-[#8247E5]" />
+            Blockchain Verified Records
+          </h2>
+          <SEOParagraph className="mb-5">
+            Every milk scan on MilkGuard is permanently recorded on the{' '}
+            <strong>Polygon blockchain</strong> — making results tamper-proof and
+            publicly verifiable by anyone.
+          </SEOParagraph>
+
+          {/* Stat card */}
+          <div className="bg-white rounded-2xl p-5 shadow-sm border border-purple-100 flex items-center gap-4 mb-5">
+            <div className="w-12 h-12 rounded-xl bg-[#8247E5]/10 flex items-center justify-center shrink-0">
+              <Link2 className="w-6 h-6 text-[#8247E5]" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                Total Scans on Chain
+              </p>
+              <p className="text-3xl font-black text-[#8247E5] leading-none">
+                {totalScans.toLocaleString()}
+              </p>
+            </div>
+          </div>
+
+          {/* Powered by Polygon badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8247E5]/10 border border-[#8247E5]/20">
+            <svg width="16" height="16" viewBox="0 0 38 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M28.5 10.5L19 5L9.5 10.5V21.5L19 27L28.5 21.5V10.5Z" fill="#8247E5" />
+            </svg>
+            <span className="text-[11px] font-black text-[#8247E5] uppercase tracking-wider">
+              Powered by Polygon
+            </span>
           </div>
         </section>
 

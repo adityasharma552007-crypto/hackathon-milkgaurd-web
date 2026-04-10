@@ -4,10 +4,12 @@ import React, { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { Shield, AlertTriangle, Star, Navigation } from 'lucide-react'
+import 'leaflet.heat'
+import { Shield, AlertTriangle, Star, Navigation, Map as MapIcon, Users, Layers, Users2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import ReportVendorButton from '@/components/ReportVendorButton'
 
 // Fix for default Leaflet markers in Next.js
 const customIcon = (tier: string) => {
@@ -24,7 +26,12 @@ const customIcon = (tier: string) => {
 
 interface VendorMapProps {
   vendors: any[]
+  scans?: any[]
+  cityName?: string
+  flaggedOnly?: boolean
 }
+
+type ViewMode = 'vendors' | 'heatmap' | 'both';
 
 function ChangeView({ center }: { center: [number, number] }) {
   const map = useMap()
@@ -32,8 +39,43 @@ function ChangeView({ center }: { center: [number, number] }) {
   return null
 }
 
-export default function VendorMap({ vendors }: VendorMapProps) {
+function HeatmapLayer({ points, viewMode }: { points: any[], viewMode: ViewMode }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (viewMode === 'vendors' || !points.length) return;
+
+    // Map the scans into Leaflet heat points format: [lat, lng, intensity]
+    // Intensity defines weight. 0.0 - 1.0 (Low to high adulteration risk)
+    const heatPoints = points.map(p => [
+      p.latitude, 
+      p.longitude, 
+      (p.adulteration_score || 0) / 100
+    ])
+    
+    // Add heat layer
+    const heat = (L as any).heatLayer(heatPoints, {
+      radius: 25,
+      blur: 15,
+      maxZoom: 14,
+      gradient: {
+        0.3: '#10B981', // green for low risk
+        0.6: '#F5A623', // orange for medium risk
+        1.0: '#EF4444'  // red for high risk
+      }
+    }).addTo(map)
+
+    return () => {
+      map.removeLayer(heat)
+    }
+  }, [map, points, viewMode])
+
+  return null
+}
+
+export default function VendorMap({ vendors, scans = [], cityName = 'Jaipur', flaggedOnly = false }: VendorMapProps) {
   const [isMounted, setIsMounted] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('both')
   const defaultCenter: [number, number] = [26.9124, 75.7873] // Jaipur
 
   useEffect(() => {
@@ -42,8 +84,44 @@ export default function VendorMap({ vendors }: VendorMapProps) {
 
   if (!isMounted) return <div className="w-full h-full bg-slate-100 animate-pulse rounded-3xl" />
 
+  function getTrustScoreDetails(avgScore: number, reportCount: number) {
+    const trustScore = Math.round((avgScore * 0.6) + Math.max(0, 40 - (reportCount * 5)))
+    if (trustScore >= 80) return { score: trustScore, label: 'Trusted', color: 'text-emerald-500', bg: 'bg-emerald-50' }
+    if (trustScore >= 50) return { score: trustScore, label: 'Moderate', color: 'text-amber-500', bg: 'bg-amber-50' }
+    return { score: trustScore, label: 'Flagged', color: 'text-red-500', bg: 'bg-red-50' }
+  }
+
   return (
-    <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl">
+    <div className="w-full h-full relative rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex bg-white/90 backdrop-blur-md rounded-full shadow-lg p-1 border border-slate-100">
+        <button
+          onClick={() => setViewMode('vendors')}
+          className={cn(
+            "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 flex items-center",
+            viewMode === 'vendors' ? "bg-slate-800 text-white shadow-md" : "text-slate-500 hover:bg-slate-100"
+          )}
+        >
+          <Users size={12} /> Vendors
+        </button>
+        <button
+          onClick={() => setViewMode('heatmap')}
+          className={cn(
+            "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 flex items-center",
+            viewMode === 'heatmap' ? "bg-red-500 text-white shadow-md" : "text-slate-500 hover:bg-slate-100"
+          )}
+        >
+          <MapIcon size={12} /> Heatmap
+        </button>
+        <button
+          onClick={() => setViewMode('both')}
+          className={cn(
+            "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all gap-1.5 flex items-center",
+            viewMode === 'both' ? "bg-[#60A5FA] text-white shadow-md" : "text-slate-500 hover:bg-slate-100"
+          )}
+        >
+          <Layers size={12} /> Both
+        </button>
+      </div>
       <MapContainer 
         {...({
           center: defaultCenter, 
@@ -61,45 +139,53 @@ export default function VendorMap({ vendors }: VendorMapProps) {
           } as any)}
         />
         
-        {vendors.map((vendor) => (
-          <Marker 
-            key={vendor.id} 
-            {...({
-              position: [vendor.latitude, vendor.longitude],
-              icon: customIcon(vendor.safety_tier)
-            } as any)}
-          >
-            <Popup {...({ className: "custom-popup" } as any)}>
-              <div className="w-48 p-1">
-                <div className="flex justify-between items-start mb-2">
-                   <h3 className="font-black text-slate-800 text-sm">{vendor.name}</h3>
-                   <Badge className={cn(
-                     "text-[8px] h-4 uppercase font-black",
-                     vendor.safety_tier === 'safe' ? "bg-blue-100 text-[#60A5FA]" : "bg-red-100 text-red-500"
-                   )}>
-                     {vendor.safety_tier}
-                   </Badge>
+        <HeatmapLayer points={scans} viewMode={viewMode} />
+        
+        {viewMode !== 'heatmap' && vendors.filter((v: any) => (v.latitude || v.lat) && (v.longitude || v.lng)).filter((v: any) => !flaggedOnly || v.is_flagged || getTrustScoreDetails(v.avg_score || 0, v.report_count || 0).score < 50).map((vendor: any) => {
+          const trust = getTrustScoreDetails(vendor.avg_score || 0, vendor.report_count || 0)
+          const iconTier = trust.score >= 80 ? 'safe' : trust.score >= 50 ? 'warning' : 'danger'
+
+          return (
+            <Marker 
+              key={vendor.id} 
+              {...({
+                position: [vendor.latitude || vendor.lat, vendor.longitude || vendor.lng],
+                icon: customIcon(iconTier)
+              } as any)}
+            >
+              <Popup {...({ className: "custom-popup" } as any)}>
+                <div className="w-52 p-1">
+                  <div className="flex justify-between items-start mb-3">
+                     <h3 className="font-black text-slate-800 text-sm max-w-[120px] leading-tight shrink-0">{vendor.name}</h3>
+                     <Badge className={cn("text-[8px] h-5 uppercase font-black shrink-0", trust.bg, trust.color)}>
+                       {trust.label}
+                     </Badge>
+                  </div>
+                  <div className="space-y-3">
+                     <div className="flex items-center justify-between bg-slate-50 p-2 rounded-xl">
+                        <div className="flex items-center gap-2">
+                           <div className={cn("text-2xl font-black leading-none", trust.color)}>{trust.score}</div>
+                           <div className="text-[8px] font-bold text-slate-400 uppercase leading-tight">Trust<br/>Score</div>
+                        </div>
+                        <div className="text-right">
+                           <div className="text-[10px] font-black text-slate-600">{Math.round(vendor.avg_score || 0)}% Purity</div>
+                           <div className="text-[8px] font-bold text-slate-400 uppercase">{vendor.total_scans || 0} Scans</div>
+                        </div>
+                     </div>
+                     
+                     <div className="flex items-center justify-between pt-1">
+                        <div className="text-[9px] font-black text-slate-400 flex items-center gap-1 uppercase">
+                           <Users2 size={12} className="text-slate-300" />
+                           {vendor.report_count || 0} Reports
+                        </div>
+                        <ReportVendorButton vendorId={vendor.id} vendorName={vendor.name} />
+                     </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                   <div className="flex items-center gap-2">
-                      <div className="text-xl font-black text-slate-800">{vendor.safety_score}%</div>
-                      <div className="text-[8px] font-bold text-slate-400 uppercase">Avg Purity</div>
-                   </div>
-                   <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
-                      <div className="flex items-center gap-1">
-                         <Star size={10} className="fill-[#F5A623] text-[#F5A623]" />
-                         {vendor.rating}
-                      </div>
-                      <div>{vendor.total_scans} SCANS</div>
-                   </div>
-                   <button className="w-full h-8 bg-[#60A5FA] text-white rounded-lg text-xs font-bold uppercase tracking-tighter mt-1">
-                      View Profile
-                   </button>
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+              </Popup>
+            </Marker>
+          )
+        })}
       </MapContainer>
 
       {/* Map Controls Floating Overlay */}
@@ -109,24 +195,44 @@ export default function VendorMap({ vendors }: VendorMapProps) {
          </button>
       </div>
 
-      <div className="absolute bottom-4 left-4 right-4 z-[1000]">
+      <div className="absolute bottom-4 left-4 z-[1000]">
          <Card className="rounded-2xl border-none shadow-xl bg-white/90 backdrop-blur-md">
-            <CardContent className="p-4 flex items-center justify-between">
-               <div className="flex gap-4">
-                  <div className="flex items-center gap-1">
-                     <div className="w-3 h-3 bg-[#60A5FA] rounded-full" />
-                     <span className="text-[9px] font-black uppercase text-slate-500">Safe</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                     <div className="w-3 h-3 bg-[#F5A623] rounded-full" />
-                     <span className="text-[9px] font-black uppercase text-slate-500">Watch</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                     <div className="w-3 h-3 bg-red-500 rounded-full" />
-                     <span className="text-[9px] font-black uppercase text-slate-500">Danger</span>
-                  </div>
-               </div>
-               <p className="text-[9px] font-bold text-[#60A5FA] uppercase italic underline underline-offset-2">Filter By Tier</p>
+            <CardContent className="p-3">
+               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1 w-full text-center">
+                 {viewMode === 'vendors' ? 'Vendor Filter' : 'Risk Legend'}
+               </p>
+               
+               {viewMode === 'vendors' ? (
+                 <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-[#60A5FA] rounded-full ring-2 ring-[#60A5FA]/20" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">Safe Vendors</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-[#F5A623] rounded-full ring-2 ring-[#F5A623]/20" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">Warning Area</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-red-500 rounded-full ring-2 ring-red-500/20" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">Danger Zone</span>
+                    </div>
+                 </div>
+               ) : (
+                 <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">High Risk Area</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-[#F5A623] rounded-full shadow-[0_0_8px_rgba(245,166,35,0.5)]" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">Medium Risk Area</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-3 h-3 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                       <span className="text-[9px] font-black uppercase text-slate-600">Safe Area</span>
+                    </div>
+                 </div>
+               )}
             </CardContent>
          </Card>
       </div>

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { Shield, ArrowRight, Activity, MapPin, Zap, Bot } from "lucide-react"
+import { Shield, ArrowRight, Activity, MapPin, Zap, Bot, AlertTriangle, BrainCircuit } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
@@ -33,6 +33,13 @@ export default async function HomePage() {
     .order('created_at', { ascending: false })
     .limit(3)
 
+  // Fetch flagged vendors in user's city
+  const { count: flaggedCount } = await supabase
+    .from('vendors')
+    .select('id', { count: 'exact', head: true })
+    .eq('city', profile?.city || 'Jaipur')
+    .eq('is_flagged', true)
+
   const stats = [
     { label: "Total Scans", value: profile?.total_scans || 0, icon: Activity, color: "text-blue-400" },
     { label: "Safe Milk", value: profile?.safe_scans || 0, icon: Shield, color: "text-[#60A5FA]" },
@@ -59,7 +66,52 @@ export default async function HomePage() {
         </Link>
       </header>
 
-      <main className="flex-1 p-6 space-y-6">
+      <main className="flex-1 p-6 pt-0 space-y-6">
+        {/* Flagged Vendors Alert */}
+        {flaggedCount && flaggedCount > 0 ? (
+          <Link href="/map?filter=flagged" className="block mt-4 mb-2">
+            <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center justify-between group hover:bg-red-100 transition-colors shadow-sm shadow-red-100/50">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                     <AlertTriangle size={14} className="text-red-500" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest leading-tight">
+                      Community Alert
+                    </p>
+                    <p className="text-[11px] font-black text-red-600 uppercase tracking-tight leading-tight">
+                      ⚠️ {flaggedCount} vendors in your area are flagged 
+                    </p>
+                  </div>
+               </div>
+               <ArrowRight size={16} className="text-red-400 group-hover:translate-x-1 transition-transform shrink-0" />
+            </div>
+          </Link>
+        ) : null}
+
+        {/* AI Insights Link */}
+        <Link href="/insights" className="block mb-6">
+           <div className="bg-slate-800 rounded-3xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform shadow-xl shadow-slate-200">
+              <div className="flex justify-between items-center relative z-10">
+                 <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center shrink-0">
+                       <BrainCircuit size={24} className="text-[#60A5FA]" />
+                    </div>
+                    <div>
+                       <h3 className="text-white font-black uppercase tracking-tighter text-lg leading-tight flex items-center gap-2">
+                          AI Insights <span className="bg-[#60A5FA] text-white text-[8px] px-1.5 py-0.5 rounded uppercase tracking-widest leading-none">New</span>
+                       </h3>
+                       <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">City-wide Risk Analysis</p>
+                    </div>
+                 </div>
+                 <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center group-hover:bg-[#60A5FA] transition-colors">
+                    <ArrowRight size={14} className="text-white" />
+                 </div>
+              </div>
+              <div className="absolute top-[-20px] right-[-20px] w-32 h-32 bg-[#60A5FA]/20 rounded-full blur-3xl pointer-events-none" />
+           </div>
+        </Link>
+
         {/* Quick Action Card */}
         <Card className="bg-[#60A5FA] border-none shadow-xl shadow-blue-100/50 rounded-3xl overflow-hidden relative">
           <CardContent className="p-6">

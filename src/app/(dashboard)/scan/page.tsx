@@ -1,17 +1,18 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Zap, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useUserStore } from '@/store/useUserStore'
-import { runScan } from '@/lib/ai/scanEngine'
+import { runScan, recordScanOnChain } from '@/lib/ai/scanEngine'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { cn } from '@/lib/utils'
 import { useDeviceStore } from '@/store/useDeviceStore'
 import Link from 'next/link'
 import { trackTestInitiation } from '@/components/analytics/GoogleAnalytics'
+import BlockchainConfirmation from '@/components/BlockchainConfirmation'
 
 const SCAN_DURATION = 8000 // 8 seconds
 
@@ -22,6 +23,10 @@ export default function ScanPage() {
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState<'idle' | 'scanning' | 'analyzing' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [pendingScanId, setPendingScanId] = useState<string | null>(null)
+  // Holds the live blockchain promise so the overlay can await it
+  const blockchainPromiseRef = useRef<Promise<string | null>>(Promise.resolve(null))
   
   const connState = useDeviceStore((s) => s.connState)
   const isConnected = connState === 'connected'
@@ -56,7 +61,19 @@ export default function ScanPage() {
       try {
         const result = await runScan({ userId: user.id })
         if (result.success) {
-          router.push(`/history/${result.scanId}`)
+          // Start blockchain recording immediately (non-blocking) —
+          // the promise is passed to the overlay which awaits it in step 2.
+          blockchainPromiseRef.current = recordScanOnChain(
+            result.scanId,
+            null,           // vendorId not available from scan page (no vendor selected here)
+            result.safetyScore,
+            result.resultTier
+          )
+
+          setPendingScanId(result.scanId)
+          setShowConfirmation(true)
+          setIsScanning(false)
+          setStatus('idle')
         } else {
           throw new Error(result.error || 'Scan failed')
         }
@@ -70,6 +87,18 @@ export default function ScanPage() {
 
   return (
     <div className="flex flex-col items-center justify-between min-h-screen p-6 py-12 bg-white">
+      {/* Blockchain Confirmation Overlay */}
+      <AnimatePresence>
+        {showConfirmation && pendingScanId && (
+          <BlockchainConfirmation
+            blockchainPromise={blockchainPromiseRef.current}
+            onComplete={(txHash) => {
+              setShowConfirmation(false)
+              router.push(`/history/${pendingScanId}`)
+            }}
+          />
+        )}
+      </AnimatePresence>
       {/* Top Section */}
       <div className="w-full text-center">
         <h1 className="text-2xl font-black text-[#60A5FA] uppercase tracking-tighter mb-2">

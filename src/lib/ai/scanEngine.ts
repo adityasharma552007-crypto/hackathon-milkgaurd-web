@@ -1,5 +1,6 @@
 import { generateWavelengths, pickProfile } from "./wavegen"
 import { createClient } from "@/lib/supabase/client"
+import { recordScanOnBlockchain } from "@/lib/blockchain.service"
 
 export interface ScanRequest {
   userId: string
@@ -17,6 +18,7 @@ export interface ScanResponse {
   wavelengthAnalysis: WavelengthReading[]
   recommendation: string
   autoReported: boolean
+  vendorName?: string | null
   error?: string
 }
 
@@ -40,8 +42,9 @@ export interface WavelengthReading {
   status: "normal" | "elevated" | "anomaly"
 }
 
+// ─── Step 1: Run the NIR analysis (calls Edge Function, saves to Supabase) ─────
 export async function runScan(request: ScanRequest): Promise<ScanResponse> {
-  const profile    = pickProfile()
+  const profile     = pickProfile()
   const wavelengths = generateWavelengths(profile)
 
   const supabase = createClient()
@@ -69,4 +72,62 @@ export async function runScan(request: ScanRequest): Promise<ScanResponse> {
   }
 
   return res.json()
+}
+
+// ─── Step 2: Record result on blockchain & persist txHash to Supabase ──────────
+// Called separately so the UI can display a loading overlay while this runs.
+// Never throws — returns null on failure so the scan result is never lost.
+export async function recordScanOnChain(
+  scanId: string,
+  vendorId: string | null,
+  safetyScore: number,
+  resultTier: "safe" | "warning" | "danger" | "hazard"
+): Promise<string | null> {
+  try {
+    const supabase = createClient()
+
+    // Fetch vendor info for the blockchain record
+    let vendorName: string | null = null
+    let location: string | null = null
+
+    if (vendorId) {
+      const { data: vendor } = await supabase
+        .from("vendors")
+        .select("name, area, city")
+        .eq("id", vendorId)
+        .single()
+
+      if (vendor) {
+        vendorName = vendor.name ?? null
+        location = [vendor.area, vendor.city].filter(Boolean).join(", ") || null
+      }
+    }
+
+    const resultStatus = resultTier === "safe" ? "PASS" : "FAIL"
+
+    const txHash = await recordScanOnBlockchain(
+      vendorId,
+      vendorName,
+      location,
+      safetyScore,
+      resultStatus
+    )
+
+    if (txHash) {
+      const { error } = await supabase
+        .from("scans")
+        .update({ tx_hash: txHash })
+        .eq("id", scanId)
+
+      if (error) {
+        console.error("[MilkGuard Blockchain] Failed to persist tx_hash:", error)
+        return null
+      }
+    }
+
+    return txHash
+  } catch (err) {
+    console.error("[MilkGuard Blockchain] recordScanOnChain error (non-fatal):", err)
+    return null
+  }
 }

@@ -11,30 +11,48 @@ import {
   ChevronDown,
   Building2,
   Calendar,
-  Activity
+  Activity,
+  Blocks
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 
 import SpectralChart from "@/components/SpectralChart"
-import PDFButton from "@/components/PDFButton"
+import FSSAIReportModal from "@/components/FSSAIReportModal"
 import ReportButton from "@/components/ReportButton"
+import ReportVendorButton from "@/components/ReportVendorButton"
 import ExplainWithAI from "@/components/ExplainWithAI"
+import BlockchainDetails from "@/components/BlockchainDetails"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 
-export default async function ScanResultPage({ params }: { params: { id: string } }) {
+export default async function ScanResultPage({ 
+  params,
+  searchParams 
+}: { 
+  params: { id: string },
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   const supabase = createClient()
   const { data: scan } = await supabase
     .from('scans')
-    .select('*, vendors(name), adulterant_results(*), fssai_reports(id)')
+    .select('*, vendors(id, name, avg_score, report_count), adulterant_results(*), fssai_reports(id), tx_hash')
     .eq('id', params.id)
     .single()
 
   if (!scan) notFound()
+
+  function getTrustScoreDetails(avgScore: number, reportCount: number) {
+    const trustScore = Math.round((avgScore * 0.6) + Math.max(0, 40 - (reportCount * 5)))
+    if (trustScore >= 80) return { score: trustScore, label: 'Trusted', color: 'text-emerald-500', bg: 'bg-emerald-50' }
+    if (trustScore >= 50) return { score: trustScore, label: 'Moderate', color: 'text-amber-500', bg: 'bg-amber-50' }
+    return { score: trustScore, label: 'Flagged', color: 'text-red-500', bg: 'bg-red-50' }
+  }
+
+  const vendorTrust = scan.vendors ? getTrustScoreDetails(scan.vendors.avg_score || 0, scan.vendors.report_count || 0) : null
 
   const tierColors = {
     safe: "bg-[#60A5FA] text-white",
@@ -85,20 +103,65 @@ export default async function ScanResultPage({ params }: { params: { id: string 
       <main className="p-4 -mt-4 relative z-20 space-y-4 pb-12">
         {/* Info Card */}
         <Card className="rounded-3xl border-none shadow-lg">
-          <CardContent className="p-5 flex justify-between items-center">
-             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
-                  <Building2 size={20} className="text-slate-400" />
+          <CardContent className="p-5">
+             <div className="flex justify-between items-start mb-4">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                    <Building2 size={20} className="text-slate-400" />
+                 </div>
+                 <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Source</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-slate-800 leading-none">{scan.vendors?.name || 'Home/Unlisted Sample'}</p>
+                      {vendorTrust && (
+                        <Badge className={cn("text-[8px] h-4 uppercase font-black px-1.5", vendorTrust.bg, vendorTrust.color)}>
+                          {vendorTrust.label}
+                        </Badge>
+                      )}
+                    </div>
+                 </div>
                </div>
-               <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Source</p>
-                  <p className="font-bold text-slate-800 leading-none">{scan.vendors?.name || 'Home/Unlisted Sample'}</p>
+               <div className="text-right shrink-0">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Confidence</p>
+                  <Badge variant="secondary" className="bg-blue-50 text-[#60A5FA] border-none font-black">{scan.ai_confidence}%</Badge>
                </div>
              </div>
-             <div className="text-right">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Confidence</p>
-                <Badge variant="secondary" className="bg-blue-50 text-[#60A5FA] border-none font-black">{scan.ai_confidence}%</Badge>
-             </div>
+             
+             {scan.vendors && vendorTrust && (
+               <>
+                 <Separator className="mb-4 opacity-50" />
+                 <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                       <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Trust Score</p>
+                         <p className={cn("text-xl font-black leading-none", vendorTrust.color)}>{vendorTrust.score}</p>
+                       </div>
+                       <div>
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Comm. Reports</p>
+                         <p className="text-sm font-bold text-slate-600 leading-none">{scan.vendors.report_count || 0}</p>
+                       </div>
+                    </div>
+                    <ReportVendorButton 
+                      vendorId={scan.vendors.id} 
+                      vendorName={scan.vendors.name} 
+                      lastScanId={scan.id} 
+                    />
+                 </div>
+               </>
+             )}
+          </CardContent>
+        </Card>
+
+        {/* Blockchain Details Card */}
+        <Card className="rounded-3xl border-none shadow-lg">
+          <CardHeader className="p-5 pb-2">
+            <CardTitle className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+              <Blocks size={14} className="text-[#8247E5]" />
+              Blockchain Record
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-5 pt-3">
+            <BlockchainDetails txHash={scan.tx_hash ?? null} />
           </CardContent>
         </Card>
 
@@ -167,7 +230,7 @@ export default async function ScanResultPage({ params }: { params: { id: string 
           adulterantResults={scan.adulterant_results ?? []}
         />
 
-        {/* FSSAI Notice - PDF Export */}
+        {/* FSSAI Notice & Report Generator */}
         <div className="space-y-3">
           {['hazard', 'danger'].includes(scan.result_tier) && scan.vendor_id && (
             <ReportButton 
@@ -177,10 +240,13 @@ export default async function ScanResultPage({ params }: { params: { id: string 
             />
           )}
 
-          <PDFButton scan={scan} />
+          <FSSAIReportModal 
+            scan={scan} 
+            defaultOpen={searchParams.report === 'true'} 
+          />
         </div>
 
-        <Button variant="ghost" className="w-full text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+        <Button variant="ghost" className="w-full text-slate-400 font-bold text-[10px] uppercase tracking-widest print:hidden">
            Terms of Service & Regulatory Basis
         </Button>
       </main>
