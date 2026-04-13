@@ -90,4 +90,47 @@ MilkGuard compares all detected samples against **FSSAI (Food Safety and Standar
 
 ---
 
+## 📱 Android App
+
+MilkGuard is available as an Android APK for on-the-go milk testing.
+
+### Download
+
+Get the official APK from our download page:
+**[Download MilkGuard APK](https://milkguard.vercel.app/download)**
+
+### System Requirements
+
+| Requirement | Specification |
+|-------------|---------------|
+| Android Version | 5.0 (API 21) or higher |
+| Storage | 50 MB free space |
+| Internet | Required for cloud sync and AI analysis |
+
+### Installation Steps
+
+1. **Download the APK** from the download page
+2. **Enable Unknown Sources**: Settings → Security → Enable "Install from Unknown Sources"
+3. **Install**: Open Downloads folder and tap `MilkGuard.apk`
+4. **Launch**: Tap "Open" after installation
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Installation blocked | Enable "Unknown Sources" in Settings → Security |
+| App won't open | Ensure Android 5.0+ is installed |
+| Download fails | Check internet connection and retry |
+| Insufficient storage | Free up at least 50 MB of space |
+
+### Version Info
+
+- **Current Version:** 1.0.0
+- **Build Date:** April 2026
+- **Target SDK:** Android 14 (API 34)
+
+For support, contact: support@milkguard.app
+
+---
+
 Built with ❤️ for a Healthier India 🇮🇳

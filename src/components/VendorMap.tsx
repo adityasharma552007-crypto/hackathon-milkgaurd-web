@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -156,7 +157,9 @@ export default function VendorMap({ vendors, scans = [], cityName = 'Jaipur', fl
               <Popup {...({ className: "custom-popup" } as any)}>
                 <div className="w-52 p-1">
                   <div className="flex justify-between items-start mb-3">
-                     <h3 className="font-black text-slate-800 text-sm max-w-[120px] leading-tight shrink-0">{vendor.name}</h3>
+                     <Link href={`/vendors/${vendor.id}`}>
+                       <h3 className="font-black text-slate-800 text-sm max-w-[120px] leading-tight shrink-0 hover:text-[#60A5FA] cursor-pointer transition-colors underline underline-offset-4">{vendor.name}</h3>
+                     </Link>
                      <Badge className={cn("text-[8px] h-5 uppercase font-black shrink-0", trust.bg, trust.color)}>
                        {trust.label}
                      </Badge>

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { Download } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -17,6 +18,7 @@ export default function LandingClient() {
   const router = useRouter()
 
   const goToLogin = () => router.push('/auth/login')
+  const goToDownload = () => router.push('/download')
 
   return (
     <main
@@ -150,13 +152,13 @@ export default function LandingClient() {
           Trusted by families across India 🇮🇳
         </motion.p>
 
-        {/* CTA Button */}
+        {/* CTA Buttons */}
         <motion.div
           custom={0.35}
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          style={{ width: '100%', maxWidth: 320 }}
+          style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 12 }}
         >
           <button
             onClick={goToLogin}
@@ -176,6 +178,29 @@ export default function LandingClient() {
             }}
           >
             Get Started →
+          </button>
+          <button
+            onClick={goToDownload}
+            className="landing-cta-btn-secondary"
+            style={{
+              width: '100%',
+              height: 48,
+              borderRadius: 999,
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              color: '#fff',
+              fontSize: 15,
+              fontWeight: 600,
+              border: '2px solid rgba(255,255,255,0.3)',
+              cursor: 'pointer',
+              letterSpacing: '0.2px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            <Download size={18} />
+            Download APK
           </button>
         </motion.div>
 
@@ -639,6 +664,54 @@ export default function LandingClient() {
           textAlign: 'center',
         }}
       >
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 12 }}>
+          <button
+            onClick={goToDownload}
+            style={{
+              color: '#65A4FF',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 500,
+              padding: 0,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            Download APK
+          </button>
+          <a
+            href="/about"
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 13,
+              padding: 0,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            About
+          </a>
+          <a
+            href="/faq"
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: 13,
+              padding: 0,
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+            }}
+          >
+            FAQ
+          </a>
+        </div>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, margin: 0 }}>
           MilkGuard © 2026
         </p>
@@ -658,6 +731,17 @@ export default function LandingClient() {
           box-shadow: 0 6px 24px rgba(245,166,35,0.5) !important;
         }
         .landing-cta-btn:active {
+          transform: scale(0.98);
+        }
+        .landing-cta-btn-secondary {
+          transition: background-color 200ms ease, transform 200ms ease, border-color 200ms ease;
+        }
+        .landing-cta-btn-secondary:hover {
+          background-color: rgba(255,255,255,0.3) !important;
+          transform: scale(1.02);
+          border-color: rgba(255,255,255,0.5) !important;
+        }
+        .landing-cta-btn-secondary:active {
           transform: scale(0.98);
         }
         @keyframes scrollPulse {

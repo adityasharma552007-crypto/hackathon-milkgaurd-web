@@ -48,7 +48,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="p-6 pb-2 pt-12 flex items-center justify-between">
+      <header className="p-6 pb-2 pt-6 flex items-center justify-between">
         <div>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Welcome back</p>
           <h1 className="text-2xl font-black text-[#60A5FA] tracking-tighter uppercase leading-none">

@@ -169,7 +169,7 @@ export default async function InsightsPage() {
            </h2>
            <div className="flex gap-3 overflow-x-auto pb-4 snap-x pr-6 -mr-6 pl-1">
               {topVendors.map(vendor => (
-                <div key={vendor.id} className="min-w-[200px] bg-white rounded-2xl p-4 shadow-sm border border-slate-100 snap-center shrink-0">
+                <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="min-w-[200px] bg-white rounded-2xl p-4 shadow-sm border border-slate-100 snap-center shrink-0 hover:shadow-md transition-shadow">
                    <div className="flex justify-between items-start mb-2">
                      <p className="font-black text-slate-800 text-sm truncate pr-2">{vendor.name}</p>
                      <Badge className="bg-emerald-50 text-emerald-600 shrink-0 text-[8px] uppercase font-black px-1.5 border-none h-4">
@@ -179,7 +179,7 @@ export default async function InsightsPage() {
                    <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                      <MapPin size={10} /> {vendor.area || city}
                    </div>
-                </div>
+                </Link>
               ))}
            </div>
         </section>
@@ -192,7 +192,7 @@ export default async function InsightsPage() {
              </h2>
              <div className="flex gap-3 overflow-x-auto pb-4 snap-x pr-6 -mr-6 pl-1">
                 {flagVendorsList.map(vendor => (
-                  <Link key={vendor.id} href={`/map?filter=flagged`} className="min-w-[200px] bg-red-50 rounded-2xl p-4 border border-red-100 snap-center shrink-0 hover:bg-red-100 transition-colors">
+                  <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="min-w-[200px] bg-red-50 rounded-2xl p-4 border border-red-100 snap-center shrink-0 hover:bg-red-100 transition-colors">
                      <div className="flex justify-between items-start mb-2">
                        <p className="font-black text-slate-800 text-sm truncate pr-2">{vendor.name}</p>
                        <Badge className="bg-red-500 text-white shrink-0 text-[8px] uppercase font-black px-1.5 border-none h-4">
