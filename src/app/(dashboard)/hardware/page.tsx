@@ -186,7 +186,20 @@ export default function HardwarePage() {
             <ChevronLeft size={20} className="text-[#60A5FA]" />
           </Link>
           <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Device</h1>
-          <ConnectionStatus showLabel={false} />
+          {/* Animated WiFi signal when LIVE */}
+          <div className="relative flex items-center justify-center w-9 h-9">
+            {deviceStatus === "LIVE" && (
+              <>
+                <span className="absolute inline-flex h-9 w-9 rounded-full bg-green-400 opacity-20 animate-ping" />
+                <span className="absolute inline-flex h-6 w-6 rounded-full bg-green-400 opacity-30 animate-ping [animation-delay:0.2s]" />
+              </>
+            )}
+            <div className={`relative z-10 p-1.5 rounded-full transition-colors ${
+              deviceStatus === "LIVE" ? "bg-green-100" : "bg-slate-100"
+            }`}>
+              <Wifi size={18} className={deviceStatus === "LIVE" ? "text-green-600" : "text-slate-400"} />
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -249,14 +262,17 @@ export default function HardwarePage() {
 
               {!pairedDevice ? (
                 /* No device paired */
-                <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
-                  <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center">
-                    <Cpu size={32} className="text-slate-300" />
+                <div className="flex flex-col items-center justify-center py-16 text-center gap-4">
+                  <div className={`w-20 h-20 rounded-3xl flex items-center justify-center transition-colors ${
+                    deviceStatus === "LIVE" ? "bg-green-50" : "bg-slate-50"
+                  }`}>
+                    <Cpu size={32} className={deviceStatus === "LIVE" ? "text-green-500" : "text-slate-300"} />
                   </div>
                   <div>
-                    <p className="font-black text-slate-700 tracking-tight">No Device Connected</p>
+                    <p className="font-black text-slate-700 tracking-tight">
+                      {deviceStatus === "LIVE" ? "ESP32 is Live!" : "No Device Connected"}
+                    </p>
                     <p className="text-slate-400 text-xs mt-1 max-w-[220px] leading-relaxed">
-                      Go to the <strong>Scanner</strong> tab to find your MilkGuard Pod on the network.
                     </p>
                   </div>
                   <button
@@ -308,20 +324,26 @@ export default function HardwarePage() {
 
                   {/* ── Test controls ── */}
                   {testPhase === 'idle' && (
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={startTest}
-                      disabled={!isConnected}
-                      className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#60A5FA] disabled:bg-slate-200 text-white disabled:text-slate-400 rounded-2xl font-black text-base tracking-tight hover:bg-[#3B82F6] transition-colors shadow-lg shadow-green-900/20"
-                    >
-                      {isConnecting ? (
-                        <><Loader2 size={20} className="animate-spin" /> Connecting…</>
-                      ) : isConnected ? (
-                        <><Play size={20} fill="white" /> Start Test</>
-                      ) : (
-                        <><PlugZap size={20} /> Connect Device First</>
-                      )}
-                    </motion.button>
+                    deviceStatus === 'LIVE' ? (
+                      <Link
+                        href="/scan"
+                        className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#60A5FA] text-white rounded-2xl font-black text-base tracking-tight hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.01] active:scale-[0.98]"
+                      >
+                        <Play size={20} fill="white" /> Scan Milk Now
+                      </Link>
+                    ) : (
+                      <motion.button
+                        whileTap={{ scale: 0.97 }}
+                        disabled
+                        className="w-full flex items-center justify-center gap-2.5 py-5 bg-slate-100 text-slate-400 rounded-2xl font-black text-base tracking-tight cursor-not-allowed"
+                      >
+                        {deviceStatus === 'WAITING' ? (
+                          <><Loader2 size={20} className="animate-spin" /> Waiting for ESP32…</>
+                        ) : (
+                          <><PlugZap size={20} /> Device Offline</>  
+                        )}
+                      </motion.button>
+                    )
                   )}
 
                   {/* Live test progress */}
