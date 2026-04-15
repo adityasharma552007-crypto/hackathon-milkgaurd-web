@@ -48,7 +48,6 @@ BEGIN
     ai_confidence,
     scan_duration,
     wavelength_data,
-    adulterants,
     recommendation,
     source_hardware_id,
     created_at
@@ -66,7 +65,6 @@ BEGIN
       'channels', 1,
       'note', 'Hardware reading — no spectral decomposition available'
     ),
-    NULL,                                  -- no adulterant breakdown for hardware scans
     v_recommendation,
     NEW.id,                                -- link back to milk_data row
     NEW.created_at
