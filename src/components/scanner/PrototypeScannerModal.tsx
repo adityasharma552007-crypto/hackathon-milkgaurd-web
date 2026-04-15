@@ -221,7 +221,6 @@ export function PrototypeScannerModal({ isOpen, onClose }: PrototypeScannerModal
           scan_duration:   scanDuration,
           wavelength_data: wavelengthAnalysis,
           baseline_data:   BASELINE,
-          adulterants,
           recommendation,
         })
         .select()
@@ -234,7 +233,6 @@ export function PrototypeScannerModal({ isOpen, onClose }: PrototypeScannerModal
         adulterants.map(a => ({
           scan_id:        scan.id,
           name:           a.name,
-          detected:       a.detected,
           detected_value: a.detectedValue,
           safe_limit:     a.safeLimit,
           unit:           a.unit,
