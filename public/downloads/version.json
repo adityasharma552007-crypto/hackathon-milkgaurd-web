@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "versionCode": 1,
+  "buildDate": "2026-04-13T12:00:00Z",
+  "mode": "release",
+  "filename": "MilkGuard.apk",
+  "size": "24.5 MB",
+  "sizeBytes": 25690112,
+  "minSdkVersion": 21,
+  "targetSdkVersion": 34,
+  "downloadUrl": "/downloads/MilkGuard.apk",
+  "changelog": [
+    "Initial release of MilkGuard Android app",
+    "AI-powered milk adulteration detection",
+    "Contactless spectral analysis integration",
+    "FSSAI compliance reporting",
+    "Real-time results in 8 seconds",
+    "Vendor mapping and history tracking",
+    "Blockchain-backed test records"
+  ],
+  "requirements": {
+    "android": "5.0 (API 21) or higher",
+    "storage": "50 MB free space",
+    "internet": "Required for cloud sync and AI analysis",
+    "permissions": [
+      "Camera (for QR scanning)",
+      "Location (for vendor mapping)",
+      "Storage (for report exports)"
+    ]
+  },
+  "releaseNotes": "MilkGuard v1.0 - Your pocket milk safety tester. Scan milk samples, get instant AI-powered adulteration results, and protect your family from harmful contaminants."
+}
