@@ -82,11 +82,11 @@ export default function FAQPage() {
         />
 
         {/* ── HERO SECTION ────────────────────────────────────────────────── */}
-        <header className="bg-gradient-to-b from-[#1A6B4A] to-[#134f37] text-white py-12 px-6">
+        <header className="bg-gradient-to-b from-[#60A5FA] to-[#3B82F6] text-white py-12 px-6">
           <PageTitle as="h1" className="text-white mb-2">
             Frequently Asked Questions
           </PageTitle>
-          <PageSubtitle className="text-green-200">
+          <PageSubtitle className="text-blue-200">
             Everything About Milk Purity Testing
           </PageSubtitle>
         </header>
@@ -94,16 +94,16 @@ export default function FAQPage() {
         {/* ── QUICK LINKS ───────────────────────────────────────────────── */}
         <section className="py-6 px-6 border-b">
           <div className="flex flex-wrap gap-2">
-            <a href="#general" className="text-xs font-medium text-[#1A6B4A] bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors">
+            <a href="#general" className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">
               General
             </a>
-            <a href="#accuracy" className="text-xs font-medium text-[#1A6B4A] bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors">
+            <a href="#accuracy" className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">
               Accuracy
             </a>
-            <a href="#device" className="text-xs font-medium text-[#1A6B4A] bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors">
+            <a href="#device" className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">
               Device
             </a>
-            <a href="#safety" className="text-xs font-medium text-[#1A6B4A] bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition-colors">
+            <a href="#safety" className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-3 py-1.5 rounded-full hover:bg-blue-100 transition-colors">
               Safety
             </a>
           </div>
@@ -111,7 +111,7 @@ export default function FAQPage() {
 
         {/* ── GENERAL QUESTIONS ─────────────────────────────────────────── */}
         <section id="general" className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <HelpCircle className="w-6 h-6" />
             General Questions
           </h2>
@@ -125,7 +125,7 @@ export default function FAQPage() {
 
         {/* ── ACCURACY & DETECTION ──────────────────────────────────────── */}
         <section id="accuracy" className="py-8 px-6 bg-slate-50">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <HelpCircle className="w-6 h-6" />
             Accuracy & Detection
           </h2>
@@ -139,7 +139,7 @@ export default function FAQPage() {
 
         {/* ── DEVICE & USAGE ────────────────────────────────────────────── */}
         <section id="device" className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <HelpCircle className="w-6 h-6" />
             Device & Usage
           </h2>
@@ -153,7 +153,7 @@ export default function FAQPage() {
 
         {/* ── SAFETY & COMPLIANCE ───────────────────────────────────────── */}
         <section id="safety" className="py-8 px-6 bg-slate-50">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <HelpCircle className="w-6 h-6" />
             Safety & Compliance
           </h2>
@@ -167,14 +167,14 @@ export default function FAQPage() {
 
         {/* ── STILL HAVE QUESTIONS ──────────────────────────────────────── */}
         <section className="py-8 px-6">
-          <div className="bg-gradient-to-r from-[#1A6B4A] to-[#134f37] text-white p-6 rounded-xl text-center">
+          <div className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white p-6 rounded-xl text-center">
             <h2 className="font-black text-xl mb-2">Still Have Questions?</h2>
             <p className="text-white/90 text-sm mb-4">
               Our AI chat assistant can help with specific questions about milk testing, adulteration, and FSSAI standards.
             </p>
             <a
               href="/chat"
-              className="inline-block bg-white text-[#1A6B4A] font-bold py-3 px-8 rounded-full hover:bg-green-50 transition-colors"
+              className="inline-block bg-white text-[#3B82F6] font-bold py-3 px-8 rounded-full hover:bg-blue-50 transition-colors"
             >
               Chat with AI →
             </a>
@@ -183,23 +183,23 @@ export default function FAQPage() {
 
         {/* ── RELATED LINKS ─────────────────────────────────────────────── */}
         <section className="py-8 px-6 border-t">
-          <h3 className="font-bold text-[#1A6B4A] mb-4 text-center">Related Resources</h3>
+          <h3 className="font-bold text-[#3B82F6] mb-4 text-center">Related Resources</h3>
           <div className="flex flex-wrap justify-center gap-3">
             <a
               href="/how-it-works"
-              className="text-sm text-[#1A6B4A] bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors"
+              className="text-sm text-[#3B82F6] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
             >
               How It Works
             </a>
             <a
               href="/about"
-              className="text-sm text-[#1A6B4A] bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors"
+              className="text-sm text-[#3B82F6] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
             >
               About MilkGuard
             </a>
             <a
               href="/learn"
-              className="text-sm text-[#1A6B4A] bg-green-50 px-4 py-2 rounded-lg hover:bg-green-100 transition-colors"
+              className="text-sm text-[#3B82F6] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
             >
               Learn About Adulteration
             </a>
@@ -215,7 +215,7 @@ export default function FAQPage() {
         {/* ── FOOTER ────────────────────────────────────────────────────── */}
         <footer className="py-8 px-6 text-center border-t">
           <p className="text-sm text-slate-500">
-            MilkGuard © 2026 | Team API Avengers 🇮🇳
+            MilkGuard © 2026 | ARJUNAS 🇮🇳
           </p>
         </footer>
       </div>
@@ -231,7 +231,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <details className="group bg-white rounded-lg shadow-sm border border-slate-200">
       <summary className="flex items-center justify-between cursor-pointer p-4 list-none">
-        <h4 className="font-semibold text-[#1A6B4A] text-sm pr-4">
+        <h4 className="font-semibold text-[#3B82F6] text-sm pr-4">
           {question}
         </h4>
         <ChevronDown className="w-5 h-5 text-slate-400 flex-shrink-0 transition-transform group-open:rotate-180" />

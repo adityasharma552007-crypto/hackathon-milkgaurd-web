@@ -20,7 +20,7 @@ export const metadata: Metadata = aboutMetadata
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Team API Avengers',
+  name: 'ARJUNAS',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://milkguard.vercel.app',
   description: 'Developers building AI-powered food safety solutions for India',
   foundingDate: '2024',
@@ -50,16 +50,16 @@ export default async function AboutPage() {
         />
 
         {/* ── HERO SECTION ────────────────────────────────────────────────── */}
-        <header className="bg-gradient-to-b from-[#1A6B4A] to-[#134f37] text-white py-12 px-6">
+        <header className="bg-gradient-to-b from-[#60A5FA] to-[#3B82F6] text-white py-12 px-6">
           <PageTitle as="h1" className="text-white mb-2">About MilkGuard</PageTitle>
-          <PageSubtitle className="text-green-200">
+          <PageSubtitle className="text-blue-200">
             Protecting Families, One Drop at a Time
           </PageSubtitle>
         </header>
 
         {/* ── MISSION SECTION ─────────────────────────────────────────────── */}
         <section className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <Target className="w-6 h-6" />
             Our Mission
           </h2>
@@ -73,7 +73,7 @@ export default async function AboutPage() {
 
         {/* ── THE PROBLEM ─────────────────────────────────────────────────── */}
         <section className="py-8 px-6 bg-red-50 border-l-4 border-red-500">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <Shield className="w-6 h-6 text-red-600" />
             The Problem We're Solving
           </h2>
@@ -101,7 +101,7 @@ export default async function AboutPage() {
 
         {/* ── OUR SOLUTION ────────────────────────────────────────────────── */}
         <section className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <Zap className="w-6 h-6" />
             The MilkGuard Solution
           </h2>
@@ -109,34 +109,34 @@ export default async function AboutPage() {
             MilkGuard combines <strong>hardware innovation with artificial intelligence</strong> to deliver laboratory-grade milk testing in a portable, affordable device.
           </SEOParagraph>
           <div className="grid gap-4 mt-6">
-            <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Zap className="w-5 h-5 text-green-600" />
+            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Zap className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-bold text-[#1A6B4A] mb-1">8-Second Testing</h3>
+                <h3 className="font-bold text-[#3B82F6] mb-1">8-Second Testing</h3>
                 <p className="text-sm text-slate-600">
                   Get results faster than any traditional test kit
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Shield className="w-5 h-5 text-green-600" />
+            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Shield className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-bold text-[#1A6B4A] mb-1">Contactless Detection</h3>
+                <h3 className="font-bold text-[#3B82F6] mb-1">Contactless Detection</h3>
                 <p className="text-sm text-slate-600">
                   NIR technology reads through containers — no touching, no contamination
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Award className="w-5 h-5 text-green-600" />
+            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <Award className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-bold text-[#1A6B4A] mb-1">FSSAI Compliant</h3>
+                <h3 className="font-bold text-[#3B82F6] mb-1">FSSAI Compliant</h3>
                 <p className="text-sm text-slate-600">
                   Every result compared against official FSSAI 2025-26 safety limits
                 </p>
@@ -147,19 +147,19 @@ export default async function AboutPage() {
 
         {/* ── TEAM SECTION ────────────────────────────────────────────────── */}
         <section className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <Users className="w-6 h-6" />
-            Team API Avengers
+            ARJUNAS
           </h2>
           <SEOParagraph className="mb-4">
             We are a team of passionate developers, engineers, and food safety advocates dedicated to solving India's milk adulteration crisis through technology.
           </SEOParagraph>
-          <div className="bg-gradient-to-r from-[#1A6B4A] to-[#134f37] text-white p-6 rounded-xl mt-4">
+          <div className="bg-gradient-to-r from-[#60A5FA] to-[#3B82F6] text-white p-6 rounded-xl mt-4">
             <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
               <Heart className="w-5 h-5" />
               Built for India, By India
             </h3>
-            <p className="text-green-100 text-sm">
+            <p className="text-blue-100 text-sm">
               MilkGuard is proudly developed in India, designed specifically for Indian milk supply chains and FSSAI regulations. We understand the unique challenges Indian families face and have built a solution that works in real-world conditions.
             </p>
           </div>
@@ -167,7 +167,7 @@ export default async function AboutPage() {
 
         {/* ── TECHNOLOGY SECTION ──────────────────────────────────────────── */}
         <section className="py-8 px-6">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-6 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-6 tracking-tight flex items-center gap-2">
             <Award className="w-6 h-6" />
             Our Technology
           </h2>
@@ -178,7 +178,7 @@ export default async function AboutPage() {
             Our <strong>AI model analyzes 18 different wavelengths</strong> of light to create a unique spectral fingerprint for each milk sample. This fingerprint is compared against our database of known adulterants to identify contaminants with high accuracy.
           </SEOParagraph>
           <div className="bg-slate-50 p-4 rounded-lg mt-4">
-            <h3 className="font-bold text-[#1A6B4A] mb-2">Detected Adulterants:</h3>
+            <h3 className="font-bold text-[#3B82F6] mb-2">Detected Adulterants:</h3>
             <ul className="grid grid-cols-2 gap-2 text-sm text-slate-600">
               <li>• Urea</li>
               <li>• Detergent</li>
@@ -194,7 +194,7 @@ export default async function AboutPage() {
 
         {/* ── BLOCKCHAIN TRANSPARENCY SECTION ─────────────────────────────── */}
         <section className="py-8 px-6 bg-gradient-to-br from-[#f5f0ff] to-white">
-          <h2 className="text-2xl font-black text-[#1A6B4A] mb-4 tracking-tight flex items-center gap-2">
+          <h2 className="text-2xl font-black text-[#3B82F6] mb-4 tracking-tight flex items-center gap-2">
             <ShieldCheck className="w-6 h-6 text-[#8247E5]" />
             Blockchain Verified Records
           </h2>
@@ -239,7 +239,7 @@ export default async function AboutPage() {
             </p>
             <a
               href="/scan"
-              className="inline-block bg-white text-[#F5A623] font-bold py-3 px-8 rounded-full hover:bg-green-50 transition-colors"
+              className="inline-block bg-white text-[#F5A623] font-bold py-3 px-8 rounded-full hover:bg-blue-50 transition-colors"
             >
               Start Free Test →
             </a>
@@ -249,16 +249,16 @@ export default async function AboutPage() {
         {/* ── FOOTER ──────────────────────────────────────────────────────── */}
         <footer className="py-8 px-6 text-center border-t">
           <p className="text-sm text-slate-500">
-            MilkGuard © 2026 | Built by Team API Avengers 🇮🇳
+            MilkGuard © 2026 | Built by ARJUNAS 🇮🇳
           </p>
           <div className="flex justify-center gap-4 mt-4">
-            <a href="/how-it-works" className="text-sm text-[#1A6B4A] hover:underline">
+            <a href="/how-it-works" className="text-sm text-[#3B82F6] hover:underline">
               How It Works
             </a>
-            <a href="/faq" className="text-sm text-[#1A6B4A] hover:underline">
+            <a href="/faq" className="text-sm text-[#3B82F6] hover:underline">
               FAQ
             </a>
-            <a href="/learn" className="text-sm text-[#1A6B4A] hover:underline">
+            <a href="/learn" className="text-sm text-[#3B82F6] hover:underline">
               Learn More
             </a>
           </div>
