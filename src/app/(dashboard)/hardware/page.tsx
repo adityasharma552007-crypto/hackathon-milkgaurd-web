@@ -15,9 +15,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Cpu, Wifi, ScanLine, Settings2, ChevronLeft,
   Loader2, AlertCircle, RefreshCw, Play, Zap,
-  PlugZap, Info, ClipboardList,
+  PlugZap, Info, ClipboardList, CheckCircle2,
 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useDeviceStore, DiscoveredDevice } from '@/store/useDeviceStore'
 import { useDeviceSocket } from '@/hooks/useDeviceSocket'
 import { ConnectionStatus } from '@/components/ConnectionStatus'
@@ -25,6 +26,7 @@ import { DeviceCard } from '@/components/DeviceCard'
 import { TestProgress } from '@/components/TestProgress'
 import { IoTResultsDisplay } from '@/components/IoTResultsDisplay'
 import { useRealtimeScans, ScanRow, getDerivativeStatus } from '@/hooks/useRealtimeScans'
+import { createClient } from '@/lib/supabase/client'
 
 const timeAgo = (dateString: string) => {
   const diff = Date.now() - new Date(dateString).getTime();
@@ -73,9 +75,12 @@ function useSettings() {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HardwarePage() {
-  const [tab,         setTab]         = useState<Tab>('device')
-  const [scanLoading, setScanLoading] = useState(false)
-  const [scanError,   setScanError]   = useState<string | null>(null)
+  const router = useRouter()
+  const [tab,                setTab]                = useState<Tab>('device')
+  const [scanLoading,        setScanLoading]        = useState(false)
+  const [scanError,          setScanError]          = useState<string | null>(null)
+  const [isAwaitingReading,  setIsAwaitingReading]  = useState(false)
+  const [awaitPhase,         setAwaitPhase]         = useState<'waiting' | 'found'>('waiting')
 
   const {
     pairedDevice, connState, discovered,
@@ -89,6 +94,53 @@ export default function HardwarePage() {
   
   // Realtime Supabase Hook
   const { readings, loading: scansLoading } = useRealtimeScans()
+
+  // ── Hardware Scan Flow ───────────────────────────────────────────────────────
+  // When user taps "Scan Milk Now", subscribe to the NEXT milk_data INSERT,
+  // wait for the Postgres trigger to create a scans row, then navigate to it.
+  const startHardwareScan = useCallback(async () => {
+    setIsAwaitingReading(true)
+    setAwaitPhase('waiting')
+    const supabase = createClient()
+
+    const channel = supabase
+      .channel('hardware_scan_once_' + Date.now())
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'milk_data' },
+        async (payload) => {
+          const milkDataId = payload.new.id
+          setAwaitPhase('found')
+
+          // Wait 1.5s for the trigger to create the scans row
+          await new Promise(r => setTimeout(r, 1500))
+
+          // Fetch the corresponding scans row
+          const { data: scanRow } = await supabase
+            .from('scans')
+            .select('id')
+            .eq('source_hardware_id', milkDataId)
+            .single()
+
+          await supabase.removeChannel(channel)
+
+          if (scanRow?.id) {
+            router.push(`/history/${scanRow.id}`)
+          } else {
+            // Fallback: go to history if scan row not found
+            router.push('/history')
+          }
+          setIsAwaitingReading(false)
+        }
+      )
+      .subscribe()
+
+    // Auto-cancel after 60s if no reading arrives
+    setTimeout(() => {
+      supabase.removeChannel(channel)
+      setIsAwaitingReading(false)
+    }, 60000)
+  }, [router])
   
   // Calculate hardware connection status
   const [deviceStatus, setDeviceStatus] = useState<"LIVE" | "WAITING" | "OFFLINE">("WAITING");
@@ -178,6 +230,58 @@ export default function HardwarePage() {
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col min-h-screen bg-white">
+
+      {/* ── Hardware Scan Loading Overlay ── */}
+      <AnimatePresence>
+        {isAwaitingReading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center gap-6 px-8"
+          >
+            {awaitPhase === 'waiting' ? (
+              <>
+                {/* Pulsing sensor indicator */}
+                <div className="relative flex items-center justify-center w-32 h-32">
+                  <span className="absolute w-32 h-32 rounded-full bg-[#60A5FA]/10 animate-ping" />
+                  <span className="absolute w-24 h-24 rounded-full bg-[#60A5FA]/20 animate-ping [animation-delay:0.3s]" />
+                  <div className="relative z-10 w-20 h-20 rounded-full bg-[#60A5FA] flex items-center justify-center shadow-2xl shadow-blue-200">
+                    <Wifi size={36} className="text-white" />
+                  </div>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Scanning Milk</p>
+                  <p className="text-sm text-slate-400 font-medium mt-1">Waiting for ESP32 sensor reading…</p>
+                  <p className="text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-3">Place sensor in milk sample</p>
+                </div>
+                <button
+                  onClick={() => setIsAwaitingReading(false)}
+                  className="text-xs text-slate-400 font-bold uppercase tracking-widest hover:text-slate-600"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                {/* Reading found */}
+                <motion.div
+                  initial={{ scale: 0.5 }}
+                  animate={{ scale: 1 }}
+                  className="w-24 h-24 rounded-full bg-green-500 flex items-center justify-center shadow-2xl shadow-green-200"
+                >
+                  <CheckCircle2 size={44} className="text-white" />
+                </motion.div>
+                <div className="text-center">
+                  <p className="text-2xl font-black text-slate-800 uppercase tracking-tighter">Reading Captured!</p>
+                  <p className="text-sm text-slate-400 font-medium mt-1">Generating your report…</p>
+                </div>
+                <Loader2 size={24} className="animate-spin text-[#60A5FA]" />
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Header ── */}
       <header className="px-5 pt-12 pb-4 bg-white">
@@ -279,12 +383,12 @@ export default function HardwarePage() {
                     </p>
                   </div>
                   {deviceStatus === "LIVE" ? (
-                    <Link
-                      href="/scan"
+                    <button
+                      onClick={startHardwareScan}
                       className="flex items-center gap-2 px-6 py-3.5 bg-[#60A5FA] text-white text-sm font-black rounded-2xl hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       <Play size={15} fill="white" /> Scan Milk Now
-                    </Link>
+                    </button>
                   ) : (
                     <button
                       onClick={() => setTab('scanner')}
@@ -337,12 +441,12 @@ export default function HardwarePage() {
                   {/* ── Test controls ── */}
                   {testPhase === 'idle' && (
                     deviceStatus === 'LIVE' ? (
-                      <Link
-                        href="/scan"
+                      <button
+                        onClick={startHardwareScan}
                         className="w-full flex items-center justify-center gap-2.5 py-5 bg-[#60A5FA] text-white rounded-2xl font-black text-base tracking-tight hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.01] active:scale-[0.98]"
                       >
                         <Play size={20} fill="white" /> Scan Milk Now
-                      </Link>
+                      </button>
                     ) : (
                       <motion.button
                         whileTap={{ scale: 0.97 }}
