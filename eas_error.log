@@ -1,0 +1,51 @@
+{
+  "id": "cadd4ecc-e8ff-4eeb-aad2-7e28a8138388",
+  "status": "ERRORED",
+  "platform": "ANDROID",
+  "error": {
+    "errorCode": "UNKNOWN_ERROR",
+    "message": "Unknown error. See logs of the Bundle JavaScript build phase for more information."
+  },
+  "artifacts": {},
+  "fingerprint": {
+    "id": "019d923a-6c57-705d-a7e6-992fe42fe0c5",
+    "hash": "44eccf609e3a549e6cc0f4016eea71d061a364c8"
+  },
+  "initiatingActor": {
+    "id": "cb724199-91bf-473d-8bac-8141a2942fcb",
+    "displayName": "adityasharma552007"
+  },
+  "logFiles": [
+    "https://job-logs.eascdn.net/production/cadd4ecc-e8ff-4eeb-aad2-7e28a8138388/1776274795804-0ac8e99d-9045-45c5-91bb-1e660b8c410a.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260415%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260415T174134Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=48f5f25a391dc050b12ec0779aa73dbc188fa7cbf5e32e0a057b8f75e2e6580811dff66772e9b2bb8c9676b80aea0a9e01ac3887374419f6c426d336116241d71c5c0b0e01bf08458f4bc25fb53f5bd96fdcb6e72c9cdceac83602a379893cd358d0b9839f482a1f55b5f3301b501b0937d928af4e5b4bfdefb7f2c56af9846e51909ab2adb3dca375951180140f1baa59f858f18a5b77accb3aa70b34255fff0d4c243a559d88c0d320052bcd91ff11e1916fc45b0cf6cdce88e60f812d3e015dd3ae58cc7b3e72c6c1b234f4952befe7247f19b2369ae854edb032618e15fd9d697c2486341f5a0e2ee481cd8ddedad4dc05b776d2da2bb41c27ba6a42e794",
+    "https://job-logs.eascdn.net/production/cadd4ecc-e8ff-4eeb-aad2-7e28a8138388/1776274805598-ee9ea64c-8ea8-4d18-83a6-91e66f4c653d.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260415%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260415T174134Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=3ead29c2261e386c8f16f2f34369c038138c4bedd7396cd65bc1e29a9f7f0c34c5c008b5c773d5584ace807ac8fac2f55e4e54af0d796a70109942247cc0473567dafa6d86a4df8c456670920a9352d90aba048ba8e974c0d37b5405c1f8ebc37fc47a511f872e93e7bd519d56a98c44953e859137ba2b575a5ef22504ee8ba9b3d2d358f1e0aa11706bb1a29b6b8d7a4750103439db7d8f1cd9e002353be95c2dac41d6cb729c94f39e8183931bc44952cf05272c3aa19fab2630b98be06158003e35b259e40a01840d494fafb2dd8fa7ae9d70cd0ca3e85f62e0b6ef5204a1edd9de1616b1c1f46a87458c57849ed7b803523e822276b2815ba29b737451aa",
+    "https://job-logs.eascdn.net/production/cadd4ecc-e8ff-4eeb-aad2-7e28a8138388/1776274805823-e109a99e-9dde-4263-98a3-de52f4261392.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260415%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260415T174134Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=81d78fc1ab61428b0155d03a663704f2e7be1213bf359505ed00397b6e93d2171e366dcad931bea01a2b530caa7eb81e502c4a20a9c88ff72afb92273e1b58a96734e1cc0e6bd5b2b24009737973d3288829a2269cd730fd3d2683edcc36a047e05ff5d085b541330453d0ba104b44cf32061288c051f2b852d131523ae869c2d41cbd9bef9ff5956e58ed78e9a2214f66d6b82bc3728a65d49035434bb5f8ad1842cd3a9a94af0f86789e80a55a44e28d6ece7087248e98bc1d277885fa43de38be63d0b3dad800950b576e81c03fb59ee7b074d9707434932d768f9946c06391e2ffb6e374119d76cf5328ff5895b9ec984dd7822d089de9569a76015198c2",
+    "https://job-logs.eascdn.net/production/cadd4ecc-e8ff-4eeb-aad2-7e28a8138388/1776274806014-a2b9c946-0162-4d62-a291-1b031a6e15f3.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260415%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260415T174134Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=3ab9250d18d4b2f372c8486647b29c8b773bcc096a388897234a8106dd1c1a6cadaad93a74b1aec3d243207b2ed9471b49c4ad65813e9f24eeeb91a5c285180dc2e9549c9f40f82701392fb34fae52ec9b97f8a61d9d2c62d68001dbff6e8250beb6625c066ff510cf6c86b60e991f516446299f1818e375be231eb80f99ba322002f27728d5bc6402c14aa7b14490003e5452e148de120a78470532cecf8a068afacb33cdc1e153f63d0eed4e93cc6706e94552a7d9548496df966d7504cb664263874d454501c063eba1bbbd47c971ba3a348d957131b1fe89f82230fca12187a428dba2c28f6ffcf3860bbd03acf30b7972e3d6d227f9b099dd904a849828"
+  ],
+  "project": {
+    "id": "f52bad05-1700-4f6c-bf03-fd4fe581b4d2",
+    "name": "milkguard",
+    "slug": "milkguard",
+    "ownerAccount": {
+      "id": "80209df0-19f5-443f-9f9b-fac912c3acdc",
+      "name": "adityasharma552007"
+    }
+  },
+  "distribution": "INTERNAL",
+  "buildProfile": "preview",
+  "sdkVersion": "55.0.0",
+  "appVersion": "1.0.0",
+  "appBuildVersion": "1",
+  "gitCommitHash": "a7715a416346188a4411e68241b26c53899473b0",
+  "gitCommitMessage": "chore: setup eas config natively and backup old android directory to fix build",
+  "priority": "NORMAL_PLUS",
+  "createdAt": "2026-04-15T17:39:55.560Z",
+  "updatedAt": "2026-04-15T17:41:27.017Z",
+  "completedAt": "2026-04-15T17:41:26.316Z",
+  "expirationDate": "2026-04-29T17:39:55.588Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 131,
+    "buildQueueTime": 57076,
+    "buildDuration": 32643
+  }
+}

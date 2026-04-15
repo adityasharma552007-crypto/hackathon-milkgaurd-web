@@ -24,6 +24,14 @@ import { ConnectionStatus } from '@/components/ConnectionStatus'
 import { DeviceCard } from '@/components/DeviceCard'
 import { TestProgress } from '@/components/TestProgress'
 import { IoTResultsDisplay } from '@/components/IoTResultsDisplay'
+import { useRealtimeScans, ScanRow, getDerivativeStatus } from '@/hooks/useRealtimeScans'
+
+const timeAgo = (dateString: string) => {
+  const diff = Date.now() - new Date(dateString).getTime();
+  const seconds = Math.floor(diff / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  return `${Math.floor(seconds / 60)}m ago`;
+};
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 type Tab = 'device' | 'scanner' | 'settings'
@@ -78,6 +86,36 @@ export default function HardwarePage() {
 
   const { startTest } = useDeviceSocket()
   const settings = useSettings()
+  
+  // Realtime Supabase Hook
+  const { readings, loading: scansLoading } = useRealtimeScans()
+  
+  // Calculate hardware connection status
+  const [deviceStatus, setDeviceStatus] = useState<"LIVE" | "WAITING" | "OFFLINE">("WAITING");
+
+  useEffect(() => {
+    const updateStatus = () => {
+      if (!readings || readings.length === 0) {
+        setDeviceStatus("WAITING");
+        return;
+      }
+      
+      const lastReadingTime = new Date(readings[0].created_at).getTime();
+      const diffSeconds = (Date.now() - lastReadingTime) / 1000;
+      
+      if (diffSeconds < 30) {
+        setDeviceStatus("LIVE");
+      } else if (diffSeconds < 120) {
+        setDeviceStatus("WAITING");
+      } else {
+        setDeviceStatus("OFFLINE");
+      }
+    };
+
+    updateStatus();
+    const interval = setInterval(updateStatus, 1000);
+    return () => clearInterval(interval);
+  }, [readings]);
 
   const isConnected  = connState === 'connected'
   const isConnecting = connState === 'connecting' || connState === 'reconnecting'
@@ -187,6 +225,28 @@ export default function HardwarePage() {
               exit={{ opacity: 0, x: 10 }}
               className="space-y-4"
             >
+              {/* Hardware Status Banner */}
+              <div className={`px-4 py-3 rounded-2xl flex items-center justify-between text-sm font-bold shadow-sm transition-colors ${
+                deviceStatus === "LIVE" ? "bg-green-50 text-green-700 border border-green-200" :
+                deviceStatus === "WAITING" ? "bg-yellow-50 text-yellow-700 border border-yellow-200" :
+                "bg-red-50 text-red-700 border border-red-200"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    {deviceStatus === "LIVE" && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
+                    <span className={`relative inline-flex rounded-full h-3 w-3 ${
+                      deviceStatus === "LIVE" ? "bg-green-500" :
+                      deviceStatus === "WAITING" ? "bg-yellow-500" : "bg-red-500"
+                    }`}></span>
+                  </span>
+                  {deviceStatus === "LIVE" ? "ESP32 Connected — Live" :
+                   deviceStatus === "WAITING" ? "Waiting for device..." : "Device Offline"}
+                </div>
+                <div className="text-xs opacity-70">
+                  {readings.length > 0 ? `Last: ${timeAgo(readings[0].created_at)}` : ''}
+                </div>
+              </div>
+
               {!pairedDevice ? (
                 /* No device paired */
                 <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
@@ -285,6 +345,66 @@ export default function HardwarePage() {
 
                   {/* Results */}
                   {testPhase === 'done' && <IoTResultsDisplay />}
+                  
+                  {/* Realtime ESP32 Stream */}
+                  {testPhase === 'idle' && (
+                    <div className="mt-8 space-y-3">
+                      <h3 className="font-black text-slate-700 uppercase tracking-tight flex items-center gap-2">
+                        <Zap size={16} className="text-blue-500" /> Live Data Stream
+                      </h3>
+                      
+                      {scansLoading ? (
+                        <div className="flex justify-center p-8 text-slate-400">
+                          <Loader2 className="animate-spin w-6 h-6" />
+                        </div>
+                      ) : readings.length === 0 ? (
+                        <div className="text-center bg-slate-50 border border-slate-100 rounded-2xl py-10">
+                          <p className="font-bold text-slate-400">Waiting for readings...</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <AnimatePresence>
+                            {readings.map((reading) => {
+                              const statusText = getDerivativeStatus(reading.quality);
+                              let badgeColor = "bg-yellow-100 text-yellow-700";
+                              if (statusText === 'Pure Milk') badgeColor = "bg-green-100 text-green-700";
+                              if (statusText === 'Adulterated / Spoiled') badgeColor = "bg-red-100 text-red-700";
+                              
+                              return (
+                              <motion.div
+                                key={reading.id}
+                                initial={{ opacity: 0, height: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, height: 'auto', scale: 1 }}
+                                className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-xl font-black text-slate-800">
+                                      {reading.quality?.toFixed(2)} <span className="text-xs text-slate-400 font-bold uppercase">Quality</span>
+                                    </p>
+                                    <p className="text-xs text-slate-400 mt-0.5">
+                                      {new Date(reading.created_at).toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${badgeColor}`}>
+                                      {statusText === 'Pure Milk' ? '✅ ' : statusText === 'Adulterated / Spoiled' ? '❌ ' : '⚠️ '}
+                                      {statusText}
+                                    </span>
+                                    {reading.tx_hash && (
+                                      <p className="text-[9px] text-[#8B5CF6] font-bold mt-1.5 flex items-center justify-end gap-1">
+                                        ⛓️ Logged to chain
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )})}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </motion.div>
