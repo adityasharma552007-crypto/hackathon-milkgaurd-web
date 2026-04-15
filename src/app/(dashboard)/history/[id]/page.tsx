@@ -260,15 +260,26 @@ export default async function ScanResultPage({
           )}
         </div>
 
-        {/* AI Explanation */}
-        <ExplainWithAI
-          safetyScore={scan.safety_score}
-          resultTier={scan.result_tier}
-          recommendation={scan.recommendation}
-          vendorName={scan.vendors?.name}
-          aiConfidence={scan.ai_confidence}
-          adulterantResults={scan.adulterant_results ?? []}
-        />
+        {/* AI Explanation — only for AI-processed scans */}
+        {!scan.source_hardware_id ? (
+          <ExplainWithAI
+            safetyScore={scan.safety_score}
+            resultTier={scan.result_tier}
+            recommendation={scan.recommendation}
+            vendorName={scan.vendors?.name}
+            aiConfidence={scan.ai_confidence}
+            adulterantResults={scan.adulterant_results ?? []}
+          />
+        ) : (
+          <div className="rounded-3xl border border-slate-100 bg-white shadow-lg p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">📡</span>
+              <p className="font-black text-sm text-slate-700 uppercase tracking-tight">Hardware Reading Summary</p>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed">{scan.recommendation}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-3">Source: ESP32 NIR Sensor — No AI inference available for direct hardware readings</p>
+          </div>
+        )}
 
         {/* FSSAI Notice & Report Generator */}
         <div className="space-y-3">

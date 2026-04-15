@@ -25,13 +25,25 @@ export default async function HomePage() {
     .eq('id', user.id)
     .single()
 
-  // Fetch recent scans
-  const { data: scans } = await supabase
-    .from('scans')
-    .select('*, vendors(name)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(3)
+  // Fetch recent scans (user's own + latest hardware scans)
+  const [{ data: userScans }, { data: hwScans }] = await Promise.all([
+    supabase
+      .from('scans')
+      .select('*, vendors(name), source_hardware_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(3),
+    supabase
+      .from('scans')
+      .select('*, vendors(name), source_hardware_id')
+      .not('source_hardware_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(3)
+  ])
+
+  const scans = [...(userScans ?? []), ...(hwScans ?? [])]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 3)
 
   // Fetch flagged vendors in user's city
   const { count: flaggedCount } = await supabase
@@ -170,7 +182,9 @@ export default async function HomePage() {
                         {scan.result_tier === 'safe' ? <Shield size={24} /> : <Activity size={24} />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-800 truncate">{scan.vendors?.name || 'Home Sample'}</p>
+                        <p className="font-bold text-slate-800 truncate">
+                          {(scan as any).source_hardware_id ? '📡 ESP32 Hardware' : (scan.vendors?.name || 'Home Sample')}
+                        </p>
                         <p className="text-[10px] text-slate-400 font-bold uppercase">{format(new Date(scan.created_at), 'dd MMM, hh:mm a')}</p>
                       </div>
                       <div className="text-right">
