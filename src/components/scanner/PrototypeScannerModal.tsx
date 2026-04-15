@@ -7,7 +7,6 @@ import { Cpu, X, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { createClient } from '@/lib/supabase/client'
 
 type ScanStage = 'idle' | 'connecting' | 'reading' | 'processing' | 'input' | 'submitting'
 
@@ -185,10 +184,6 @@ export function PrototypeScannerModal({ isOpen, onClose }: PrototypeScannerModal
     setScanStage('submitting')
 
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('You must be logged in to run a prototype scan.')
-
       // 1. Build wavelengths from NIR reading
       const wavelengths = nirToWavelengths(reading)
 
@@ -210,40 +205,29 @@ export function PrototypeScannerModal({ isOpen, onClose }: PrototypeScannerModal
       }))
 
       // 3. Insert scan row
-      const { data: scan, error: scanErr } = await supabase
-        .from('scans')
-        .insert({
-          user_id:         user.id,
-          vendor_id:       null,
-          safety_score:    safetyScore,
-          result_tier:     resultTier,
-          ai_confidence:   aiConfidence,
-          scan_duration:   scanDuration,
-          wavelength_data: wavelengthAnalysis,
-          baseline_data:   BASELINE,
+      // Call the API route (uses service role key — no schema cache issues)
+      const res = await fetch('/api/prototype-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          safetyScore,
+          resultTier,
+          aiConfidence,
+          scanDuration,
+          wavelengthAnalysis,
+          baselineData: BASELINE,
           recommendation,
-        })
-        .select()
-        .single()
+          adulterants,
+        }),
+      })
 
-      if (scanErr || !scan) throw new Error(scanErr?.message ?? 'Failed to save scan result.')
+      const result = await res.json()
+      if (!res.ok || !result.scanId) {
+        throw new Error(result.error ?? 'Failed to save scan result.')
+      }
 
-      // 4. Insert adulterant rows
-      await supabase.from('adulterant_results').insert(
-        adulterants.map(a => ({
-          scan_id:        scan.id,
-          name:           a.name,
-          detected_value: a.detectedValue,
-          safe_limit:     a.safeLimit,
-          unit:           a.unit,
-          status:         a.status,
-          quantity_500ml: a.quantity500ml,
-          analogy:        a.analogy,
-        }))
-      )
-
-      // 5. Navigate to real report page
-      router.push(`/history/${scan.id}`)
+      // Navigate to the real detailed report page
+      router.push(`/history/${result.scanId}`)
       handleClose()
     } catch (err: any) {
       console.error('[PrototypeScanner]', err)
