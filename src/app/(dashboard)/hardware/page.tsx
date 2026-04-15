@@ -273,14 +273,26 @@ export default function HardwarePage() {
                       {deviceStatus === "LIVE" ? "ESP32 is Live!" : "No Device Connected"}
                     </p>
                     <p className="text-slate-400 text-xs mt-1 max-w-[220px] leading-relaxed">
+                      {deviceStatus === "LIVE"
+                        ? "Your hardware sensor is active and sending data. Tap below to start a milk scan."
+                        : "No readings received yet. Make sure your ESP32 is powered on and connected to WiFi."}
                     </p>
                   </div>
-                  <button
-                    onClick={() => setTab('scanner')}
-                    className="flex items-center gap-2 px-5 py-3 bg-[#60A5FA] text-white text-sm font-black rounded-2xl hover:bg-[#3B82F6] transition-colors"
-                  >
-                    <ScanLine size={15} /> Scan for Devices
-                  </button>
+                  {deviceStatus === "LIVE" ? (
+                    <Link
+                      href="/scan"
+                      className="flex items-center gap-2 px-6 py-3.5 bg-[#60A5FA] text-white text-sm font-black rounded-2xl hover:bg-[#3B82F6] transition-all shadow-lg shadow-blue-200 hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      <Play size={15} fill="white" /> Scan Milk Now
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => setTab('scanner')}
+                      className="flex items-center gap-2 px-5 py-3 bg-slate-200 text-slate-500 text-sm font-black rounded-2xl"
+                    >
+                      <ScanLine size={15} /> Scan for Devices
+                    </button>
+                  )}
                 </div>
               ) : (
                 <>
