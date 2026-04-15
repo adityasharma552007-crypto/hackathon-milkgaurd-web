@@ -38,8 +38,6 @@ export async function POST(req: NextRequest) {
         ai_confidence:   aiConfidence,
         scan_duration:   scanDuration,
         wavelength_data: wavelengthAnalysis,
-        baseline_data:   baselineData,
-        recommendation,
       })
       .select()
       .single()

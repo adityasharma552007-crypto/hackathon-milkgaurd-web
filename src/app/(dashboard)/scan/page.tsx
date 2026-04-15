@@ -13,6 +13,7 @@ import { useDeviceStore } from '@/store/useDeviceStore'
 import Link from 'next/link'
 import { trackTestInitiation } from '@/components/analytics/GoogleAnalytics'
 import BlockchainConfirmation from '@/components/BlockchainConfirmation'
+import { PrototypeScannerModal } from '@/components/scanner/PrototypeScannerModal'
 
 const SCAN_DURATION = 8000 // 8 seconds
 
@@ -25,6 +26,7 @@ export default function ScanPage() {
   const [error, setError] = useState<string | null>(null)
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingScanId, setPendingScanId] = useState<string | null>(null)
+  const [showPrototypeModal, setShowPrototypeModal] = useState(false)
   // Holds the live blockchain promise so the overlay can await it
   const blockchainPromiseRef = useRef<Promise<string | null>>(Promise.resolve(null))
   
@@ -86,7 +88,16 @@ export default function ScanPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen p-6 py-12 bg-white">
+    <div className="flex flex-col items-center justify-between min-h-screen p-6 py-12 bg-white relative">
+      <PrototypeScannerModal isOpen={showPrototypeModal} onClose={() => setShowPrototypeModal(false)} />
+      {/* Small prototype toggle */}
+      <button 
+        onClick={() => setShowPrototypeModal(true)} 
+        className="absolute top-4 right-4 text-xs font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest px-3 py-1 bg-slate-50 rounded-full border border-slate-200"
+      >
+        Prototype
+      </button>
+
       {/* Blockchain Confirmation Overlay */}
       <AnimatePresence>
         {showConfirmation && pendingScanId && (
