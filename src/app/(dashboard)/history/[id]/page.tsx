@@ -39,7 +39,7 @@ export default async function ScanResultPage({
   const supabase = createClient()
   const { data: scan } = await supabase
     .from('scans')
-    .select('*, vendors(id, name, avg_score, report_count), adulterant_results(*), fssai_reports(id), tx_hash')
+    .select('*, vendors(id, name, avg_score, report_count), adulterant_results(*), fssai_reports(id), tx_hash, source_hardware_id')
     .eq('id', params.id)
     .single()
 
@@ -174,7 +174,18 @@ export default async function ScanResultPage({
              </CardTitle>
           </CardHeader>
           <CardContent className="p-5 pt-0">
-             <SpectralChart data={scan.wavelength_data} />
+             {!scan.source_hardware_id ? (
+               <SpectralChart data={scan.wavelength_data} />
+             ) : (
+               <div className="py-8 text-center bg-slate-50 rounded-2xl">
+                 <p className="text-3xl mb-2">📡</p>
+                 <p className="font-bold text-slate-600">Direct Hardware Reading</p>
+                 <p className="text-xs mt-1 text-slate-400">Spectral decomposition is not available for ESP32 sensor readings.</p>
+                 <p className="mt-3 text-sm font-black text-slate-700">
+                   Quality Index: <span className="text-[#60A5FA]">{scan.wavelength_data?.quality_raw?.toFixed(3) ?? 'N/A'}</span>
+                 </p>
+               </div>
+             )}
              <div className="mt-4 p-3 bg-slate-50 rounded-2xl flex items-center gap-3">
                 <Info size={16} className="text-slate-400 shrink-0" />
                 <p className="text-[10px] text-slate-500 font-medium leading-tight">
@@ -184,10 +195,11 @@ export default async function ScanResultPage({
           </CardContent>
         </Card>
 
-        {/* Adulterant Breakdown */}
+        {/* Adulterant Breakdown / Hardware Summary */}
         <div className="space-y-3">
           <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Detailed Findings</h3>
-          {scan.adulterant_results?.map((res: any) => (
+          {!scan.source_hardware_id ? (
+            scan.adulterant_results?.map((res: any) => (
             <Card key={res.id} className="rounded-2xl border-none shadow-sm overflow-hidden">
               <CardContent className="p-0">
                 <div className="p-4 flex justify-between items-center">
@@ -217,7 +229,35 @@ export default async function ScanResultPage({
                 )}
               </CardContent>
             </Card>
-          ))}
+          ))
+          ) : (
+            <Card className="rounded-2xl border-none shadow-sm">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xl">📡</div>
+                  <div>
+                    <p className="font-bold text-slate-800">ESP32 Sensor Reading</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Direct Hardware Analysis — No chemical breakdown available</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Quality Index (Raw)</p>
+                    <p className="text-2xl font-black text-slate-800">{scan.wavelength_data?.quality_raw?.toFixed(3) ?? 'N/A'}</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-3">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sensor Type</p>
+                    <p className="text-sm font-bold text-slate-800">ESP32 NIR</p>
+                    <p className="text-[10px] text-slate-400">Near-infrared spectroscopy</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-xl p-3 col-span-2">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Detection Method</p>
+                    <p className="text-xs font-medium text-slate-600">Single-channel quality index threshold comparison. Hardware sensor confidence: <strong>95%</strong></p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* AI Explanation */}

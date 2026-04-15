@@ -25,12 +25,23 @@ export default async function HistoryPage() {
 
   if (!user) return null
 
-  // Fetch all scans for the user
-  const { data: scans } = await supabase
-    .from('scans')
-    .select('*, vendors(name), tx_hash')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
+  // Fetch user's own scans + all hardware scans (visible to all authenticated users)
+  const [{ data: userScans }, { data: hwScans }] = await Promise.all([
+    supabase
+      .from('scans')
+      .select('*, vendors(name), tx_hash, source_hardware_id')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('scans')
+      .select('*, vendors(name), tx_hash, source_hardware_id')
+      .not('source_hardware_id', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(20)
+  ])
+
+  const scans = [...(userScans ?? []), ...(hwScans ?? [])]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   // Prepare trend data (last 30 days)
   const now = new Date()
@@ -110,7 +121,9 @@ export default async function HistoryPage() {
                            {scan.result_tier === 'safe' ? <Shield size={24} /> : <AlertTriangle size={24} />}
                          </div>
                          <div className="flex-1 min-w-0">
-                            <p className="font-bold text-slate-800 truncate">{scan.vendors?.name || 'Home Sample'}</p>
+                          <p className="font-bold text-slate-800 truncate">
+                             {scan.source_hardware_id ? '📡 ESP32 Hardware' : (scan.vendors?.name || 'Home Sample')}
+                          </p>
                             <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                                <Calendar size={10} />
                                {format(new Date(scan.created_at), 'MMM dd, yyyy')}
@@ -123,12 +136,17 @@ export default async function HistoryPage() {
                             )}>
                                {scan.safety_score}%
                             </span>
-                            <Badge variant="outline" className={cn(
-                              "text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black",
-                              scan.result_tier === 'safe' ? "border-[#60A5FA] text-[#60A5FA]" : "border-red-500 text-red-500"
-                            )}>
-                              {scan.result_tier}
-                            </Badge>
+                          <Badge variant="outline" className={cn(
+                               "text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black",
+                               scan.result_tier === 'safe' ? "border-[#60A5FA] text-[#60A5FA]" : "border-red-500 text-red-500"
+                             )}>
+                               {scan.result_tier}
+                             </Badge>
+                             {scan.source_hardware_id && (
+                               <Badge variant="outline" className="text-[8px] h-4 mt-1 px-1 tracking-tighter uppercase font-black border-blue-300 text-blue-500 block">
+                                 Hardware
+                               </Badge>
+                             )}
                          </div>
                       </CardContent>
                     </Card>
