@@ -25,7 +25,8 @@ import { ConnectionStatus } from '@/components/ConnectionStatus'
 import { DeviceCard } from '@/components/DeviceCard'
 import { TestProgress } from '@/components/TestProgress'
 import { IoTResultsDisplay } from '@/components/IoTResultsDisplay'
-import { useRealtimeScans, ScanRow, getDerivativeStatus } from '@/hooks/useRealtimeScans'
+import { useRealtimeScans, getStatusFromQuality } from '@/hooks/useRealtimeScans'
+import { ScanCard } from '@/components/ScanCard'
 import { createClient } from '@/lib/supabase/client'
 
 const timeAgo = (dateString: string) => {
@@ -500,45 +501,10 @@ export default function HardwarePage() {
                           <p className="font-bold text-slate-400">Waiting for readings...</p>
                         </div>
                       ) : (
-                        <div className="space-y-2">
-                          <AnimatePresence>
-                            {readings.map((reading) => {
-                              const statusText = getDerivativeStatus(reading.quality);
-                              let badgeColor = "bg-yellow-100 text-yellow-700";
-                              if (statusText === 'Pure Milk') badgeColor = "bg-green-100 text-green-700";
-                              if (statusText === 'Adulterated / Spoiled') badgeColor = "bg-red-100 text-red-700";
-                              
-                              return (
-                              <motion.div
-                                key={reading.id}
-                                initial={{ opacity: 0, height: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, height: 'auto', scale: 1 }}
-                                className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className="text-xl font-black text-slate-800">
-                                      {reading.quality?.toFixed(2)} <span className="text-xs text-slate-400 font-bold uppercase">Quality</span>
-                                    </p>
-                                    <p className="text-xs text-slate-400 mt-0.5">
-                                      {new Date(reading.created_at).toLocaleString()}
-                                    </p>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${badgeColor}`}>
-                                      {statusText === 'Pure Milk' ? '✅ ' : statusText === 'Adulterated / Spoiled' ? '❌ ' : '⚠️ '}
-                                      {statusText}
-                                    </span>
-                                    {reading.tx_hash && (
-                                      <p className="text-[9px] text-[#8B5CF6] font-bold mt-1.5 flex items-center justify-end gap-1">
-                                        ⛓️ Logged to chain
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </motion.div>
-                            )})}
-                          </AnimatePresence>
+                        <div className="space-y-3">
+                          {readings.map((reading, i) => (
+                            <ScanCard key={reading.id} scan={reading} index={i} />
+                          ))}
                         </div>
                       )}
                     </div>
@@ -702,14 +668,14 @@ export default function HardwarePage() {
                   </p>
                 </div>
                 <div className="bg-slate-900 rounded-xl p-3 text-[10px] font-mono text-green-400 space-y-1 overflow-x-auto">
-                  <p>{`// HTTP info endpoint`}</p>
-                  <p className="text-slate-400">{`GET http://<ip>:${settings.port}/info`}</p>
-                  <p className="mt-2">{`// WebSocket endpoint`}</p>
-                  <p className="text-slate-400">{`ws://<ip>:${settings.port}/ws`}</p>
-                  <p className="mt-2">{`// Start test command`}</p>
-                  <p className="text-slate-400">{`{ "cmd": "start_test" }`}</p>
-                  <p className="mt-2">{`// Result frame`}</p>
-                  <p className="text-slate-400">{`{ "type": "result", "safetyScore": 87, ... }`}</p>
+                  <p>{`// Supabase REST insert (AS7343 → milk_data)`}</p>
+                  <p className="text-slate-400">{`POST https://<project>.supabase.co/rest/v1/milk_data`}</p>
+                  <p className="mt-2">{`// Required body (14 channels + quality)`}</p>
+                  <p className="text-slate-400">{`{ "f1":..., "f2":..., "f3":..., "f4":...,`}</p>
+                  <p className="text-slate-400 pl-2">{`"f5":..., "f6":..., "f7":..., "f8":...,`}</p>
+                  <p className="text-slate-400 pl-2">{`"nir":..., "clear":..., "quality":0.85 }`}</p>
+                  <p className="mt-2">{`// Auth header`}</p>
+                  <p className="text-slate-400">{`apikey: <supabase-anon-key>`}</p>
                 </div>
               </div>
 

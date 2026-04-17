@@ -8,14 +8,17 @@ const CORS_HEADERS = {
 }
 
 const BASELINE = [
-  0.81, 0.80, 0.75, 0.71, 0.68, 0.64,
-  0.61, 0.57, 0.55, 0.51, 0.47, 0.44,
-  0.41, 0.68, 0.35, 0.31, 0.29, 0.27
+  0.52, 0.61, 0.74, 0.78, 0.80, 0.76, 0.70, 0.63,  // F1-F8 visible
+  0.48,                                               // NIR
+  0.82,                                               // CLEAR
+  0.44, 0.51, 0.58, 0.65                             // FD, FZ, FY, FXL
 ]
 
 const WAVELENGTHS = [
-  410, 435, 460, 485, 510, 535, 560, 585,
-  610, 645, 680, 705, 730, 760, 810, 860, 900, 940
+  415, 445, 480, 515, 555, 590, 630, 680,  // Visible spectrum
+  855,                                     // NIR
+  0,                                       // CLEAR
+  0, 0, 0, 0                               // Aux
 ]
 
 const RULES: Record<string, {
@@ -30,7 +33,7 @@ const RULES: Record<string, {
 }> = {
   waterAddition: {
     name: "Water Addition",
-    channels: [13],
+    channels: [8], // NIR detects dilution
     threshold: 0.08,
     limit: 3.0,
     unit: "%",
@@ -39,7 +42,7 @@ const RULES: Record<string, {
   },
   urea: {
     name: "Urea",
-    channels: [4, 5],
+    channels: [3, 4], // F4/F5
     threshold: 0.12,
     limit: 0.07,
     unit: "%",
@@ -48,7 +51,7 @@ const RULES: Record<string, {
   },
   detergent: {
     name: "Detergent",
-    channels: [3, 4, 5],
+    channels: [2, 3, 4], // F3/F4/F5
     threshold: 0.20,
     limit: 0.0,
     unit: "%",
@@ -57,7 +60,7 @@ const RULES: Record<string, {
   },
   starch: {
     name: "Starch",
-    channels: [8, 9],
+    channels: [6, 7], // F7/F8
     threshold: 0.15,
     limit: 0.0,
     unit: "%",
@@ -66,7 +69,7 @@ const RULES: Record<string, {
   },
   formalin: {
     name: "Formalin",
-    channels: [16],
+    channels: [8], // NIR overlap
     threshold: 0.30,
     limit: 0.0,
     unit: "%",
@@ -75,7 +78,7 @@ const RULES: Record<string, {
   },
   neutralizers: {
     name: "Neutralizers",
-    channels: [0, 1, 2],
+    channels: [0, 1, 2], // F1-F3
     threshold: 0.10,
     limit: 0.05,
     unit: "%",
@@ -84,7 +87,7 @@ const RULES: Record<string, {
   },
   fatContent: {
     name: "Fat Content",
-    channels: [15, 16],
+    channels: [7, 8],
     threshold: 0.12,
     limit: 3.5,
     unit: "%",
@@ -252,8 +255,8 @@ Deno.serve(async (req) => {
     const body = await req.json() as { wavelengths: number[], userId: string, vendorId?: string }
     const { wavelengths, userId, vendorId } = body
 
-    if (!Array.isArray(wavelengths) || wavelengths.length !== 18) {
-      throw new Error("Invalid wavelength data — exactly 18 channels required")
+    if (!Array.isArray(wavelengths) || wavelengths.length !== 14) {
+      throw new Error("Invalid wavelength data — exactly 14 channels required")
     }
 
     if (!userId) {
