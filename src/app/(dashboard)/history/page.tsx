@@ -73,13 +73,16 @@ export default async function HistoryPage() {
           supabase.from('scans').select('*, vendors(name), tx_hash, source_hardware_id').not('source_hardware_id', 'is', null).order('created_at', { ascending: false }).limit(20)
         ])
         const fetched = [...(userScans ?? []), ...(hwScans ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        scans = fetched.length > 0 ? fetched : fallbackScans
+        scans = fetched
       }
-    } catch {
+    } catch (err) {
+
+      console.error('[History Page Error]', err)
       user = { id: 'demo-user-123', email: 'demo@milkguard.com' }
       scans = fallbackScans
     }
   }
+
 
   if (!user) return null
 

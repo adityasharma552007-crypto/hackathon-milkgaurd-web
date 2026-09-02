@@ -42,37 +42,31 @@ export interface WavelengthReading {
   status: "normal" | "elevated" | "anomaly"
 }
 
-// ─── Step 1: Run the NIR analysis (calls Edge Function, saves to Supabase) ─────
+// ─── Step 1: Run the NIR analysis (calls Next.js server route, saves to Supabase) ─────
 export async function runScan(request: ScanRequest): Promise<ScanResponse> {
   const profile     = pickProfile()
   const wavelengths = generateWavelengths(profile)
 
-  const supabase = createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/analyze-milk`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${session?.access_token}`
-      },
-      body: JSON.stringify({
-        wavelengths,
-        userId:   request.userId,
-        vendorId: request.vendorId ?? null
-      })
-    }
-  )
+  const res = await fetch("/api/scan", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      wavelengths,
+      userId:   request.userId,
+      vendorId: request.vendorId ?? null
+    })
+  })
 
   if (!res.ok) {
-    const err = await res.json()
+    const err = await res.json().catch(() => ({ error: "Scan failed" }))
     throw new Error(err.error ?? "Scan failed")
   }
 
   return res.json()
 }
+
 
 // ─── Step 2: Record result on blockchain & persist txHash to Supabase ──────────
 // Called separately so the UI can display a loading overlay while this runs.

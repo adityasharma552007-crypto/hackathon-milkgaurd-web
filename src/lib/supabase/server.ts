@@ -11,13 +11,14 @@ export const createClient = () => {
       global: {
         fetch: (url, options) => {
           const controller = new AbortController()
-          const timer = setTimeout(() => controller.abort(), 1200)
+          const timer = setTimeout(() => controller.abort(), 10000)
           return fetch(url, {
             ...options,
             signal: options?.signal || controller.signal,
           }).finally(() => clearTimeout(timer))
         },
       },
+
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value

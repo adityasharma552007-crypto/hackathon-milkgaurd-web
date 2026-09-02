@@ -29,13 +29,14 @@ export async function middleware(request: NextRequest) {
           global: {
             fetch: (url, options) => {
               const controller = new AbortController()
-              const timer = setTimeout(() => controller.abort(), 1000)
+              const timer = setTimeout(() => controller.abort(), 8000)
               return fetch(url, {
                 ...options,
                 signal: options?.signal || controller.signal,
               }).finally(() => clearTimeout(timer))
             },
           },
+
           cookies: {
             get(name: string) {
               return request.cookies.get(name)?.value
