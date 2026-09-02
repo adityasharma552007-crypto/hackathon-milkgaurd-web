@@ -16,7 +16,8 @@ export function LogoutButton({ className, variant = "outline" }: LogoutButtonPro
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      document.cookie = "mg_demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      await signOut().catch(() => {});
       router.push('/auth/login');
       router.refresh();
     } catch (error) {

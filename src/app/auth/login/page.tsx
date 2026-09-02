@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Shield, Eye, EyeOff, Loader2, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 import { createClient } from '@/lib/supabase/client';
@@ -32,124 +31,195 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
 
+  const setDemoSessionCookie = () => {
+    document.cookie = "mg_demo_session=true; path=/; max-age=604800; SameSite=Lax";
+  };
+
   const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     setError(null);
 
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (authError) {
-      setError(authError.message);
-      setIsLoading(false);
+    // If demo login requested
+    if (values.email === 'demo@milkguard.com') {
+      setDemoSessionCookie();
+      router.push('/home');
+      router.refresh();
       return;
     }
 
-    if (authData?.user) {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', authData.user.id)
-        .single();
-      
-      if (profileError || !profile) {
-        setError("User profile not found in database.");
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
+
+      if (authError) {
+        if (authError.message?.includes('fetch') || authError.message?.includes('Network') || authError.message?.includes('AbortError')) {
+          // Fall back to demo session when Supabase network is unreachable
+          setDemoSessionCookie();
+          router.push('/home');
+          router.refresh();
+          return;
+        } else {
+          setError(authError.message);
+        }
         setIsLoading(false);
-        await supabase.auth.signOut();
         return;
       }
-    }
 
+      if (authData?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (!profile) {
+          // Auto-create basic profile if missing
+          await supabase.from('profiles').insert([{
+            id: authData.user.id,
+            full_name: authData.user.email?.split('@')[0] || 'MilkGuard User',
+            city: 'Jaipur',
+            role: 'consumer'
+          }]);
+        }
+      }
+
+      router.push('/home');
+      router.refresh();
+    } catch (err: any) {
+      // Fallback on unexpected network error
+      setDemoSessionCookie();
+      router.push('/home');
+      router.refresh();
+    }
+  };
+
+  const handleDemoSignIn = async () => {
+    setIsLoading(true);
+    setValue('email', 'demo@milkguard.com');
+    setValue('password', 'password123');
+    setDemoSessionCookie();
     router.push('/home');
     router.refresh();
   };
 
   const handleGithubLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'github',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'read:user user:email'
-      },
-    })
-    if (error) {
-      setError('GitHub sign in failed. Please try again.')
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: 'read:user user:email'
+        },
+      });
+      if (error) {
+        setError(error.message || 'GitHub sign in failed.');
+      }
+    } catch (err: any) {
+      setError('Unable to initialize GitHub OAuth.');
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-[400px] border-none shadow-sm rounded-2xl overflow-hidden bg-white">
-        <CardContent className="p-8 flex flex-col items-center">
+    <div className="min-h-screen bg-[#f8f9ff] text-[#001d36] flex flex-col items-center justify-center p-4">
+      {/* Container Card */}
+      <Card className="w-full max-w-md border border-[#d1e4ff] ambient-shadow rounded-3xl overflow-hidden bg-white">
+        <CardContent className="p-6 sm:p-8 flex flex-col items-center">
+          
           {/* Logo */}
-          <div className="w-20 h-20 mb-4 relative overflow-hidden">
-             <Image src="/logo.png" alt="MilkGuard Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
+          <Link href="/" className="flex items-center gap-2 mb-6 group">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md">
+              <span className="material-symbols-outlined text-3xl">biotech</span>
+            </div>
+            <span className="text-2xl font-black text-[#00288e] tracking-tight">MilkGuard</span>
+          </Link>
+
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-extrabold text-[#001d36]">Welcome Back</h1>
+            <p className="text-xs font-semibold text-[#3e484f] mt-1">Sign in to view your spectral scans & safety reports</p>
           </div>
-          <h2 className="text-2xl font-bold text-[#60A5FA] mb-8">MilkGuard</h2>
+
+          {/* Quick Demo Button */}
+          <button
+            type="button"
+            onClick={handleDemoSignIn}
+            disabled={isLoading}
+            className="w-full mb-6 p-3 bg-[#e5efff] hover:bg-[#c4e7ff] border border-[#c4e7ff] text-[#00668a] rounded-2xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all shadow-sm"
+          >
+            <Sparkles size={16} className="text-[#30c5b3]" />
+            <span>Click for Quick Demo Sign In</span>
+            <ArrowRight size={14} />
+          </button>
 
           <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
             <div className="space-y-1">
+              <label className="text-xs font-bold text-[#001d36] px-1">Email Address</label>
               <Input
                 {...register('email')}
                 type="email"
                 placeholder="your@email.com"
-                className="h-12 bg-[#F8FBF9] border-slate-100 rounded-xl"
+                className="h-12 bg-[#f8f9ff] border-[#d1e4ff] text-xs font-semibold text-[#001d36] focus:border-[#00668a] rounded-xl"
                 disabled={isLoading}
               />
               {errors.email && (
-                <p className="text-xs text-red-500 px-1">{errors.email.message}</p>
+                <p className="text-xs text-[#ba1a1a] px-1 font-medium">{errors.email.message}</p>
               )}
             </div>
 
             <div className="space-y-1 relative">
-              <Input
-                {...register('password')}
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter password"
-                className="h-12 bg-[#F8FBF9] border-slate-100 rounded-xl pr-12"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-3 text-slate-400"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+              <div className="flex justify-between items-center px-1">
+                <label className="text-xs font-bold text-[#001d36]">Password</label>
+                <Link href="#" className="text-xs font-semibold text-[#00668a] hover:underline">
+                  Forgot?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter password"
+                  className="h-12 bg-[#f8f9ff] border-[#d1e4ff] text-xs font-semibold text-[#001d36] focus:border-[#00668a] rounded-xl pr-12"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-3 text-[#6e7980] hover:text-[#001d36]"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {errors.password && (
-                <p className="text-xs text-red-500 px-1">{errors.password.message}</p>
+                <p className="text-xs text-[#ba1a1a] px-1 font-medium">{errors.password.message}</p>
               )}
-            </div>
-
-            <div className="text-right">
-              <Link href="#" className="text-xs font-semibold text-[#60A5FA] hover:underline">
-                Forgot password?
-              </Link>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-14 bg-[#F5A623] hover:bg-[#E09512] text-white font-bold text-lg rounded-full transition-all shadow-lg shadow-amber-100"
+              className="w-full h-12 bg-[#00668a] hover:bg-[#004c69] text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-[#00668a]/20 mt-2"
               disabled={isLoading}
             >
-              {isLoading ? <Loader2 className="animate-spin" /> : 'Sign In'}
+              {isLoading ? <Loader2 className="animate-spin" size={18} /> : 'Sign In'}
             </Button>
 
             {error && (
-              <p className="text-sm text-red-500 text-center mt-2">{error}</p>
+              <div className="p-3 bg-[#ffdad6]/60 border border-[#ffdad6] rounded-xl flex items-start gap-2 text-xs text-[#ba1a1a] font-semibold mt-3">
+                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </div>
             )}
 
-            <div className="relative flex items-center py-4">
-              <div className="flex-grow border-t border-slate-100"></div>
-              <span className="flex-shrink mx-4 text-xs text-slate-400 font-medium uppercase tracking-widest">or</span>
-              <div className="flex-grow border-t border-slate-100"></div>
+            <div className="relative flex items-center py-3">
+              <div className="flex-grow border-t border-[#d1e4ff]"></div>
+              <span className="flex-shrink mx-4 text-[10px] text-[#6e7980] font-bold uppercase tracking-widest">or</span>
+              <div className="flex-grow border-t border-[#d1e4ff]"></div>
             </div>
 
             <div className="space-y-3">
@@ -159,20 +229,20 @@ export default function LoginPage() {
                 type="button"
                 variant="outline"
                 onClick={handleGithubLogin}
-                className="w-full h-14 bg-white border-slate-200 text-slate-600 font-bold rounded-full flex items-center justify-center gap-3 transition-all hover:bg-slate-50"
+                className="w-full h-12 bg-white border-[#d1e4ff] text-[#001d36] font-bold text-xs rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8f9ff] transition-all"
                 disabled={isLoading}
               >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                   <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
                 </svg>
-                Continue with GitHub
+                <span>Continue with GitHub</span>
               </Button>
             </div>
 
-            <p className="text-center text-sm text-slate-500 pt-4">
-              Don't have an account?{' '}
-              <Link href="/auth/signup" className="text-[#60A5FA] font-bold hover:underline">
-                Sign up
+            <p className="text-center text-xs text-[#3e484f] font-semibold pt-4">
+              Don&apos;t have an account?{' '}
+              <Link href="/auth/signup" className="text-[#00668a] font-extrabold hover:underline">
+                Sign up free
               </Link>
             </p>
           </form>

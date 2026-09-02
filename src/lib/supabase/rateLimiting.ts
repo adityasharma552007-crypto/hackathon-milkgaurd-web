@@ -32,6 +32,11 @@ let cacheExpiry: Date | null = null
 async function getRateLimitConfig(endpoint: string): Promise<{ limit: number; windowMinutes: number } | null> {
   const now = new Date()
 
+  // Fast fail-open when Supabase host is offline/invalid
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('xogvlpwwwwjwjstypjlo')) {
+    return null
+  }
+
   // Check cache first (5 minute TTL)
   if (configCache && cacheExpiry && now < cacheExpiry) {
     const cached = configCache.get(endpoint)

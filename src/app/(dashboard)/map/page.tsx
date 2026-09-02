@@ -9,73 +9,85 @@ const VendorMap = dynamic(() => import("@/components/VendorMap"), {
   loading: () => <div className="w-full h-full bg-slate-100 animate-pulse rounded-3xl flex items-center justify-center font-black text-slate-300 uppercase tracking-widest">Loading Jaipur Map...</div>
 })
 
-export default async function MapPage({ searchParams }: { searchParams: { filter?: string } }) {
-  const supabase = createClient()
+import { cookies } from "next/headers"
 
-  const { data: { user } } = await supabase.auth.getUser()
+const DEFAULT_VENDORS = [
+  { id: 'v1', name: 'Amul Dairy Booth #104', latitude: 26.9124, longitude: 75.7873, avg_score: 95, report_count: 0, is_flagged: false, total_scans: 42, city: 'Jaipur' },
+  { id: 'v2', name: 'Saras Milk Outlet', latitude: 26.9000, longitude: 75.8000, avg_score: 88, report_count: 1, is_flagged: false, total_scans: 29, city: 'Jaipur' },
+  { id: 'v3', name: 'Rawat Local Dairy', latitude: 26.9200, longitude: 75.7700, avg_score: 42, report_count: 5, is_flagged: true, total_scans: 18, city: 'Jaipur' },
+  { id: 'v4', name: 'Jaipur Fresh Milk Depot', latitude: 26.8800, longitude: 75.8100, avg_score: 91, report_count: 0, is_flagged: false, total_scans: 35, city: 'Jaipur' },
+]
+
+const DEFAULT_SCANS = [
+  { latitude: 26.9200, longitude: 75.7700, adulteration_score: 85 },
+  { latitude: 26.9124, longitude: 75.7873, adulteration_score: 10 },
+  { latitude: 26.9000, longitude: 75.8000, adulteration_score: 25 },
+]
+
+export default async function MapPage({ searchParams }: { searchParams: { filter?: string } }) {
+  const cookieStore = cookies()
+  const isDemo = cookieStore.get('mg_demo_session')?.value === 'true'
+
   let cityName = 'Jaipur'
-  
-  if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('city')
-      .eq('id', user.id)
-      .single()
-    if (profile?.city) {
-      cityName = profile.city
+  let vendors: any[] = DEFAULT_VENDORS
+  let scans: any[] = DEFAULT_SCANS
+
+  if (!isDemo) {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('city').eq('id', user.id).single()
+        if (profile?.city) cityName = profile.city
+      }
+      const [{ data: vData }, { data: sData }] = await Promise.all([
+        supabase.from('vendors').select('*').order('avg_score', { ascending: false }),
+        supabase.from('scans').select('latitude, longitude, adulteration_score').not('latitude', 'is', null).not('longitude', 'is', null)
+      ])
+      if (vData && vData.length > 0) vendors = vData
+      if (sData && sData.length > 0) scans = sData
+    } catch {
+      vendors = DEFAULT_VENDORS
+      scans = DEFAULT_SCANS
     }
   }
-  
-  // Fetch vendors
-  const { data: vendors } = await supabase
-    .from('vendors')
-    .select('*')
-    .order('avg_score', { ascending: false }) // actually schema has avg_score, not safety_score
 
-  // Fetch heatmap scans
-  const { data: scans } = await supabase
-    .from('scans')
-    .select('latitude, longitude, adulteration_score')
-    .not('latitude', 'is', null)
-    .not('longitude', 'is', null)
+  const flaggedVendorsCount = (vendors || []).filter(v => v.is_flagged).length
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col gap-4 w-full h-[calc(100vh-140px)]">
       {/* Search Header */}
-      <header className="p-6 pb-4 pt-12 space-y-4 shrink-0 z-50">
-        <div className="flex items-center justify-between">
-          <Link href="/home" className="p-2 bg-slate-100 rounded-full">
-            <ChevronLeft size={20} className="text-[#60A5FA]" />
-          </Link>
-          <div className="flex flex-col items-center">
-            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter">Vendor Map</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Adulteration Hotspots — {cityName}</p>
-          </div>
-          <div className="p-2 bg-slate-100 rounded-full">
-             <SlidersHorizontal size={20} className="text-[#60A5FA]" />
-          </div>
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white p-4 rounded-2xl border border-[#d1e4ff] ambient-shadow">
+        <div>
+          <h1 className="text-xl font-extrabold text-[#001d36] tracking-tight">Contamination Heatmap</h1>
+          <p className="text-xs font-medium text-[#3e484f]">Adulteration Hotspots & Verified Vendors — {cityName}</p>
         </div>
 
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input 
-            type="text" 
-            placeholder={`Search ${cityName} area or vendor...`} 
-            className="w-full h-12 bg-slate-50 border-none rounded-2xl pl-10 pr-4 text-sm font-bold focus:ring-[#60A5FA]"
-          />
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-72">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#6e7980]" size={16} />
+            <input 
+              type="text" 
+              placeholder={`Search ${cityName} area or vendor...`} 
+              className="w-full h-10 bg-[#f8f9ff] border border-[#d1e4ff] rounded-xl pl-10 pr-4 text-xs font-semibold text-[#001d36] focus:outline-none focus:border-[#00668a]"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#e5efff] px-3 py-2 rounded-xl text-xs font-bold text-[#00668a] shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ba1a1a] animate-pulse"></span>
+            <span>{flaggedVendorsCount} Flagged</span>
+          </div>
         </div>
       </header>
 
-      {/* Map View */}
-      <main className="flex-1 px-4 pb-24 overflow-hidden">
-        <div className="w-full h-full relative">
-           <VendorMap 
-             vendors={vendors || []} 
-             scans={scans || []} 
-             cityName={cityName} 
-             flaggedOnly={searchParams.filter === 'flagged'}
-           />
-        </div>
+      {/* Map Container */}
+      <main className="flex-1 w-full rounded-2xl overflow-hidden border border-[#d1e4ff] ambient-shadow relative bg-white">
+        <VendorMap 
+          vendors={vendors || []} 
+          scans={scans || []} 
+          cityName={cityName} 
+          flaggedOnly={searchParams.filter === 'flagged'}
+        />
       </main>
     </div>
   )

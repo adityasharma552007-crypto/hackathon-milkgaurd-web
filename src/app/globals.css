@@ -1,28 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
+  --background: 228 100% 98%;
+  --foreground: 208 100% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --card-foreground: 208 100% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 222.2 84% 4.9%;
-  --primary: 213 94% 68%; /* Soft Blue #60A5FA */
+  --popover-foreground: 208 100% 11%;
+  --primary: 195 100% 27%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 216 99% 95%;
-  --accent-foreground: 216 99% 25%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 213 94% 68%;
-  --radius: 1.5rem;
+  --secondary: 194 15% 35%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 216 100% 95%;
+  --muted-foreground: 204 12% 37%;
+  --accent: 199 95% 49%;
+  --accent-foreground: 208 100% 11%;
+  --destructive: 0 75% 42%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 205 25% 85%;
+  --input: 205 25% 85%;
+  --ring: 195 100% 27%;
+  --radius: 0.75rem;
 }
 
 html {
@@ -30,6 +33,30 @@ html {
 }
 
 body {
-  @apply bg-background text-foreground;
+  @apply bg-[#f8f9ff] text-[#001d36];
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* Pulse Animation for Active Alerts */
+@keyframes soft-pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+.alert-pulse {
+  animation: soft-pulse 2s infinite;
+}
+
+/* Ambient Shadow Utility */
+.ambient-shadow {
+  box-shadow: 0 8px 30px rgba(15, 59, 102, 0.06);
+}
+

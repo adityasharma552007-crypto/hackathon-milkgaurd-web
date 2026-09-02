@@ -259,51 +259,50 @@ export default function ChatPage() {
   const isDisabled = groqStatus.ok === false
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-[calc(100vh-120px)] bg-white rounded-2xl border border-[#d1e4ff] ambient-shadow overflow-hidden max-w-4xl mx-auto">
 
       {/* ── Header ── */}
-      <div className="bg-[#60A5FA] text-white px-5 pt-14 pb-5 shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Bot size={20} />
-            </div>
-            <div>
-              <h1 className="font-black text-lg tracking-tight leading-none">MilkGuard AI</h1>
-              <p className="text-[10px] text-white/70 font-bold uppercase tracking-widest mt-0.5">
-                {isChecking
-                  ? '● Connecting…'
-                  : isDisabled
-                  ? '● Setup Required'
-                  : loading
-                  ? '● Thinking…'
-                  : '● Online · Powered by Groq'}
-              </p>
-            </div>
+      <div className="bg-gradient-to-r from-[#00668a] to-[#004c69] text-white px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-white/15 backdrop-blur-md rounded-xl flex items-center justify-center text-white">
+            <span className="material-symbols-outlined text-2xl">smart_toy</span>
           </div>
-          <div className="flex items-center gap-1">
-            {isChecking ? (
-              <span className="text-[9px] bg-white/20 text-white px-2 py-0.5 rounded-full font-black uppercase tracking-wider animate-pulse">
-                Checking…
-              </span>
-            ) : isDisabled ? (
-              <button
-                onClick={() => setShowSetupModal(true)}
-                className="text-[9px] bg-[#F5A623] text-white px-2 py-0.5 rounded-full font-black uppercase tracking-wider hover:bg-[#e09512] transition-colors"
-              >
-                Setup Key
-              </button>
-            ) : (
-              <span className="text-[9px] bg-[#F5A623] text-white px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
-                Mixtral
-              </span>
-            )}
-            {messages.length > 0 && !isDisabled && (
-              <button onClick={clearChat} className="p-2 hover:bg-white/20 rounded-full transition-colors ml-1" title="Clear chat">
-                <Trash2 size={16} />
-              </button>
-            )}
+          <div>
+            <h1 className="font-extrabold text-base tracking-tight leading-tight">MilkGuard AI Assistant</h1>
+            <p className="text-xs text-[#c4e7ff] font-medium mt-0.5">
+              {isChecking
+                ? '● Connecting to Groq…'
+                : isDisabled
+                ? '● Setup Required'
+                : loading
+                ? '● Computing spectral response…'
+                : '● Online · Groq Mixtral Inference'}
+            </p>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {isChecking ? (
+            <span className="text-[10px] bg-white/20 text-white px-2.5 py-1 rounded-full font-bold uppercase tracking-wider animate-pulse">
+              Checking…
+            </span>
+          ) : isDisabled ? (
+            <button
+              onClick={() => setShowSetupModal(true)}
+              className="text-[10px] bg-[#f59e0b] text-white px-3 py-1 rounded-full font-bold uppercase tracking-wider hover:bg-[#d97706] transition-colors"
+            >
+              Setup Key
+            </button>
+          ) : (
+            <span className="text-[10px] bg-[#30c5b3] text-[#004d44] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+              Mixtral 8x7B
+            </span>
+          )}
+          {messages.length > 0 && !isDisabled && (
+            <button onClick={clearChat} className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/80 hover:text-white" title="Clear chat">
+              <Trash2 size={16} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -319,8 +318,8 @@ export default function ChatPage() {
         )}
       </AnimatePresence>
 
-      {/* ── Messages ── */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 scroll-smooth">
+      {/* ── Messages Container ── */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#f8f9ff]">
 
         {/* Key checking state */}
         {isChecking && (
@@ -329,33 +328,33 @@ export default function ChatPage() {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center h-full pb-10 text-center"
           >
-            <Loader2 size={28} className="animate-spin text-[#60A5FA]/40 mb-3" />
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Connecting to AI…</p>
+            <Loader2 size={32} className="animate-spin text-[#00668a] mb-3" />
+            <p className="text-xs text-[#3e484f] font-semibold uppercase tracking-wider">Connecting to AI Analyst Engine...</p>
           </motion.div>
         )}
 
-        {/* Key missing / invalid — inline callout (when modal dismissed) */}
+        {/* Key missing / invalid */}
         {!isChecking && isDisabled && !showSetupModal && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center h-full pb-10 gap-5 px-2"
+            className="flex flex-col items-center justify-center h-full pb-10 gap-4 text-center px-4"
           >
-            <div className="w-16 h-16 bg-amber-50 rounded-3xl flex items-center justify-center">
-              <WifiOff size={28} className="text-amber-400" />
+            <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 border border-amber-200">
+              <WifiOff size={28} />
             </div>
-            <div className="text-center">
-              <p className="font-black text-slate-800 text-base tracking-tight mb-1">AI Not Connected</p>
-              <p className="text-slate-400 text-xs leading-relaxed max-w-[240px]">
-                Set up your free Groq API key to start chatting about milk safety.
+            <div>
+              <p className="font-extrabold text-[#001d36] text-base mb-1">AI Service Disconnected</p>
+              <p className="text-[#3e484f] text-xs max-w-xs leading-relaxed">
+                Provide your Groq API key to unlock instant milk safety analysis and spectral breakdown explanations.
               </p>
             </div>
             <button
               onClick={() => setShowSetupModal(true)}
-              className="flex items-center gap-2 px-5 py-3 bg-[#60A5FA] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-[#3B82F6] transition-colors shadow-lg shadow-green-900/20"
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#00668a] text-white rounded-xl font-bold text-xs hover:bg-[#004c69] transition-colors shadow-sm"
             >
-              <Sparkles size={15} className="text-[#F5A623]" />
-              View Setup Guide
+              <Sparkles size={14} className="text-[#30c5b3]" />
+              Open Setup Guide
             </button>
           </motion.div>
         )}
@@ -365,21 +364,22 @@ export default function ChatPage() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center h-full pb-10 text-center"
+            className="flex flex-col items-center justify-center h-full py-8 text-center max-w-lg mx-auto"
           >
-            <div className="w-16 h-16 bg-[#60A5FA]/10 rounded-3xl flex items-center justify-center mb-4">
-              <Sparkles size={28} className="text-[#60A5FA]" />
+            <div className="w-14 h-14 bg-[#e5efff] rounded-2xl flex items-center justify-center mb-3 text-[#00668a]">
+              <span className="material-symbols-outlined text-3xl">psychology</span>
             </div>
-            <h2 className="font-black text-slate-800 text-lg tracking-tight mb-1">Ask MilkGuard AI</h2>
-            <p className="text-slate-400 text-xs font-medium max-w-[240px] leading-relaxed mb-6">
-              Ask anything about your scan results, milk safety, or adulteration standards.
+            <h2 className="font-extrabold text-[#001d36] text-xl tracking-tight mb-1">Ask MilkGuard AI Analyst</h2>
+            <p className="text-[#3e484f] text-xs max-w-sm leading-relaxed mb-6">
+              Get instant scientific explanations about your milk purity tests, adulterants, FSSAI regulatory standards, or health risks.
             </p>
-            <div className="w-full space-y-2">
+
+            <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
               {suggestions.map(s => (
                 <button
                   key={s}
                   onClick={() => sendMessage(s)}
-                  className="w-full text-left text-xs font-medium px-4 py-3 rounded-2xl bg-slate-50 hover:bg-[#60A5FA]/5 border border-slate-100 hover:border-[#60A5FA]/20 text-slate-600 hover:text-[#60A5FA] transition-all"
+                  className="p-3 rounded-xl bg-white hover:bg-[#e5efff]/60 border border-[#d1e4ff] text-xs font-semibold text-[#001d36] hover:text-[#00668a] transition-all ambient-shadow"
                 >
                   {s}
                 </button>
@@ -403,41 +403,36 @@ export default function ChatPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Input ── */}
-      <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 shrink-0">
+      {/* ── Input Bar ── */}
+      <div className="p-4 bg-white border-t border-[#d1e4ff] shrink-0">
         {isDisabled ? (
           <button
             onClick={() => setShowSetupModal(true)}
-            className="w-full flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl text-amber-700 text-xs font-black uppercase tracking-widest hover:from-amber-100 hover:to-orange-100 transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs font-bold hover:bg-amber-100 transition-all"
           >
-            <Sparkles size={14} className="text-amber-500" />
-            Setup Groq API Key to enable chat
+            <Sparkles size={14} className="text-amber-600" />
+            Configure Groq API Key to chat
           </button>
         ) : (
-          <div className="flex items-end gap-2 bg-white rounded-2xl border border-slate-200 px-4 py-2.5 focus-within:border-[#60A5FA] transition-colors shadow-sm">
+          <div className="flex items-end gap-2 bg-[#f8f9ff] rounded-xl border border-[#d1e4ff] p-2.5 focus-within:border-[#00668a] transition-colors">
             <textarea
               ref={textareaRef}
               rows={1}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isChecking ? 'Connecting…' : 'Ask about your milk test results…'}
+              placeholder={isChecking ? 'Connecting…' : 'Ask about your test result or milk safety standards...'}
               disabled={loading || isChecking || isDisabled}
-              className="flex-1 resize-none bg-transparent text-sm text-slate-800 placeholder:text-slate-300 focus:outline-none disabled:opacity-40 leading-relaxed"
+              className="flex-1 resize-none bg-transparent text-xs text-[#001d36] placeholder:text-[#6e7980] focus:outline-none disabled:opacity-40 leading-relaxed font-semibold"
             />
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || isChecking || isDisabled}
-              className="w-9 h-9 bg-[#60A5FA] disabled:bg-slate-200 text-white rounded-xl flex items-center justify-center shrink-0 transition-all hover:bg-[#3B82F6] active:scale-95"
+              className="w-9 h-9 bg-[#00668a] disabled:bg-[#bdc8d1] text-white rounded-lg flex items-center justify-center shrink-0 transition-all hover:bg-[#004c69] active:scale-95 shadow-sm"
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
             </button>
           </div>
-        )}
-        {!isDisabled && (
-          <p className="text-center text-[9px] text-slate-300 mt-1.5 tracking-widest font-medium uppercase">
-            Enter to send · Shift+Enter for newline
-          </p>
         )}
       </div>
     </div>

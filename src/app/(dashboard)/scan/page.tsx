@@ -88,14 +88,16 @@ export default function ScanPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen p-6 py-12 bg-white relative">
+    <div className="flex flex-col items-center justify-between min-h-[80vh] p-6 py-8 bg-white rounded-3xl ambient-shadow border border-[#d1e4ff] relative overflow-hidden max-w-2xl mx-auto">
       <PrototypeScannerModal isOpen={showPrototypeModal} onClose={() => setShowPrototypeModal(false)} />
-      {/* Small prototype toggle */}
+      
+      {/* Prototype Toggle */}
       <button 
         onClick={() => setShowPrototypeModal(true)} 
-        className="absolute top-4 right-4 text-xs font-bold text-slate-400 hover:text-indigo-600 uppercase tracking-widest px-3 py-1 bg-slate-50 rounded-full border border-slate-200"
+        className="absolute top-4 right-4 text-xs font-bold text-[#00668a] hover:bg-[#e5efff] px-3.5 py-1.5 bg-[#e5efff]/60 rounded-full border border-[#c4e7ff] transition-all flex items-center gap-1 z-20"
       >
-        Prototype
+        <span className="material-symbols-outlined text-sm">settings_input_component</span>
+        <span>Hardware Mock</span>
       </button>
 
       {/* Blockchain Confirmation Overlay */}
@@ -110,121 +112,139 @@ export default function ScanPage() {
           />
         )}
       </AnimatePresence>
-      {/* Top Section */}
-      <div className="w-full text-center">
-        <h1 className="text-2xl font-black text-[#60A5FA] uppercase tracking-tighter mb-2">
-          {status === 'idle' ? 'Ready to Scan' : status === 'scanning' ? 'Scanning Milk...' : 'AI Analysis...'}
+
+      {/* Top Header */}
+      <div className="w-full text-center space-y-1 mt-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#e5efff] border border-[#c4e7ff] text-xs font-semibold text-[#00668a] mb-2">
+          <span className="w-2 h-2 rounded-full bg-[#30c5b3] animate-pulse"></span>
+          <span>NIR Spectroscopy Active</span>
+        </div>
+
+        <h1 className="text-3xl font-extrabold text-[#001d36] tracking-tight">
+          {status === 'idle' ? 'Ready to Scan' : status === 'scanning' ? 'Scanning Milk...' : 'AI Computing...'}
         </h1>
-        <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">
-          {status === 'idle' ? 'Place Pod in milk sample' : 'Keep device submerged'}
+
+        <p className="text-sm font-medium text-[#3e484f]">
+          {status === 'idle' ? 'Submerge pod in milk sample and press start' : 'Keep device submerged during analysis'}
         </p>
       </div>
 
-      {/* Middle Animation */}
-      <div className="relative flex items-center justify-center w-64 h-64">
-        {/* Pulsing Circles */}
+      {/* Center Animated Scanner */}
+      <div className="relative flex items-center justify-center w-72 h-72 my-8">
+        {/* Pulsing Outer Rings */}
         <AnimatePresence>
           {isScanning && (
             <>
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1.5, opacity: 0.2 }}
-                exit={{ scale: 2, opacity: 0 }}
+                animate={{ scale: 1.4, opacity: 0.25 }}
+                exit={{ scale: 1.8, opacity: 0 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                className="absolute w-full h-full border-4 border-[#60A5FA] rounded-full"
+                className="absolute w-full h-full border-4 border-[#00668a] rounded-full"
               />
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1.3, opacity: 0.3 }}
-                exit={{ scale: 1.8, opacity: 0 }}
+                animate={{ scale: 1.25, opacity: 0.35 }}
+                exit={{ scale: 1.6, opacity: 0 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeOut", delay: 0.5 }}
-                className="absolute w-full h-full border-2 border-[#F5A623] rounded-full"
+                className="absolute w-full h-full border-2 border-[#30c5b3] rounded-full"
               />
             </>
           )}
         </AnimatePresence>
 
-        {/* Core Icon */}
+        {/* Core Animated Button/Icon */}
         <motion.div
-          animate={isScanning ? { scale: [1, 1.1, 1] } : {}}
+          animate={isScanning ? { scale: [1, 1.05, 1] } : {}}
           transition={{ duration: 1.5, repeat: Infinity }}
           className={cn(
-            "z-10 w-40 h-40 rounded-full flex items-center justify-center shadow-2xl transition-colors duration-500",
-            status === 'error' ? "bg-red-500" : "bg-[#60A5FA]"
+            "z-10 w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-2xl transition-colors duration-500 border-4 border-white/40",
+            status === 'error' 
+              ? "bg-[#ba1a1a] text-white" 
+              : isScanning 
+              ? "bg-gradient-to-br from-[#00668a] to-[#004c69] text-white" 
+              : "bg-gradient-to-br from-[#00668a] to-[#38bdf8] text-white"
           )}
         >
           {status === 'error' ? (
-            <AlertCircle size={64} className="text-white" />
+            <AlertCircle size={56} />
           ) : isScanning ? (
-            <Zap size={64} className="text-[#F5A623]" fill="#F5A623" />
+            <div className="flex flex-col items-center gap-1">
+              <Zap size={48} className="text-[#30c5b3] animate-bounce" fill="#30c5b3" />
+              <span className="text-xs font-bold tracking-wider uppercase opacity-90">Analyzing</span>
+            </div>
           ) : (
-             <Shield size={64} className="text-white" />
+            <div className="flex flex-col items-center gap-1">
+              <Shield size={56} />
+              <span className="text-xs font-bold tracking-wider uppercase opacity-90">Sensor Ready</span>
+            </div>
           )}
         </motion.div>
 
-        {/* Progress Text */}
+        {/* Progress % Display */}
         {isScanning && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute -bottom-12 font-black text-2xl text-[#60A5FA]"
+            className="absolute -bottom-10 font-extrabold text-2xl text-[#00668a]"
           >
             {Math.round(progress)}%
           </motion.div>
         )}
       </div>
 
-      {/* Bottom Controls */}
-      <div className="w-full space-y-6">
+      {/* Bottom Controls & Info */}
+      <div className="w-full space-y-5">
         {status === 'idle' ? (
           !isConnected ? (
-            <div className="space-y-4 text-center">
-               <p className="text-red-500 font-bold uppercase tracking-widest text-sm">Hardware Disconnected</p>
-               <Button 
+            <div className="space-y-3 text-center">
+              <p className="text-xs font-bold text-[#ba1a1a] uppercase tracking-wider">Hardware Pod Disconnected</p>
+              <Button 
                 asChild
-                className="w-full h-20 bg-amber-500 hover:bg-amber-600 text-white font-black text-xl rounded-full shadow-lg uppercase tracking-tighter"
-               >
-                 <Link href="/hardware">Connect Device</Link>
-               </Button>
+                className="w-full h-14 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold text-lg rounded-2xl shadow-md uppercase tracking-tight"
+              >
+                <Link href="/hardware">Connect Sensor Pod</Link>
+              </Button>
             </div>
           ) : (
             <Button 
               onClick={handleStartScan}
-              className="w-full h-20 bg-[#60A5FA] hover:bg-[#3B82F6] text-white font-black text-xl rounded-full shadow-2xl shadow-blue-100 uppercase tracking-tighter"
+              className="w-full h-16 bg-[#00668a] hover:bg-[#004c69] text-white font-extrabold text-xl rounded-2xl shadow-xl hover:shadow-2xl transition-all uppercase tracking-tight flex items-center justify-center gap-2"
             >
-              Start Scan
+              <span className="material-symbols-outlined text-2xl">play_arrow</span>
+              <span>Start Pure Analysis</span>
             </Button>
           )
         ) : status === 'error' ? (
-          <div className="space-y-4">
-            <p className="text-red-500 text-center font-bold">{error}</p>
+          <div className="space-y-3">
+            <p className="text-[#ba1a1a] text-center font-semibold text-sm">{error}</p>
             <Button 
               onClick={() => { setStatus('idle'); setIsScanning(false); }}
               variant="outline"
-              className="w-full h-14 border-red-200 text-red-500 font-bold rounded-full"
+              className="w-full h-12 border-[#ffdad6] text-[#ba1a1a] font-bold rounded-2xl"
             >
               Try Again
             </Button>
           </div>
         ) : (
-          <div className="space-y-4">
-            <Progress value={progress} className="h-3 bg-slate-100" />
-            <p className="text-[10px] text-center font-bold text-slate-400 uppercase tracking-widest flex items-center justify-center gap-2">
-              <Loader2 size={12} className="animate-spin text-[#60A5FA]" />
-              {status === 'scanning' ? 'Connecting to spectral pod...' : 'AI computing adulterants...'}
+          <div className="space-y-3">
+            <Progress value={progress} className="h-3 bg-[#e5efff]" />
+            <p className="text-xs text-center font-bold text-[#3e484f] uppercase tracking-wider flex items-center justify-center gap-2">
+              <Loader2 size={14} className="animate-spin text-[#00668a]" />
+              {status === 'scanning' ? 'Connecting to spectral pod...' : 'AI computing adulterant fingerprint...'}
             </p>
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-6 text-slate-400">
-           <div className="flex items-center gap-1">
-             <CheckCircle2 size={14} className="text-[#60A5FA]" />
-             <span className="text-[10px] font-bold uppercase tracking-wider italic">FSSAI Compliant</span>
-           </div>
-           <div className="flex items-center gap-1">
-             <CheckCircle2 size={14} className="text-[#60A5FA]" />
-             <span className="text-[10px] font-bold uppercase tracking-wider italic">Cloud Verified</span>
-           </div>
+        <div className="flex items-center justify-center gap-6 text-[#6e7980] pt-2 border-t border-[#d1e4ff]/60">
+          <div className="flex items-center gap-1 text-xs font-semibold text-[#006b5f]">
+            <CheckCircle2 size={16} />
+            <span>FSSAI Compliant</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-semibold text-[#00668a]">
+            <CheckCircle2 size={16} />
+            <span>Polygon On-Chain</span>
+          </div>
         </div>
       </div>
     </div>

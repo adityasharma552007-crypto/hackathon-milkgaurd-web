@@ -208,15 +208,15 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <NextTopLoader
-          color="#60A5FA"
+          color="#00668a"
           initialPosition={0.08}
-          crawlSpeed={200}
+          crawlSpeed={150}
           height={3}
           crawl={true}
           showSpinner={false}
-          easing="ease"
+          easing="cubic-bezier(0.22, 1, 0.36, 1)"
           speed={200}
-          shadow="0 0 10px #60A5FA,0 0 5px #60A5FA"
+          shadow="0 0 10px #38bdf8, 0 0 5px #00668a"
         />
         {children}
         <Toaster position="top-center" richColors />

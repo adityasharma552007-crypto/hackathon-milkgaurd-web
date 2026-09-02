@@ -58,11 +58,11 @@ export default async function InsightsPage() {
   const avgAdulterationArea = mappedVendors.length > 0 ? Math.round(totalAdulteration / mappedVendors.length) : 0
   const flagCount = mappedVendors.filter(v => v.trustDetails.score < 50 || v.is_flagged).length
 
-  let areaRisk = { level: 'LOW', color: 'text-emerald-500' }
-  if (avgAdulterationArea > 60) areaRisk = { level: 'HIGH', color: 'text-red-500' }
-  else if (avgAdulterationArea >= 30) areaRisk = { level: 'MEDIUM', color: 'text-amber-500' }
+  let areaRisk = { level: 'LOW', color: 'text-[#006b5f]' }
+  if (avgAdulterationArea > 60) areaRisk = { level: 'HIGH', color: 'text-[#ba1a1a]' }
+  else if (avgAdulterationArea >= 30) areaRisk = { level: 'MEDIUM', color: 'text-amber-600' }
 
-  // 4. WEEKLY TREND (Average ADULTERATION score per day)
+  // 4. WEEKLY TREND
   const now = new Date()
   const last7Days = eachDayOfInterval({
     start: new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000),
@@ -70,7 +70,6 @@ export default async function InsightsPage() {
   })
 
   const trendData = last7Days.map((day: Date) => {
-    // For adulteration, it's 100 - safety_score
     const dayScans = scans?.filter(s => isSameDay(new Date(s.created_at), day)) || []
     const avgScore = dayScans.length > 0 
       ? dayScans.reduce((acc, s) => acc + (100 - s.safety_score), 0) / dayScans.length 
@@ -97,117 +96,110 @@ export default async function InsightsPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F7F9F8] pb-24">
+    <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto">
       {/* Header */}
-      <header className="p-6 pb-4 pt-12 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/home" className="p-2 bg-white rounded-full shadow-sm hover:scale-105 transition-transform">
-            <ChevronLeft size={20} className="text-[#60A5FA]" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-black text-[#60A5FA] uppercase tracking-tighter leading-none inline-flex items-center gap-2">
-              Smart Insights
-            </h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-              AI analysis in {city}
-            </p>
-          </div>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#001d36] tracking-tight">Smart City Insights</h1>
+          <p className="text-sm font-medium text-[#3e484f]">AI-driven risk analysis & vendor compliance for {city}</p>
         </div>
-        <Link href="/insights" className="p-2 bg-white rounded-full shadow-sm hover:scale-105 transition-transform text-[#60A5FA]">
-           <RefreshCw size={18} />
+        <Link href="/insights" className="p-2.5 bg-white rounded-xl border border-[#d1e4ff] text-[#00668a] hover:bg-[#e5efff] transition-all ambient-shadow">
+          <RefreshCw size={18} />
         </Link>
-      </header>
+      </div>
 
-      <main className="px-6 space-y-8">
-        
-        {/* Stats Strip */}
-        <div className="grid grid-cols-4 gap-2">
-           <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-              <span className="text-lg font-black text-slate-800 leading-none">{totalScans}</span>
-              <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest mt-1">Scans</span>
-           </div>
-           <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-              <span className="text-lg font-black text-[#60A5FA] leading-none">{passRate}%</span>
-              <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest mt-1">Pass</span>
-           </div>
-           <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-              <span className={cn("text-lg font-black leading-none", flagCount > 0 ? "text-red-500" : "text-emerald-500")}>{flagCount}</span>
-              <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest mt-1">Flagged</span>
-           </div>
-           <div className="bg-white rounded-2xl p-3 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-              <span className={cn("text-sm mt-0.5 font-black leading-none line-clamp-1", areaRisk.color)}>{areaRisk.level}</span>
-              <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest mt-1">Risk</span>
-           </div>
+      {/* Stats Strip */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-4 ambient-shadow border border-[#d1e4ff] flex flex-col items-center justify-center text-center">
+          <span className="text-2xl font-extrabold text-[#001d36]">{totalScans}</span>
+          <span className="text-xs font-semibold text-[#3e484f] uppercase tracking-wider mt-1">Total Scans</span>
         </div>
+        <div className="bg-white rounded-2xl p-4 ambient-shadow border border-[#d1e4ff] flex flex-col items-center justify-center text-center">
+          <span className="text-2xl font-extrabold text-[#00668a]">{passRate}%</span>
+          <span className="text-xs font-semibold text-[#3e484f] uppercase tracking-wider mt-1">Pass Rate</span>
+        </div>
+        <div className="bg-white rounded-2xl p-4 ambient-shadow border border-[#d1e4ff] flex flex-col items-center justify-center text-center">
+          <span className={cn("text-2xl font-extrabold", flagCount > 0 ? "text-[#ba1a1a]" : "text-[#006b5f]")}>{flagCount}</span>
+          <span className="text-xs font-semibold text-[#3e484f] uppercase tracking-wider mt-1">Flagged Vendors</span>
+        </div>
+        <div className="bg-white rounded-2xl p-4 ambient-shadow border border-[#d1e4ff] flex flex-col items-center justify-center text-center">
+          <span className={cn("text-lg font-extrabold uppercase", areaRisk.color)}>{areaRisk.level}</span>
+          <span className="text-xs font-semibold text-[#3e484f] uppercase tracking-wider mt-1">Area Risk</span>
+        </div>
+      </div>
 
-        {/* AI Generated Insights Section */}
-        <section>
-           <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-             <Activity size={14} /> Live Analyst Briefing
-           </h2>
-           <AIAssistantFeed contextData={aiContext} />
+      {/* AI Generated Insights Section */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-[#001d36] uppercase tracking-wider flex items-center gap-2">
+          <Activity size={16} className="text-[#00668a]" />
+          <span>Live Analyst Briefing</span>
+        </h2>
+        <AIAssistantFeed contextData={aiContext} />
+      </section>
+
+      {/* Weekly Trend Chart */}
+      <section>
+        <Card className="rounded-2xl border border-[#d1e4ff] ambient-shadow bg-white overflow-hidden">
+          <CardHeader className="p-5 pb-0">
+            <CardTitle className="text-xs font-bold text-[#3e484f] uppercase tracking-wider">
+              Adulteration Trend (Last 7 Days)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-5 pt-2">
+            <AdulterationTrendChart data={trendData} />
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Top Vendors */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-bold text-[#001d36] uppercase tracking-wider flex items-center gap-2">
+          <Award size={16} className="text-[#006b5f]" />
+          <span>Most Trusted Vendors in {city}</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {topVendors.map(vendor => (
+            <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="bg-white rounded-2xl p-4 ambient-shadow border border-[#d1e4ff] hover:border-[#00668a] transition-all">
+              <div className="flex justify-between items-start mb-2">
+                <p className="font-bold text-[#001d36] text-sm truncate">{vendor.name}</p>
+                <Badge className="bg-[#30c5b3]/15 text-[#006b5f] text-[10px] uppercase font-bold px-2 py-0.5 border-none">
+                  {vendor.trustDetails.score} Trust
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 text-xs font-medium text-[#3e484f]">
+                <MapPin size={12} className="text-[#6e7980]" />
+                <span>{vendor.area || city}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Flagged Vendors */}
+      {flagVendorsList.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-bold text-[#ba1a1a] uppercase tracking-wider flex items-center gap-2">
+            <AlertTriangle size={16} />
+            <span>Flagged Vendors Near You</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {flagVendorsList.map(vendor => (
+              <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="bg-[#ffdad6]/40 rounded-2xl p-4 border border-[#ffdad6] hover:bg-[#ffdad6]/70 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <p className="font-bold text-[#001d36] text-sm truncate">{vendor.name}</p>
+                  <Badge className="bg-[#ba1a1a] text-white text-[10px] uppercase font-bold px-2 py-0.5 border-none">
+                    {vendor.trustDetails.score} Score
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-medium text-[#93000a]">
+                  <MapPin size={12} />
+                  <span>{vendor.area || city}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </section>
-
-        {/* Weekly Trend Chart */}
-        <section>
-          <Card className="rounded-3xl border-none shadow-sm bg-white overflow-hidden relative">
-            <CardHeader className="p-5 pb-0">
-               <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex justify-between items-center">
-                  <span>Adulteration Trend (7 Days)</span>
-               </CardTitle>
-            </CardHeader>
-            <CardContent className="p-5 pt-2">
-               <AdulterationTrendChart data={trendData} />
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Top Vendors */}
-        <section>
-           <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-             <Award size={14} /> Most Trusted Vendors
-           </h2>
-           <div className="flex gap-3 overflow-x-auto pb-4 snap-x pr-6 -mr-6 pl-1">
-              {topVendors.map(vendor => (
-                <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="min-w-[200px] bg-white rounded-2xl p-4 shadow-sm border border-slate-100 snap-center shrink-0 hover:shadow-md transition-shadow">
-                   <div className="flex justify-between items-start mb-2">
-                     <p className="font-black text-slate-800 text-sm truncate pr-2">{vendor.name}</p>
-                     <Badge className="bg-emerald-50 text-emerald-600 shrink-0 text-[8px] uppercase font-black px-1.5 border-none h-4">
-                        {vendor.trustDetails.score}
-                     </Badge>
-                   </div>
-                   <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                     <MapPin size={10} /> {vendor.area || city}
-                   </div>
-                </Link>
-              ))}
-           </div>
-        </section>
-
-        {/* Flagged Vendors */}
-        {flagVendorsList.length > 0 && (
-          <section>
-             <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-               <AlertTriangle size={14} /> Flagged Vendors Near You
-             </h2>
-             <div className="flex gap-3 overflow-x-auto pb-4 snap-x pr-6 -mr-6 pl-1">
-                {flagVendorsList.map(vendor => (
-                  <Link key={vendor.id} href={`/vendors/${vendor.id}`} className="min-w-[200px] bg-red-50 rounded-2xl p-4 border border-red-100 snap-center shrink-0 hover:bg-red-100 transition-colors">
-                     <div className="flex justify-between items-start mb-2">
-                       <p className="font-black text-slate-800 text-sm truncate pr-2">{vendor.name}</p>
-                       <Badge className="bg-red-500 text-white shrink-0 text-[8px] uppercase font-black px-1.5 border-none h-4">
-                          {vendor.trustDetails.score}
-                       </Badge>
-                     </div>
-                     <div className="flex items-center gap-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-                       <MapPin size={10} /> {vendor.area || city}
-                     </div>
-                  </Link>
-                ))}
-             </div>
-          </section>
-        )}
-      </main>
+      )}
     </div>
   )
 }

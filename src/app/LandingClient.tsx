@@ -1,754 +1,223 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Download } from 'lucide-react'
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (delay: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay, ease: 'easeOut' },
-  }),
-}
+import Link from 'next/link'
+import { Download, ShieldCheck, Zap, Award, ArrowRight, Smartphone, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react'
 
 export default function LandingClient() {
   const router = useRouter()
 
   const goToLogin = () => router.push('/auth/login')
+  const goToSignup = () => router.push('/auth/signup')
   const goToDownload = () => router.push('/download')
 
   return (
-    <main
-      style={{
-        maxWidth: 430,
-        margin: '0 auto',
-        minHeight: '100vh',
-        backgroundColor: '#F7F9F8',
-        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-        position: 'relative',
-        overflowX: 'hidden',
-      }}
-    >
-      {/* ── HERO SECTION ── */}
-      <section
-        style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(160deg, #60A5FA 0%, #3B82F6 100%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '60px 32px 48px',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Background decorative circles */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -80,
-            right: -80,
-            width: 280,
-            height: 280,
-            borderRadius: '50%',
-            background: 'rgba(28,117,232,0.1)',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -60,
-            left: -60,
-            width: 220,
-            height: 220,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.04)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Logo */}
-        <motion.div
-          custom={0}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            width: 88,
-            height: 88,
-            borderRadius: 24,
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(10px)',
-            border: '1.5px solid rgba(255,255,255,0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 28,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-            position: 'relative',
-            overflow: 'hidden'
-          }}
-        >
-          <Image src="/logo.png" alt="MilkGuard Logo" width={88} height={88} style={{ objectFit: 'contain' }} priority />
-        </motion.div>
-
-        {/* App name */}
-        <motion.h1
-          custom={0.15}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            color: '#ffffff',
-            fontSize: 34,
-            fontWeight: 800,
-            letterSpacing: '-0.5px',
-            margin: 0,
-            marginBottom: 10,
-            textAlign: 'center',
-          }}
-        >
-          MilkGuard
-        </motion.h1>
-
-        {/* Tagline */}
-        <motion.p
-          custom={0.25}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            color: '#65A4FF',
-            fontSize: 17,
-            fontWeight: 500,
-            margin: 0,
-            marginBottom: 8,
-            textAlign: 'center',
-            letterSpacing: '0.1px',
-          }}
-        >
-          Safe Milk. Scanned in Seconds.
-        </motion.p>
-
-        {/* Trust line */}
-        <motion.p
-          custom={0.32}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            color: 'rgba(255,255,255,0.6)',
-            fontSize: 13,
-            margin: 0,
-            marginBottom: 56,
-            textAlign: 'center',
-          }}
-        >
-          Trusted by families across India 🇮🇳
-        </motion.p>
-
-        {/* CTA Buttons */}
-        <motion.div
-          custom={0.35}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 12 }}
-        >
-          <button
-            onClick={goToLogin}
-            className="landing-cta-btn"
-            style={{
-              width: '100%',
-              height: 56,
-              borderRadius: 999,
-              backgroundColor: '#F5A623',
-              color: '#fff',
-              fontSize: 17,
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              letterSpacing: '0.2px',
-              boxShadow: '0 4px 20px rgba(245,166,35,0.4)',
-            }}
-          >
-            Get Started →
-          </button>
-          <button
-            onClick={goToDownload}
-            className="landing-cta-btn-secondary"
-            style={{
-              width: '100%',
-              height: 48,
-              borderRadius: 999,
-              backgroundColor: 'rgba(255,255,255,0.2)',
-              color: '#fff',
-              fontSize: 15,
-              fontWeight: 600,
-              border: '2px solid rgba(255,255,255,0.3)',
-              cursor: 'pointer',
-              letterSpacing: '0.2px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-          >
-            <Download size={18} />
-            Download APK
-          </button>
-        </motion.div>
-
-        {/* Already have account */}
-        <motion.p
-          custom={0.42}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 13,
-            marginTop: 18,
-            textAlign: 'center',
-          }}
-        >
-          Already have an account?{' '}
-          <button
-            onClick={goToLogin}
-            style={{
-              color: '#65A4FF',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 600,
-              padding: 0,
-              textDecoration: 'underline',
-              textUnderlineOffset: 3,
-            }}
-          >
-            Sign in
-          </button>
-        </motion.p>
-
-        {/* Scroll hint */}
-        <motion.div
-          custom={0.55}
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          style={{
-            position: 'absolute',
-            bottom: 24,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, letterSpacing: 1 }}>
-            SCROLL
-          </span>
-          <div
-            style={{
-              width: 1,
-              height: 28,
-              background: 'rgba(255,255,255,0.25)',
-              animation: 'scrollPulse 1.8s ease-in-out infinite',
-            }}
-          />
-        </motion.div>
-      </section>
-
-      {/* ── FEATURE CARDS SECTION ── */}
-      <section
-        style={{
-          backgroundColor: '#F7F9F8',
-          padding: '52px 24px',
-        }}
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          style={{
-            textAlign: 'center',
-            fontSize: 22,
-            fontWeight: 700,
-            color: '#1C1C1E',
-            margin: 0,
-            marginBottom: 28,
-            letterSpacing: '-0.3px',
-          }}
-        >
-          Why MilkGuard?
-        </motion.h2>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {[
-            {
-              icon: '🔬',
-              iconBg: '#EAF2FF',
-              iconColor: '#60A5FA',
-              title: 'Contactless Detection',
-              desc: 'NIR spectral analysis reads through the container — no touching, no contamination.',
-              delay: 0,
-            },
-            {
-              icon: '⚡',
-              iconBg: '#FDF3E3',
-              iconColor: '#F5A623',
-              title: 'Results in 8 Seconds',
-              desc: 'Faster than any test kit. Scan, get results, stay safe.',
-              delay: 0.08,
-            },
-            {
-              icon: '🛡️',
-              iconBg: '#EAF2FF',
-              iconColor: '#60A5FA',
-              title: 'FSSAI Certified Standards',
-              desc: 'Every result compared against official FSSAI 2025-26 safety limits.',
-              delay: 0.16,
-            },
-          ].map((card) => (
-            <motion.div
-              key={card.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: card.delay }}
-              style={{
-                backgroundColor: '#ffffff',
-                borderRadius: 20,
-                padding: '18px 18px',
-                boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                gap: 16,
-                border: '1px solid rgba(0,0,0,0.04)',
-              }}
-            >
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  minWidth: 50,
-                  borderRadius: 14,
-                  backgroundColor: card.iconBg,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 24,
-                }}
-              >
-                {card.icon}
-              </div>
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    marginBottom: 4,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: '#1C1C1E',
-                    letterSpacing: '-0.1px',
-                  }}
-                >
-                  {card.title}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    color: '#6E7A80',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {card.desc}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── STATS SECTION ── */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%)',
-          padding: '44px 24px',
-        }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          style={{ display: 'flex', alignItems: 'stretch', justifyContent: 'space-around' }}
-        >
-          {[
-            { value: '97%', label: 'Adulteration rate\nin Rajasthan' },
-            { value: '8 sec', label: 'Average scan\ntime' },
-            { value: '7+', label: 'Adulterants\ndetected' },
-          ].map((stat, i) => (
-            <div key={stat.value} style={{ display: 'flex', alignItems: 'center' }}>
-              {i > 0 && (
-                <div
-                  style={{
-                    width: 1,
-                    height: 48,
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    marginRight: 24,
-                  }}
-                />
-              )}
-              <div style={{ textAlign: 'center' }}>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 30,
-                    fontWeight: 800,
-                    color: '#ffffff',
-                    letterSpacing: '-0.5px',
-                  }}
-                >
-                  {stat.value}
-                </p>
-                <p
-                  style={{
-                    margin: 0,
-                    marginTop: 4,
-                    fontSize: 11,
-                    color: '#65A4FF',
-                    textAlign: 'center',
-                    whiteSpace: 'pre-line',
-                    lineHeight: 1.45,
-                  }}
-                >
-                  {stat.label}
-                </p>
-              </div>
+    <main className="min-h-screen bg-[#f8f9ff] text-[#001d36] font-sans antialiased overflow-x-hidden">
+      {/* ── TOP NAV BAR ── */}
+      <header className="sticky top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl border-b border-[#d1e4ff]/60 ambient-shadow">
+        <div className="flex justify-between items-center px-4 md:px-10 h-16 w-full max-w-7xl mx-auto">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md">
+              <span className="material-symbols-outlined text-2xl">biotech</span>
             </div>
-          ))}
-        </motion.div>
-      </section>
+            <span className="text-xl font-extrabold text-[#00288e] tracking-tight">MilkGuard</span>
+          </Link>
 
-      {/* ── HOW IT WORKS SECTION ── */}
-      <section
-        style={{
-          backgroundColor: '#F7F9F8',
-          padding: '52px 24px',
-        }}
-      >
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-          style={{
-            textAlign: 'center',
-            fontSize: 22,
-            fontWeight: 700,
-            color: '#1C1C1E',
-            margin: 0,
-            marginBottom: 36,
-            letterSpacing: '-0.3px',
-          }}
-        >
-          How It Works
-        </motion.h2>
-
-        <div style={{ position: 'relative' }}>
-          {/* Vertical dashed line */}
-          <div
-            style={{
-              position: 'absolute',
-              left: 19,
-              top: 40,
-              bottom: 40,
-              width: 1,
-              borderLeft: '1.5px dashed #D4E8DC',
-            }}
-          />
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {[
-              {
-                num: '1',
-                numBg: '#60A5FA',
-                title: 'Pour a small sample',
-                desc: 'Just 20ml of milk into the transparent cup provided.',
-                delay: 0,
-              },
-              {
-                num: '2',
-                numBg: '#60A5FA',
-                title: 'Place in the Pod cradle',
-                desc: 'Set the cup next to the MilkGuard Pod sensor.',
-                delay: 0.1,
-              },
-              {
-                num: '3',
-                numBg: '#F5A623',
-                title: 'Get instant results',
-                desc: 'AI analyses 18 wavelengths and returns your SafetyScore in 8 seconds.',
-                delay: 0.2,
-              },
-            ].map((step) => (
-              <motion.div
-                key={step.num}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: step.delay }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  gap: 16,
-                  position: 'relative',
-                }}
-              >
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    minWidth: 40,
-                    borderRadius: '50%',
-                    backgroundColor: step.numBg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    fontWeight: 800,
-                    fontSize: 16,
-                    boxShadow: `0 4px 12px ${step.numBg}55`,
-                    zIndex: 1,
-                  }}
-                >
-                  {step.num}
-                </div>
-                <div style={{ paddingTop: 6 }}>
-                  <p
-                    style={{
-                      margin: 0,
-                      marginBottom: 4,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: '#1C1C1E',
-                    }}
-                  >
-                    {step.title}
-                  </p>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: 13,
-                      color: '#6E7A80',
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {step.desc}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── BOTTOM CTA SECTION ── */}
-      <section
-        style={{
-          background: 'linear-gradient(160deg, #60A5FA 0%, #3B82F6 100%)',
-          padding: '56px 32px',
-          textAlign: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            top: -100,
-            right: -100,
-            width: 300,
-            height: 300,
-            borderRadius: '50%',
-            background: 'rgba(46,204,138,0.06)',
-            pointerEvents: 'none',
-          }}
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.45 }}
-        >
-          <h2
-            style={{
-              color: '#ffffff',
-              fontSize: 28,
-              fontWeight: 800,
-              margin: 0,
-              marginBottom: 14,
-              lineHeight: 1.25,
-              letterSpacing: '-0.4px',
-            }}
-          >
-            Ready to protect{'\n'}your family?
-          </h2>
-          <p
-            style={{
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: 14,
-              margin: 0,
-              marginBottom: 32,
-              lineHeight: 1.6,
-              maxWidth: 280,
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            Join thousands of families already using MilkGuard to verify their milk.
-          </p>
-
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {/* Navigation CTAs */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={goToDownload}
+              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#00668a] bg-[#e5efff] hover:bg-[#c4e7ff] transition-all"
+            >
+              <Download size={15} />
+              <span>Download APK</span>
+            </button>
             <button
               onClick={goToLogin}
-              className="landing-cta-btn"
-              style={{
-                width: '100%',
-                maxWidth: 320,
-                height: 56,
-                borderRadius: 999,
-                backgroundColor: '#F5A623',
-                color: '#fff',
-                fontSize: 17,
-                fontWeight: 700,
-                border: 'none',
-                cursor: 'pointer',
-                letterSpacing: '0.2px',
-                boxShadow: '0 4px 20px rgba(245,166,35,0.4)',
-              }}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-[#00668a] hover:bg-[#e5efff] transition-all"
             >
-              Get Started Free
+              Sign In
+            </button>
+            <button
+              onClick={goToSignup}
+              className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#00668a] hover:bg-[#004c69] shadow-sm transition-all flex items-center gap-1"
+            >
+              <span>Get Started</span>
+              <ArrowRight size={14} />
             </button>
           </div>
+        </div>
+      </header>
 
-          <p
-            style={{
-              color: 'rgba(255,255,255,0.5)',
-              fontSize: 12,
-              marginTop: 16,
-              marginBottom: 0,
-            }}
-          >
-            No hardware required for web demo
-          </p>
-        </motion.div>
+      {/* ── HERO SECTION ── */}
+      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 px-4 md:px-10 bg-gradient-to-b from-[#f8f9ff] via-[#e5efff]/40 to-[#f8f9ff] overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          {/* Left Text Column */}
+          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#e5efff] border border-[#c4e7ff] text-xs font-bold text-[#00668a]">
+              <span className="w-2 h-2 rounded-full bg-[#30c5b3] animate-pulse"></span>
+              <span>FSSAI Compliant · Spectral NIR Intelligence</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#001d36] tracking-tight leading-[1.1]">
+              Know What&apos;s in Your Milk. <br />
+              <span className="text-[#00668a]">Scanned in Seconds.</span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#3e484f] font-medium max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              Instant non-contact NIR spectral analysis & AI adulterant detection. Verify purity, track vendor trust scores, and write tamper-proof reports to Polygon blockchain.
+            </p>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+              <button
+                onClick={goToSignup}
+                className="w-full sm:w-auto px-8 py-4 bg-[#00668a] hover:bg-[#004c69] text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-[#00668a]/20 transition-all flex items-center justify-center gap-2 group"
+              >
+                <span>Start Free Purity Scan</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              <button
+                onClick={goToDownload}
+                className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-[#f8f9ff] border border-[#d1e4ff] text-[#001d36] font-bold text-sm rounded-2xl ambient-shadow transition-all flex items-center justify-center gap-2"
+              >
+                <Smartphone size={18} className="text-[#00668a]" />
+                <span>Get Mobile App</span>
+              </button>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="pt-6 flex items-center justify-center lg:justify-start gap-6 text-xs text-[#3e484f] font-semibold">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-[#30c5b3]" />
+                <span>100% Non-Contact</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-[#30c5b3]" />
+                <span>Polygon On-Chain</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 size={16} className="text-[#30c5b3]" />
+                <span>8 Sec Analysis</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Visual Card */}
+          <div className="lg:col-span-5 flex justify-center">
+            <div className="w-full max-w-md bg-white rounded-3xl border border-[#d1e4ff] ambient-shadow p-6 space-y-6 relative overflow-hidden">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-[#30c5b3]/15 text-[#006b5f] flex items-center justify-center">
+                    <ShieldCheck size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-[#001d36] text-sm">Sample Test Result</h3>
+                    <p className="text-xs text-[#3e484f]">Fresh Cow Milk · Jaipur</p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-[#30c5b3]/20 text-[#006b5f] text-xs font-bold">
+                  98% PURE
+                </span>
+              </div>
+
+              {/* Radial Gauge Preview */}
+              <div className="bg-[#f8f9ff] rounded-2xl p-6 border border-[#d1e4ff] flex flex-col items-center justify-center text-center space-y-2">
+                <div className="w-24 h-24 rounded-full bg-[#e5efff] border-4 border-[#30c5b3] flex items-center justify-center shadow-inner">
+                  <span className="text-3xl font-black text-[#001d36]">98</span>
+                </div>
+                <p className="text-xs font-bold text-[#006b5f] uppercase tracking-wider">PASSED · Safe for Consumption</p>
+                <p className="text-[11px] text-[#3e484f]">No Urea, Detergent, or Water dilution detected.</p>
+              </div>
+
+              {/* Verified Features list */}
+              <div className="space-y-2 text-xs font-semibold text-[#001d36]">
+                <div className="flex justify-between p-3 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff]">
+                  <span>FSSAI Standards Compliance</span>
+                  <span className="text-[#006b5f] font-bold">Verified</span>
+                </div>
+                <div className="flex justify-between p-3 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff]">
+                  <span>Polygon Amoy Blockchain Record</span>
+                  <span className="text-[#00668a] font-bold">Logged</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURE HIGHLIGHTS ── */}
+      <section className="py-16 px-4 md:px-10 bg-white border-y border-[#d1e4ff]">
+        <div className="w-full max-w-7xl mx-auto space-y-12">
+          <div className="text-center space-y-2 max-w-xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#001d36] tracking-tight">
+              Why MilkGuard Protection Works
+            </h2>
+            <p className="text-xs sm:text-sm text-[#3e484f] font-medium">
+              Engineered with NIR multispectral hardware, Groq AI inference, and decentralized blockchain verification.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#f8f9ff] p-6 rounded-2xl border border-[#d1e4ff] ambient-shadow space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                <span className="material-symbols-outlined text-2xl">biotech</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#001d36]">Contactless Detection</h3>
+              <p className="text-xs text-[#3e484f] leading-relaxed font-medium">
+                18-wavelength NIR spectral analysis reads through transparent milk containers without touching or contaminating the sample.
+              </p>
+            </div>
+
+            <div className="bg-[#f8f9ff] p-6 rounded-2xl border border-[#d1e4ff] ambient-shadow space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                <Zap size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[#001d36]">Instant AI Analysis</h3>
+              <p className="text-xs text-[#3e484f] leading-relaxed font-medium">
+                Powered by Groq Mixtral AI inference engine to deliver actionable safety reports and chemical breakdown analogies in seconds.
+              </p>
+            </div>
+
+            <div className="bg-[#f8f9ff] p-6 rounded-2xl border border-[#d1e4ff] ambient-shadow space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                <ShieldCheck size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-[#001d36]">Polygon Blockchain Proof</h3>
+              <p className="text-xs text-[#3e484f] leading-relaxed font-medium">
+                Every test score payload is SHA-256 hashed and recorded on the Polygon Amoy testnet for tamper-proof public auditability.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer
-        style={{
-          backgroundColor: '#073380',
-          padding: '28px 24px',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 12 }}>
-          <button
-            onClick={goToDownload}
-            style={{
-              color: '#65A4FF',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 500,
-              padding: 0,
-              textDecoration: 'underline',
-              textUnderlineOffset: 3,
-            }}
-          >
-            Download APK
-          </button>
-          <a
-            href="/about"
-            style={{
-              color: 'rgba(255,255,255,0.5)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 13,
-              padding: 0,
-              textDecoration: 'underline',
-              textUnderlineOffset: 3,
-            }}
-          >
-            About
-          </a>
-          <a
-            href="/faq"
-            style={{
-              color: 'rgba(255,255,255,0.5)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 13,
-              padding: 0,
-              textDecoration: 'underline',
-              textUnderlineOffset: 3,
-            }}
-          >
-            FAQ
-          </a>
-        </div>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, margin: 0 }}>
-          MilkGuard © 2026
-        </p>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: 0, marginTop: 4 }}>
-          Built for India&apos;s food safety 🇮🇳
-        </p>
-      </footer>
+      <footer className="bg-[#001d36] text-white py-12 px-4 md:px-10">
+        <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#00668a] flex items-center justify-center text-white">
+              <span className="material-symbols-outlined text-xl">biotech</span>
+            </div>
+            <span className="text-lg font-extrabold tracking-tight">MilkGuard</span>
+          </div>
 
-      {/* Global styles for this page */}
-      <style jsx global>{`
-        .landing-cta-btn {
-          transition: background-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
-        }
-        .landing-cta-btn:hover {
-          background-color: #E8941A !important;
-          transform: scale(1.02);
-          box-shadow: 0 6px 24px rgba(245,166,35,0.5) !important;
-        }
-        .landing-cta-btn:active {
-          transform: scale(0.98);
-        }
-        .landing-cta-btn-secondary {
-          transition: background-color 200ms ease, transform 200ms ease, border-color 200ms ease;
-        }
-        .landing-cta-btn-secondary:hover {
-          background-color: rgba(255,255,255,0.3) !important;
-          transform: scale(1.02);
-          border-color: rgba(255,255,255,0.5) !important;
-        }
-        .landing-cta-btn-secondary:active {
-          transform: scale(0.98);
-        }
-        @keyframes scrollPulse {
-          0%, 100% { opacity: 0.25; }
-          50% { opacity: 0.7; }
-        }
-      `}</style>
+          <div className="flex items-center gap-6 text-xs font-semibold text-[#c4e7ff]">
+            <Link href="/about" className="hover:text-white transition-colors">About</Link>
+            <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link>
+            <Link href="/download" className="hover:text-white transition-colors">Download APK</Link>
+          </div>
+
+          <p className="text-xs text-[#8e9aa0]">
+            MilkGuard © 2026 · Built for Food Safety 🇮🇳
+          </p>
+        </div>
+      </footer>
     </main>
   )
 }
