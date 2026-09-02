@@ -24,12 +24,12 @@ const FALLBACK_VENDORS_MAP: Record<string, any> = {
 }
 
 export default async function VendorProfilePage({ params }: { params: { id: string } }) {
+  const supabase = createClient()
   let vendor: any = FALLBACK_VENDORS_MAP[params.id] || null
   let scans: any[] = []
 
   if (!vendor) {
     try {
-      const supabase = createClient()
       const { data } = await supabase.from('vendors').select('*').eq('id', params.id).single()
       if (data) vendor = data
     } catch {
@@ -42,11 +42,18 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
   }
 
   // 2. Fetch all scans for this vendor
-  const { data: scans } = await supabase
-    .from('scans')
-    .select('*')
-    .eq('vendor_id', vendor.id)
-    .order('created_at', { ascending: false })
+  try {
+    const { data: fetchedScans } = await supabase
+      .from('scans')
+      .select('*')
+      .eq('vendor_id', vendor.id)
+      .order('created_at', { ascending: false })
+    if (fetchedScans) {
+      scans = fetchedScans
+    }
+  } catch {
+    scans = []
+  }
 
   const totalScans = scans?.length || 0
   const avgPurity = vendor.avg_score || 0
