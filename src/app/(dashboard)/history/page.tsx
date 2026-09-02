@@ -152,73 +152,72 @@ export default async function HistoryPage() {
         {scans && scans.length > 0 ? (
           scans.map((scan) => (
             <div key={scan.id} className="relative group">
-              <Link href={`/history/${scan.id}`} className="block">
-                <Card className="rounded-2xl border border-[#d1e4ff] bg-white ambient-shadow hover:border-[#00668a] transition-all overflow-hidden">
-                  <CardContent className="p-4 flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                        scan.result_tier === 'safe' ? "bg-[#30c5b3]/15 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
+              <Card className="rounded-2xl border border-[#d1e4ff] bg-white ambient-shadow hover:border-[#00668a] transition-all overflow-hidden">
+                <CardContent className="p-4 flex items-center justify-between gap-4">
+                  <Link href={`/history/${scan.id}`} className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                      scan.result_tier === 'safe' ? "bg-[#30c5b3]/15 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
+                    )}>
+                      <span className="material-symbols-outlined text-2xl">
+                        {scan.result_tier === 'safe' ? 'verified' : 'warning'}
+                      </span>
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-[#001d36] text-sm truncate hover:text-[#00668a] transition-colors">
+                        {scan.source_hardware_id ? '📡 ESP32 Hardware Pod' : (scan.vendors?.name || 'Home Milk Sample')}
+                      </p>
+                      <div className="flex items-center gap-2 text-xs text-[#3e484f] font-medium mt-0.5">
+                        <Calendar size={12} className="text-[#6e7980]" />
+                        <span>{scan.created_at ? format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a') : 'Recent'}</span>
+                      </div>
+                    </div>
+                  </Link>
+
+                  <div className="flex items-center gap-4 shrink-0">
+                    <Link href={`/history/${scan.id}`} className="text-right block">
+                      <span className={cn(
+                        "text-xl font-extrabold block leading-tight",
+                        scan.result_tier === 'safe' ? "text-[#006b5f]" : "text-[#ba1a1a]"
                       )}>
-                        <span className="material-symbols-outlined text-2xl">
-                          {scan.result_tier === 'safe' ? 'verified' : 'warning'}
-                        </span>
-                      </div>
+                        {scan.safety_score}%
+                      </span>
+                      <Badge variant="outline" className={cn(
+                        "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border-none",
+                        scan.result_tier === 'safe' ? "bg-[#30c5b3]/20 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
+                      )}>
+                        {scan.result_tier}
+                      </Badge>
+                    </Link>
 
-                      <div className="min-w-0">
-                        <p className="font-bold text-[#001d36] text-sm truncate">
-                          {scan.source_hardware_id ? '📡 ESP32 Hardware Pod' : (scan.vendors?.name || 'Home Milk Sample')}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-[#3e484f] font-medium mt-0.5">
-                          <Calendar size={12} className="text-[#6e7980]" />
-                          <span>{format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 shrink-0">
-                      <div className="text-right">
-                        <span className={cn(
-                          "text-xl font-extrabold block leading-tight",
-                          scan.result_tier === 'safe' ? "text-[#006b5f]" : "text-[#ba1a1a]"
-                        )}>
-                          {scan.safety_score}%
-                        </span>
-                        <Badge variant="outline" className={cn(
-                          "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border-none",
-                          scan.result_tier === 'safe' ? "bg-[#30c5b3]/20 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
-                        )}>
-                          {scan.result_tier}
-                        </Badge>
-                      </div>
-
-                      {/* Action Links */}
-                      <div className="hidden sm:flex flex-col items-end gap-1" onClick={(e) => e.stopPropagation()}>
-                        {scan.tx_hash && (
-                          <a
-                            href={`https://amoy.polygonscan.com/tx/${scan.tx_hash}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#e5efff] text-[#00668a] hover:bg-[#c4e7ff] transition-colors border border-[#c4e7ff]"
-                          >
-                            <span className="material-symbols-outlined text-xs">verified</span>
-                            <span>Polygon</span>
-                          </a>
-                        )}
-                        <Link 
-                          href={`/history/${scan.id}?report=true`}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f8f9ff] text-[#3e484f] hover:bg-[#e5efff] transition-colors border border-[#d1e4ff]"
+                    {/* Action Links */}
+                    <div className="hidden sm:flex flex-col items-end gap-1">
+                      {scan.tx_hash && (
+                        <a
+                          href={`https://amoy.polygonscan.com/tx/${scan.tx_hash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#e5efff] text-[#00668a] hover:bg-[#c4e7ff] transition-colors border border-[#c4e7ff]"
                         >
-                          <span>📄 PDF Report</span>
-                        </Link>
-                      </div>
+                          <span className="material-symbols-outlined text-xs">verified</span>
+                          <span>Polygon</span>
+                        </a>
+                      )}
+                      <Link 
+                        href={`/history/${scan.id}?report=true`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f8f9ff] text-[#3e484f] hover:bg-[#e5efff] transition-colors border border-[#d1e4ff]"
+                      >
+                        <span>📄 PDF Report</span>
+                      </Link>
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           ))
         ) : (
+
           <div className="py-16 text-center flex flex-col items-center justify-center bg-white rounded-2xl border border-dashed border-[#d1e4ff]">
             <span className="material-symbols-outlined text-5xl text-[#bdc8d1] mb-2">history</span>
             <h3 className="font-bold text-[#001d36] text-base">No scans found</h3>
