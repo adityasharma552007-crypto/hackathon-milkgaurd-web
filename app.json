@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "7e44cb28-d2a0-480f-981f-740784d39682"
+      }
+    },
+    "android": {
+      "package": "com.adityasharma552007.milkguardweb"
+    }
+  }
+}

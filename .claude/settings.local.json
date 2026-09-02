@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x:*)",
+      "Bash(./scripts/verify-apk.sh)",
+      "Bash(git:*)",
+      "Bash(ls -la /media/aditya-sharma/4E8C0ED58C0EB80B/MilkGaurd/web/*.md)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

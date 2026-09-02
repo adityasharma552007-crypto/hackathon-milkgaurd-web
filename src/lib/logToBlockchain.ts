@@ -2,7 +2,7 @@
 
 import { ethers } from 'ethers';
 import { createClient } from '@supabase/supabase-js';
-import CONTRACT_ABI from './abi.json';
+import CONTRACT_ABI from './abi';
 
 export interface ScanData {
   id: string;
