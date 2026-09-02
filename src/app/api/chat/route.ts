@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         status: 503,
         headers: {
           'Content-Type': 'application/json',
-          ...getRateLimitHeaders(rateLimitCheck)
+          ...getRateLimitHeaders(rateLimitCheck.limit, rateLimitCheck.remaining, rateLimitCheck.resetIn)
         }
       }
     )

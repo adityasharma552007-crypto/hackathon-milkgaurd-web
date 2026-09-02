@@ -104,27 +104,28 @@ export default async function HomePage() {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      {/* Flagged Vendors Alert Banner */}
+      {/* Flagged Vendors Alert Banner — compact, non-distracting */}
       {flaggedCount && flaggedCount > 0 ? (
-        <Link href="/map?filter=flagged" className="block">
-          <div className="bg-[#ffdad6] border border-[#ba1a1a]/30 rounded-2xl p-4 flex items-center justify-between group hover:bg-[#ffdad6]/80 transition-colors ambient-shadow alert-pulse">
+        <Link href="/map?filter=flagged" className="block group">
+          <div className="bg-white border border-[#ffdad6] rounded-2xl px-4 py-3 flex items-center justify-between hover:border-[#ba1a1a]/40 hover:bg-[#fff8f8] transition-all ambient-shadow">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#ba1a1a] text-white flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-xl">notifications_active</span>
+              <div className="w-8 h-8 rounded-full bg-[#ffdad6] flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[#ba1a1a] text-base">notifications_active</span>
               </div>
               <div>
-                <p className="text-xs font-bold text-[#93000a] uppercase tracking-wider">
+                <p className="text-[11px] font-bold text-[#93000a] uppercase tracking-wider leading-none mb-0.5">
                   Community Alert
                 </p>
-                <p className="text-sm font-semibold text-[#93000a]">
-                  ⚠️ {flaggedCount} vendors in your area ({profile?.city || 'Jaipur'}) are flagged for adulteration
+                <p className="text-xs font-semibold text-[#3e484f]">
+                  {flaggedCount} vendor{flaggedCount !== 1 ? 's' : ''} in {profile?.city || 'your area'} flagged for adulteration
                 </p>
               </div>
             </div>
-            <span className="material-symbols-outlined text-[#93000a] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <span className="material-symbols-outlined text-[#ba1a1a] text-base group-hover:translate-x-0.5 transition-transform shrink-0">arrow_forward</span>
           </div>
         </Link>
       ) : null}
+
 
       {/* Main Bento Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">

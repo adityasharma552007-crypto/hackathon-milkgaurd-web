@@ -45,15 +45,11 @@ body {
   font-variation-settings: 'FILL' 1;
 }
 
-/* Pulse Animation for Active Alerts */
-@keyframes soft-pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
-}
+/* Community Alert — no constant animation */
 .alert-pulse {
-  animation: soft-pulse 2s infinite;
+  /* No bounce animation — subtle left border accent only */
 }
+
 
 /* Ambient Shadow Utility */
 .ambient-shadow {
