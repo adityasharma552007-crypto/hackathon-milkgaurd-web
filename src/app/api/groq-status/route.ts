@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import Groq from 'groq-sdk'
+import { runGroqChatCompletion } from '@/lib/ai/groqClient'
 
 export async function GET(_req: NextRequest) {
   const apiKey = process.env.GROQ_API_KEY
@@ -17,13 +17,14 @@ export async function GET(_req: NextRequest) {
 
   // Ping Groq with a cheap request to verify credentials
   try {
-    const client = new Groq({ apiKey })
-    await client.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [{ role: 'user', content: 'ping' }],
-      max_tokens: 1,
-    })
-    return Response.json({ ok: true, reason: 'valid' })
+    const { modelUsed } = await runGroqChatCompletion(
+      {
+        messages: [{ role: 'user', content: 'ping' }],
+        max_tokens: 1,
+      },
+      apiKey
+    )
+    return Response.json({ ok: true, reason: 'valid', model: modelUsed })
   } catch (err: any) {
     const status = err?.status ?? 0
     if (status === 401) return Response.json({ ok: false, reason: 'invalid_key' })
@@ -31,3 +32,4 @@ export async function GET(_req: NextRequest) {
     return Response.json({ ok: false, reason: 'connection_error', detail: err?.message })
   }
 }
+

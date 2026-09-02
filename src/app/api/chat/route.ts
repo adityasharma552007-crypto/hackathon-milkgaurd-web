@@ -1,6 +1,6 @@
-import Groq from 'groq-sdk'
 import { NextRequest } from 'next/server'
 import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
+import { runGroqChatStream } from '@/lib/ai/groqClient'
 
 const SYSTEM_PROMPT = `You are a helpful AI assistant for MilkGuard, a milk adulteration detection app.
 Explain test results in simple, non-technical language for milk vendors and consumers.
@@ -11,9 +11,6 @@ Be concise, informative, and always provide:
 Use **bold** for key terms, bullet points for clarity.
 Keep responses under 200 words. Be empathetic and constructive, never alarmist.`
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
 
 export async function POST(req: NextRequest) {
   // Check rate limit FIRST
@@ -71,19 +68,20 @@ export async function POST(req: NextRequest) {
     : SYSTEM_PROMPT
 
   try {
-    const groqClient = new Groq({ apiKey })
-    const stream = await groqClient.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: systemContent },
-        ...messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
-      ],
-      stream: true,
-      max_tokens: 400,
-      temperature: 0.7,
-    })
+    const { stream } = await runGroqChatStream(
+      {
+        messages: [
+          { role: 'system', content: systemContent },
+          ...messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+        ],
+        max_tokens: 400,
+        temperature: 0.7,
+      },
+      apiKey
+    )
 
     // Return a streaming response
+
     const encoder = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {

@@ -1,6 +1,6 @@
-import Groq from 'groq-sdk'
 import { NextRequest } from 'next/server'
 import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
+import { runGroqChatCompletion } from '@/lib/ai/groqClient'
 
 export async function POST(req: NextRequest) {
   // Check rate limit
@@ -54,17 +54,18 @@ Context:
 ${JSON.stringify(context || {})}`
 
   try {
-    const groqClient = new Groq({ apiKey })
-    
-    const completion = await groqClient.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT }
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: 300,
-      temperature: 0.4,
-    })
+    const { response: completion } = await runGroqChatCompletion(
+      {
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT }
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 300,
+        temperature: 0.4,
+      },
+      apiKey
+    )
+
 
     const rawContent = completion.choices[0]?.message?.content || '{"insights": []}'
     let parsedContent;

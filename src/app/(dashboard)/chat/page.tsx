@@ -30,15 +30,16 @@ function uid() {
 }
 
 // ─── Groq status check ────────────────────────────────────────────────────────
-async function checkGroqStatus(): Promise<{ ok: boolean; reason: GroqKeyReason }> {
+async function checkGroqStatus(): Promise<{ ok: boolean; reason: GroqKeyReason; model?: string }> {
   try {
     const res = await fetch('/api/groq-status')
     const data = await res.json()
-    return data as { ok: boolean; reason: GroqKeyReason }
+    return data as { ok: boolean; reason: GroqKeyReason; model?: string }
   } catch {
     return { ok: false, reason: 'connection_error' }
   }
 }
+
 
 async function streamChat(
   messages: { role: Role; content: string }[],
@@ -176,7 +177,7 @@ export default function ChatPage() {
   const abortRef = useRef<AbortController | null>(null)
 
   // ─── Groq status state ────────────────────────────────────────────────────
-  const [groqStatus, setGroqStatus] = useState<{ ok: boolean | null; reason: GroqKeyReason }>({
+  const [groqStatus, setGroqStatus] = useState<{ ok: boolean | null; reason: GroqKeyReason; model?: string }>({
     ok: null, // null = checking
     reason: null,
   })
@@ -185,19 +186,20 @@ export default function ChatPage() {
 
   // Check key on mount
   useEffect(() => {
-    checkGroqStatus().then(({ ok, reason }) => {
-      setGroqStatus({ ok, reason })
+    checkGroqStatus().then(({ ok, reason, model }) => {
+      setGroqStatus({ ok, reason, model })
       if (!ok) setShowSetupModal(true)
     })
   }, [])
 
   const recheck = useCallback(async () => {
     setRecheckLoading(true)
-    const { ok, reason } = await checkGroqStatus()
-    setGroqStatus({ ok, reason })
+    const { ok, reason, model } = await checkGroqStatus()
+    setGroqStatus({ ok, reason, model })
     if (ok) setShowSetupModal(false)
     setRecheckLoading(false)
   }, [])
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -276,7 +278,7 @@ export default function ChatPage() {
                 ? '● Setup Required'
                 : loading
                 ? '● Computing spectral response…'
-                : '● Online · Groq Mixtral Inference'}
+                : `● Online · Groq AI Analyst`}
             </p>
           </div>
         </div>
@@ -295,7 +297,7 @@ export default function ChatPage() {
             </button>
           ) : (
             <span className="text-[10px] bg-[#30c5b3] text-[#004d44] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
-              Mixtral 8x7B
+              {groqStatus.model?.split('/').pop() || 'Groq AI'}
             </span>
           )}
           {messages.length > 0 && !isDisabled && (
@@ -304,6 +306,7 @@ export default function ChatPage() {
             </button>
           )}
         </div>
+
       </div>
 
       {/* ── Setup Guide Modal ── */}

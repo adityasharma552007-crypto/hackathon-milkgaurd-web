@@ -4,8 +4,8 @@
  */
 
 import { NextRequest } from 'next/server'
-import Groq from 'groq-sdk'
 import { checkAndLogRateLimit, getRateLimitHeaders } from '@/lib/supabase/protectedRoute'
+import { runGroqChatCompletion } from '@/lib/ai/groqClient'
 
 const EXPLAIN_PROMPT = `You are a milk quality analysis expert. Explain test results in simple terms.
 Include:
@@ -55,22 +55,24 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const groq = new Groq({ apiKey })
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.1-8b-instant',
-      messages: [
-        { role: 'system', content: EXPLAIN_PROMPT },
-        { role: 'user', content: JSON.stringify(body.results, null, 2) }
-      ],
-      max_tokens: 300,
-      temperature: 0.7,
-    })
+    const { response: completion } = await runGroqChatCompletion(
+      {
+        messages: [
+          { role: 'system', content: EXPLAIN_PROMPT },
+          { role: 'user', content: JSON.stringify(body.results, null, 2) }
+        ],
+        max_tokens: 300,
+        temperature: 0.7,
+      },
+      apiKey
+    )
 
     return new Response(
       JSON.stringify({
         explanation: completion.choices[0]?.message?.content,
         remaining: rateLimitCheck.remaining
       }),
+
       {
         status: 200,
         headers: {
