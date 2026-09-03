@@ -72,17 +72,27 @@ export default async function HistoryPage() {
           supabase.from('scans').select('*, vendors(name), tx_hash, source_hardware_id').eq('user_id', user.id).order('created_at', { ascending: false }),
           supabase.from('scans').select('*, vendors(name), tx_hash, source_hardware_id').not('source_hardware_id', 'is', null).order('created_at', { ascending: false }).limit(20)
         ])
-        const fetched = [...(userScans ?? []), ...(hwScans ?? [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        const allScans = [...(userScans ?? []), ...(hwScans ?? [])]
+        const seen = new Set<string>()
+        const fetched = allScans
+          .filter((s) => {
+            if (!s?.id || seen.has(s.id)) return false
+            seen.add(s.id)
+            return true
+          })
+          .sort((a, b) => {
+            const timeA = a.created_at ? new Date(a.created_at).getTime() : 0
+            const timeB = b.created_at ? new Date(b.created_at).getTime() : 0
+            return timeB - timeA
+          })
         scans = fetched
       }
     } catch (err) {
-
       console.error('[History Page Error]', err)
       user = { id: 'demo-user-123', email: 'demo@milkguard.com' }
       scans = fallbackScans
     }
   }
-
 
   if (!user) return null
 
@@ -94,9 +104,13 @@ export default async function HistoryPage() {
   })
 
   const trendData = last30Days.map((day: Date) => {
-    const dayScans = scans?.filter(s => isSameDay(new Date(s.created_at), day)) || []
+    const dayScans = scans?.filter((s) => {
+      if (!s?.created_at) return false
+      const d = new Date(s.created_at)
+      return !isNaN(d.getTime()) && isSameDay(d, day)
+    }) || []
     const avgScore = dayScans.length > 0 
-      ? dayScans.reduce((acc, s) => acc + s.safety_score, 0) / dayScans.length 
+      ? Math.round(dayScans.reduce((acc, s) => acc + (Number(s.safety_score) || 0), 0) / dayScans.length) 
       : null
     
     return {
@@ -170,7 +184,7 @@ export default async function HistoryPage() {
                       </p>
                       <div className="flex items-center gap-2 text-xs text-[#3e484f] font-medium mt-0.5">
                         <Calendar size={12} className="text-[#6e7980]" />
-                        <span>{scan.created_at ? format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a') : 'Recent'}</span>
+                        <span>{scan.created_at && !isNaN(new Date(scan.created_at).getTime()) ? format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a') : 'Recent'}</span>
                       </div>
                     </div>
                   </Link>
