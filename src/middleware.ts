@@ -15,6 +15,18 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // Forward any incoming request that has an OAuth authorization code to /auth/callback
+  // This handles cases where Supabase redirects directly to Site URL (e.g., /home?code=... or /?code=...)
+  const authCode = request.nextUrl.searchParams.get('code')
+  if (authCode) {
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('code', authCode)
+    if (pathname && pathname !== '/') {
+      callbackUrl.searchParams.set('next', pathname)
+    }
+    return NextResponse.redirect(callbackUrl)
+  }
+
   // Check demo session cookie first for instant 0ms auth check
   const demoCookie = request.cookies.get('mg_demo_session')?.value
   let user: any = null
