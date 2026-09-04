@@ -23,7 +23,7 @@ export async function POST() {
   })
 
   // 3. Clear all Supabase auth cookies present on the request
-  const allCookies = cookieStore.getAll()
+  const allCookies = (typeof cookieStore?.getAll === 'function' ? cookieStore.getAll() : [])
   for (const cookie of allCookies) {
     if (cookie.name.startsWith('sb-') || cookie.name.includes('auth') || cookie.name.includes('session')) {
       response.cookies.set(cookie.name, '', {

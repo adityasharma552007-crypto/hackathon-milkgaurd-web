@@ -16,6 +16,7 @@ export const createClient = () => {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
+        cookies: {},
         global: {
           fetch: (url, options) => {
             const controller = new AbortController()

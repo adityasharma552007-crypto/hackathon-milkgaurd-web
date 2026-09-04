@@ -10,6 +10,11 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
+  // 1. Never intercept OAuth callback handler — let the route handler exchange the code
+  if (pathname.startsWith('/auth/callback')) {
+    return response
+  }
+
   // Check demo session cookie first for instant 0ms auth check
   const demoCookie = request.cookies.get('mg_demo_session')?.value
   let user: any = null

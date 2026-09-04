@@ -24,9 +24,15 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    const cookieStore = cookies()
     const targetUrl = new URL(next, request.url)
     const response = NextResponse.redirect(targetUrl)
+
+    let cookieStore: any = null
+    try {
+      cookieStore = cookies()
+    } catch {
+      cookieStore = null
+    }
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -34,15 +40,25 @@ export async function GET(request: NextRequest) {
       {
         cookies: {
           get(name: string) {
-            return cookieStore.get(name)?.value
+            const reqVal = request.cookies.get(name)?.value
+            if (reqVal !== undefined) return reqVal
+            try {
+              return cookieStore?.get?.(name)?.value
+            } catch {
+              return undefined
+            }
           },
           set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options })
             response.cookies.set({ name, value, ...options })
+            try {
+              cookieStore?.set?.({ name, value, ...options })
+            } catch {}
           },
           remove(name: string, options: CookieOptions) {
-            cookieStore.set({ name, value: '', ...options })
-            response.cookies.set({ name, value: '', ...options })
+            response.cookies.set({ name, value: '', ...options, maxAge: 0 })
+            try {
+              cookieStore?.set?.({ name, value: '', ...options, maxAge: 0 })
+            } catch {}
           },
         },
       }
