@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
-import { Shield, CheckCircle2, ArrowUpRight, Search, ExternalLink, Calendar, Blocks } from "lucide-react"
+import { verifyPublicScan } from "@/lib/supabase/masterScanService"
+import { Shield, CheckCircle2, ArrowUpRight, Search, ExternalLink, Calendar, Blocks, AlertTriangle, XCircle, Activity } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,8 +8,22 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
-export default async function VerifyPage() {
+export default async function VerifyPage({
+  searchParams
+}: {
+  searchParams?: { tx?: string; scan_id?: string; query?: string }
+}) {
   const supabase = createClient()
+  const lookupQuery = (searchParams?.query || searchParams?.scan_id || searchParams?.tx || '').trim()
+
+  let verificationResult: any = null
+  if (lookupQuery) {
+    try {
+      verificationResult = await verifyPublicScan(lookupQuery)
+    } catch (err: any) {
+      verificationResult = { verified: false, reason: 'error', error: err.message }
+    }
+  }
 
   // Fetch recent scans that have tx_hash recorded on-chain
   const { data: onChainScans } = await supabase
@@ -59,26 +74,137 @@ export default async function VerifyPage() {
       <Card className="rounded-2xl border border-[#c4e7ff] bg-gradient-to-br from-[#00668a] to-[#004c69] text-white ambient-shadow overflow-hidden p-6">
         <div className="space-y-4">
           <div>
-            <h2 className="text-lg font-bold">Verify Any Scan Hash</h2>
-            <p className="text-xs text-[#c4e7ff] mt-0.5">Enter a 66-character transaction hash or scan ID to audit on Polygonscan</p>
+            <h2 className="text-lg font-bold">Verify Any Scan ID or Blockchain Hash</h2>
+            <p className="text-xs text-[#c4e7ff] mt-0.5">Enter a MilkGuard scan ID (e.g. MG-20260904-A8F31C) or 66-character Polygon transaction hash</p>
           </div>
 
           <form action="/verify" method="GET" className="flex gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#3e484f]" size={16} />
               <input 
-                name="tx"
-                placeholder="Paste transaction hash (0x...)" 
+                name="query"
+                defaultValue={lookupQuery}
+                placeholder="Enter Scan ID (MG-...) or Tx Hash (0x...)" 
                 className="w-full h-12 bg-white text-[#001d36] placeholder:text-[#6e7980] rounded-xl pl-10 pr-4 text-xs font-mono font-semibold focus:outline-none focus:ring-2 focus:ring-[#38bdf8]" 
               />
             </div>
             <Button type="submit" className="h-12 px-6 bg-[#30c5b3] hover:bg-[#28b0a0] text-[#004d44] font-extrabold rounded-xl flex items-center gap-1.5">
-              <span>Verify Hash</span>
+              <span>Verify</span>
               <ArrowUpRight size={16} />
             </Button>
           </form>
         </div>
       </Card>
+
+      {/* Verification Result Display */}
+      {lookupQuery && verificationResult && (
+        <div className="space-y-4">
+          {verificationResult.verified ? (
+            <Card className="rounded-2xl border-2 border-emerald-500 bg-white ambient-shadow overflow-hidden p-6 space-y-5">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-extrabold text-[#001d36]">CRYPTOGRAPHIC INTEGRITY VERIFIED</span>
+                      <Badge className="bg-emerald-500 text-white font-bold text-[10px] uppercase">MATCH</Badge>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">Stored data matches the blockchain-anchored fingerprint perfectly.</p>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <p className="text-xs text-slate-400 font-bold uppercase">Public Scan ID</p>
+                  <p className="font-mono font-extrabold text-sm text-[#00668a]">{verificationResult.scan_id}</p>
+                </div>
+              </div>
+
+              {/* Technical Details Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                  <p className="font-bold text-slate-700 uppercase tracking-wider text-[10px]">Hardware Origin & Timestamp</p>
+                  <p><span className="text-slate-500">Device UID:</span> <span className="font-mono font-bold text-slate-800">{verificationResult.device_uid}</span></p>
+                  <p><span className="text-slate-500">Device Name:</span> <span className="font-semibold text-slate-800">{verificationResult.device_name}</span></p>
+                  <p><span className="text-slate-500">Scan Timestamp:</span> <span className="font-medium text-slate-800">{verificationResult.created_at ? format(new Date(verificationResult.created_at), 'PPP p') : 'Recent'}</span></p>
+                </div>
+
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+                  <p className="font-bold text-slate-700 uppercase tracking-wider text-[10px]">AI Assessment & Confidence</p>
+                  <p><span className="text-slate-500">Result:</span> <span className="font-bold uppercase text-slate-800">{verificationResult.analysis_result || 'SAFE'}</span></p>
+                  <p><span className="text-slate-500">Confidence:</span> <span className="font-bold text-[#00668a]">{verificationResult.analysis_confidence}%</span></p>
+                  <p className="text-slate-600 italic">"{verificationResult.analysis_summary}"</p>
+                </div>
+              </div>
+
+              {/* 14 Sensor Signals Snapshot */}
+              {verificationResult.sensor_readings && (
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Authoritative 14 Hardware Sensor Readings
+                  </p>
+                  <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    {Array.from({ length: 14 }, (_, i) => {
+                      const key = `signal_${i < 9 ? '0' + (i + 1) : (i + 1)}`
+                      const val = verificationResult.sensor_readings[key]
+                      return (
+                        <div key={key} className="bg-white p-2 rounded border border-slate-200 text-center">
+                          <p className="text-[9px] font-mono font-bold text-slate-400">{key}</p>
+                          <p className="text-xs font-mono font-extrabold text-slate-800 mt-0.5">
+                            {typeof val === 'number' ? val.toFixed(4) : (val ?? '0.000')}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Blockchain & Hashes */}
+              <div className="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200 space-y-2 text-xs">
+                <p className="font-bold text-emerald-800 uppercase tracking-wider text-[10px]">Cryptographic Proof</p>
+                <div className="grid grid-cols-[120px_1fr] gap-2 font-mono text-[11px]">
+                  <span className="text-emerald-700 font-bold">Canonical Hash:</span>
+                  <span className="break-all font-bold text-slate-900">{verificationResult.computed_data_hash}</span>
+                  
+                  <span className="text-emerald-700 font-bold">Polygon Tx Hash:</span>
+                  <span className="break-all font-bold text-slate-900">{verificationResult.blockchain_tx_hash || 'Pending validation'}</span>
+                </div>
+                {verificationResult.blockchain_tx_hash && (
+                  <div className="pt-2">
+                    <a
+                      href={`https://amoy.polygonscan.com/tx/${verificationResult.blockchain_tx_hash}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[#00668a] hover:underline"
+                    >
+                      <span>Audit on Polygonscan Explorer</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </Card>
+          ) : (
+            <Card className="rounded-2xl border-2 border-red-400 bg-red-50/50 ambient-shadow p-6 space-y-3 text-red-900">
+              <div className="flex items-center gap-3">
+                <XCircle size={28} className="text-red-600 shrink-0" />
+                <div>
+                  <h3 className="font-extrabold text-base">
+                    {verificationResult.reason === 'hash_mismatch' ? 'DATA INTEGRITY MISMATCH' : 'SCAN NOT FOUND'}
+                  </h3>
+                  <p className="text-xs text-red-700 mt-0.5">
+                    {verificationResult.reason === 'hash_mismatch' 
+                      ? 'The stored sensor data does not match the blockchain-anchored cryptographic fingerprint! Possible data tampering detected.'
+                      : 'No verification record exists for the provided identifier. Check the scan ID and try again.'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Audit Flow Timeline Card */}
       <Card className="rounded-2xl border border-[#d1e4ff] bg-white ambient-shadow p-6">

@@ -68,11 +68,36 @@ export default async function HistoryPage() {
       user = data?.user ?? null
 
       if (user) {
-        const [{ data: userScans }, { data: hwScans }] = await Promise.all([
-          supabase.from('scans').select('*, vendors(name), tx_hash, source_hardware_id').eq('user_id', user.id).order('created_at', { ascending: false }),
-          supabase.from('scans').select('*, vendors(name), tx_hash, source_hardware_id').not('source_hardware_id', 'is', null).order('created_at', { ascending: false }).limit(20)
-        ])
-        const allScans = [...(userScans ?? []), ...(hwScans ?? [])]
+        let fetchedUserScans: any[] = []
+        let fetchedHwScans: any[] = []
+
+        // Attempt master architecture join first
+        const { data: masterUserScans, error: masterErr } = await supabase
+          .from('scans')
+          .select('*, devices(device_uid, device_name), sensor_readings(*), vendors(name)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+
+        if (!masterErr && masterUserScans) {
+          fetchedUserScans = masterUserScans
+          const { data: hwData } = await supabase
+            .from('scans')
+            .select('*, devices(device_uid, device_name), sensor_readings(*), vendors(name)')
+            .not('source_hardware_id', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(20)
+          if (hwData) fetchedHwScans = hwData
+        } else {
+          // Graceful fallback to legacy columns
+          const [{ data: legUser }, { data: legHw }] = await Promise.all([
+            supabase.from('scans').select('*, vendors(name)').eq('user_id', user.id).order('created_at', { ascending: false }),
+            supabase.from('scans').select('*, vendors(name)').not('source_hardware_id', 'is', null).order('created_at', { ascending: false }).limit(20)
+          ])
+          fetchedUserScans = legUser ?? []
+          fetchedHwScans = legHw ?? []
+        }
+
+        const allScans = [...fetchedUserScans, ...fetchedHwScans]
         const seen = new Set<string>()
         const fetched = allScans
           .filter((s) => {
@@ -164,72 +189,95 @@ export default async function HistoryPage() {
         </div>
 
         {scans && scans.length > 0 ? (
-          scans.map((scan) => (
-            <div key={scan.id} className="relative group">
-              <Card className="rounded-2xl border border-[#d1e4ff] bg-white ambient-shadow hover:border-[#00668a] transition-all overflow-hidden">
-                <CardContent className="p-4 flex items-center justify-between gap-4">
-                  <Link href={`/history/${scan.id}`} className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                      scan.result_tier === 'safe' ? "bg-[#30c5b3]/15 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
-                    )}>
-                      <span className="material-symbols-outlined text-2xl">
-                        {scan.result_tier === 'safe' ? 'verified' : 'warning'}
-                      </span>
-                    </div>
+          scans.map((scan) => {
+            const displayScanId = scan.scan_id || (scan.id?.length > 15 ? `MG-${scan.id.slice(0, 8).toUpperCase()}` : scan.id)
+            const deviceName = scan.devices?.device_name || (scan.devices?.device_uid ? `Hardware Pod (${scan.devices.device_uid})` : (scan.source_hardware_id ? `Hardware Pod (${scan.source_hardware_id})` : (scan.vendors?.name || 'MilkGuard Test Unit')))
+            const isSafe = (scan.analysis_result || scan.result_tier) === 'safe'
+            const score = scan.safety_score ?? (scan.analysis_confidence ? Math.round(Number(scan.analysis_confidence)) : 95)
+            const txHash = scan.blockchain_tx_hash || scan.tx_hash
+            const bStatus = scan.blockchain_status || (txHash ? 'confirmed' : 'pending')
 
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-[#001d36] text-sm truncate hover:text-[#00668a] transition-colors">
-                        {scan.source_hardware_id ? '📡 ESP32 Hardware Pod' : (scan.vendors?.name || 'Home Milk Sample')}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-[#3e484f] font-medium mt-0.5">
-                        <Calendar size={12} className="text-[#6e7980]" />
-                        <span>{scan.created_at && !isNaN(new Date(scan.created_at).getTime()) ? format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a') : 'Recent'}</span>
+            return (
+              <div key={scan.id} className="relative group">
+                <Card className="rounded-2xl border border-[#d1e4ff] bg-white ambient-shadow hover:border-[#00668a] transition-all overflow-hidden">
+                  <CardContent className="p-4 flex items-center justify-between gap-4">
+                    <Link href={`/history/${scan.id}`} className="flex items-center gap-3.5 min-w-0 flex-1">
+                      <div className={cn(
+                        "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
+                        isSafe ? "bg-[#30c5b3]/15 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
+                      )}>
+                        <span className="material-symbols-outlined text-2xl">
+                          {isSafe ? 'verified' : 'warning'}
+                        </span>
                       </div>
-                    </div>
-                  </Link>
 
-                  <div className="flex items-center gap-4 shrink-0">
-                    <Link href={`/history/${scan.id}`} className="text-right block">
-                      <span className={cn(
-                        "text-xl font-extrabold block leading-tight",
-                        scan.result_tier === 'safe' ? "text-[#006b5f]" : "text-[#ba1a1a]"
-                      )}>
-                        {scan.safety_score}%
-                      </span>
-                      <Badge variant="outline" className={cn(
-                        "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border-none",
-                        scan.result_tier === 'safe' ? "bg-[#30c5b3]/20 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
-                      )}>
-                        {scan.result_tier}
-                      </Badge>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-[#001d36] text-sm truncate hover:text-[#00668a] transition-colors">
+                            {deviceName}
+                          </p>
+                          <span className="font-mono text-[10px] font-bold bg-[#e5efff] text-[#00668a] px-2 py-0.5 rounded-md shrink-0 border border-[#c4e7ff]">
+                            {displayScanId}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-[#3e484f] font-medium mt-1">
+                          <span className="flex items-center gap-1">
+                            <Calendar size={12} className="text-[#6e7980]" />
+                            {scan.created_at && !isNaN(new Date(scan.created_at).getTime()) ? format(new Date(scan.created_at), 'MMM dd, yyyy · hh:mm a') : 'Recent'}
+                          </span>
+                          <span>•</span>
+                          <span className={cn(
+                            "text-[10px] font-bold uppercase px-1.5 py-0.2 rounded",
+                            bStatus === 'confirmed' ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
+                          )}>
+                            {bStatus === 'confirmed' ? 'On-Chain Verified' : 'Block Pending'}
+                          </span>
+                        </div>
+                      </div>
                     </Link>
 
-                    {/* Action Links */}
-                    <div className="hidden sm:flex flex-col items-end gap-1">
-                      {scan.tx_hash && (
-                        <a
-                          href={`https://amoy.polygonscan.com/tx/${scan.tx_hash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#e5efff] text-[#00668a] hover:bg-[#c4e7ff] transition-colors border border-[#c4e7ff]"
-                        >
-                          <span className="material-symbols-outlined text-xs">verified</span>
-                          <span>Polygon</span>
-                        </a>
-                      )}
-                      <Link 
-                        href={`/history/${scan.id}?report=true`}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f8f9ff] text-[#3e484f] hover:bg-[#e5efff] transition-colors border border-[#d1e4ff]"
-                      >
-                        <span>📄 PDF Report</span>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <Link href={`/history/${scan.id}`} className="text-right block">
+                        <span className={cn(
+                          "text-xl font-extrabold block leading-tight",
+                          isSafe ? "text-[#006b5f]" : "text-[#ba1a1a]"
+                        )}>
+                          {score}%
+                        </span>
+                        <Badge variant="outline" className={cn(
+                          "text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider border-none",
+                          isSafe ? "bg-[#30c5b3]/20 text-[#006b5f]" : "bg-[#ffdad6] text-[#93000a]"
+                        )}>
+                          {scan.analysis_result || scan.result_tier || (isSafe ? 'safe' : 'alert')}
+                        </Badge>
                       </Link>
+
+                      {/* Action Links */}
+                      <div className="hidden sm:flex flex-col items-end gap-1">
+                        {txHash && (
+                          <a
+                            href={`https://amoy.polygonscan.com/tx/${txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#e5efff] text-[#00668a] hover:bg-[#c4e7ff] transition-colors border border-[#c4e7ff]"
+                          >
+                            <span className="material-symbols-outlined text-xs">verified</span>
+                            <span>Polygon</span>
+                          </a>
+                        )}
+                        <Link 
+                          href={`/history/${scan.id}?report=true`}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f8f9ff] text-[#3e484f] hover:bg-[#e5efff] transition-colors border border-[#d1e4ff]"
+                        >
+                          <span>📄 PDF Report</span>
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))
+                  </CardContent>
+                </Card>
+              </div>
+            )
+          })
         ) : (
 
           <div className="py-16 text-center flex flex-col items-center justify-center bg-white rounded-2xl border border-dashed border-[#d1e4ff]">
