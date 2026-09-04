@@ -40,28 +40,80 @@ function ResetPasswordForm() {
   });
 
   useEffect(() => {
-    // Check if a recovery session was established by the callback
     async function checkSession() {
       try {
+        // 1. Check if recovery tokens are present in URL hash (#access_token=...&refresh_token=...)
+        if (typeof window !== 'undefined' && window.location.hash) {
+          const hashStr = window.location.hash.startsWith('#')
+            ? window.location.hash.substring(1)
+            : window.location.hash;
+          const hashParams = new URLSearchParams(hashStr);
+          const accessToken = hashParams.get('access_token');
+          const refreshToken = hashParams.get('refresh_token');
+
+          if (accessToken && refreshToken) {
+            const { data, error: setSessionErr } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            if (!setSessionErr && data?.session) {
+              setHasValidSession(true);
+              setIsVerifying(false);
+              return;
+            }
+          }
+        }
+
+        // 2. Check if token_hash or auth code is present in URL search (?token_hash=... or ?code=...)
+        if (typeof window !== 'undefined' && window.location.search) {
+          const searchParams = new URLSearchParams(window.location.search);
+          const tokenHash = searchParams.get('token_hash') || searchParams.get('token');
+          if (tokenHash) {
+            const { data: vData, error: vErr } = await supabase.auth.verifyOtp({
+              token_hash: tokenHash,
+              type: 'recovery',
+            });
+            if (!vErr && vData?.session) {
+              setHasValidSession(true);
+              setIsVerifying(false);
+              return;
+            }
+          }
+
+          const code = searchParams.get('code');
+          if (code) {
+            const { data, error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
+            if (!exchangeErr && data?.session) {
+              setHasValidSession(true);
+              setIsVerifying(false);
+              return;
+            }
+          }
+        }
+
+        // 3. Check existing session
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           setHasValidSession(true);
-        } else {
-          // Listen for session recovery event
-          const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'PASSWORD_RECOVERY' || (session && event === 'SIGNED_IN')) {
-              setHasValidSession(true);
-            }
-          });
-          // Small grace period for client auth state synchronization
-          setTimeout(() => {
-            setIsVerifying(false);
-          }, 1000);
-          return () => subscription.unsubscribe();
+          setIsVerifying(false);
+          return;
         }
+
+        // 4. Listen for auth state change event
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'PASSWORD_RECOVERY' || (session && event === 'SIGNED_IN') || (session && event === 'USER_UPDATED')) {
+            setHasValidSession(true);
+            setIsVerifying(false);
+          }
+        });
+
+        setTimeout(() => {
+          setIsVerifying(false);
+        }, 1500);
+
+        return () => subscription.unsubscribe();
       } catch (err) {
         console.warn('Session check warning:', err);
-      } finally {
         setIsVerifying(false);
       }
     }
