@@ -391,7 +391,11 @@ export async function createAuthoritativeScan(params: {
 
   // Update report_url
   const reportUrl = `/history/${scanRecord.id}`
-  await supabase.from('scans').update({ report_url: reportUrl }).eq('id', scanRecord.id).catch(() => {})
+  try {
+    await supabase.from('scans').update({ report_url: reportUrl }).eq('id', scanRecord.id)
+  } catch {
+    // Non-blocking if report_url column not present
+  }
 
   return {
     ...scanRecord,
