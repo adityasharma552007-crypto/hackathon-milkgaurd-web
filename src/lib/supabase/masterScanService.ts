@@ -472,13 +472,50 @@ export async function verifyPublicScan(scanIdOrTx: string): Promise<PublicVerifi
   const supabase = getServiceSupabase()
   const cleanKey = scanIdOrTx.trim()
 
-  // Query scan
-  let { data: scan } = await supabase
-    .from('scans')
-    .select('*, devices(*), sensor_readings(*)')
-    .or(`scan_id.eq.${cleanKey},id.eq.${cleanKey},tx_hash.eq.${cleanKey},blockchain_tx_hash.eq.${cleanKey}`)
-    .limit(1)
-    .single()
+  const isUuid = (val: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val)
+
+  let scan: any = null
+
+  // 1. Try master architecture query first
+  try {
+    let masterQuery = supabase
+      .from('scans')
+      .select('*, devices(*), sensor_readings(*)')
+    
+    if (isUuid(cleanKey)) {
+      masterQuery = masterQuery.eq('id', cleanKey)
+    } else if (cleanKey.startsWith('0x')) {
+      masterQuery = masterQuery.or(`tx_hash.eq.${cleanKey},blockchain_tx_hash.eq.${cleanKey},data_hash.eq.${cleanKey}`)
+    } else {
+      masterQuery = masterQuery.eq('scan_id', cleanKey)
+    }
+    const { data, error } = await masterQuery.limit(1).maybeSingle()
+    if (!error && data) {
+      scan = data
+    }
+  } catch {
+    // Graceful fallback if relationship not yet defined
+  }
+
+  // 2. Graceful fallback for legacy schema
+  if (!scan) {
+    let legQuery = supabase.from('scans').select('*')
+    if (isUuid(cleanKey)) {
+      const { data } = await legQuery.eq('id', cleanKey).maybeSingle()
+      if (data) scan = data
+    } else if (cleanKey.startsWith('0x')) {
+      const { data } = await legQuery.eq('tx_hash', cleanKey).maybeSingle()
+      if (data) scan = data
+    } else {
+      // Find among recent scans by scan_id or ID prefix
+      const { data: recent } = await legQuery.order('created_at', { ascending: false }).limit(25)
+      scan = (recent || []).find((s: any) => 
+        s.scan_id === cleanKey || 
+        s.id === cleanKey || 
+        `MG-${s.id?.slice(0, 8).toUpperCase()}` === cleanKey
+      ) || null
+    }
+  }
 
   if (!scan) {
     throw new Error(`No MilkGuard blockchain record found for identifier: ${cleanKey}`)
