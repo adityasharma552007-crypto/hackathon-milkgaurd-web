@@ -305,7 +305,8 @@ export async function createAuthoritativeScan(params: {
   // Attempt with master schema columns, gracefully adapting if migration hasn't been executed
   let scanRecord: any = null
   const isUuid = (val: any) => typeof val === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val)
-  const validSourceHardwareId = isUuid(device.id) ? device.id : (isUuid(deviceUid) ? deviceUid : null)
+  // Legacy schema references public.iot_devices(id). Do not pass dummy UUID to avoid fkey error.
+  const validSourceHardwareId = null
   const validDeviceId = isUuid(device.id) && device.id !== '00000000-0000-0000-0000-000000000001' ? device.id : null
 
   try {
