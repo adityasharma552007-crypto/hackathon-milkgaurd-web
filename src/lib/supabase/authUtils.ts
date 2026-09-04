@@ -23,6 +23,11 @@ export async function signInWithGoogle(nextRoute: string = '/home') {
   if (error) {
     throw new Error(error.message);
   }
+
+  if (data?.url && typeof window !== 'undefined') {
+    window.location.href = data.url;
+  }
+
   return data;
 }
 
@@ -46,6 +51,11 @@ export async function signInWithGithub(nextRoute: string = '/home') {
   if (error) {
     throw new Error(error.message);
   }
+
+  if (data?.url && typeof window !== 'undefined') {
+    window.location.href = data.url;
+  }
+
   return data;
 }
 
