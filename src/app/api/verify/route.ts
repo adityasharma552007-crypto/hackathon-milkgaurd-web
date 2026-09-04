@@ -11,7 +11,7 @@ import { verifyPublicScan } from '@/lib/supabase/masterScanService'
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
-  const scanId = searchParams.get('scan_id') || searchParams.get('tx') || searchParams.get('id')
+  const scanId = searchParams.get('query') || searchParams.get('scan_id') || searchParams.get('tx') || searchParams.get('id')
 
   if (!scanId) {
     return NextResponse.json({ error: 'scan_id or transaction hash is required' }, { status: 400 })
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}))
-  const scanId = body.scan_id || body.tx || body.id
+  const scanId = body.query || body.scan_id || body.tx || body.id
 
   if (!scanId) {
     return NextResponse.json({ error: 'scan_id or transaction hash is required' }, { status: 400 })
