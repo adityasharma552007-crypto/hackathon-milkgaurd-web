@@ -16,6 +16,7 @@ const inter = Inter({ subsets: ["latin"] });
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://milkguard.vercel.app";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   // ── BASIC METADATA ─────────────────────────────────────────────────────────
   // Core title and description for search engines
   title: {
@@ -61,20 +62,6 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-
-  // ── VIEWPORT (MOBILE OPTIMIZATION) ─────────────────────────────────────────
-  // Ensures proper mobile rendering and prevents zoom issues
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: "cover",
-  },
-
-  // ── THEME COLOR ────────────────────────────────────────────────────────────
-  // Browser theme color for mobile browsers
-  themeColor: "#1A6B4A",
 
   // ── OPEN GRAPH (SOCIAL SHARING) ────────────────────────────────────────────
   // Rich previews when shared on Facebook, LinkedIn, etc.
@@ -190,6 +177,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        />
         {/* JSON-LD Structured Data for SEO */}
         <script
           type="application/ld+json"
