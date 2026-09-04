@@ -22,7 +22,7 @@ export function LogoutButton({ className, variant = "outline" }: LogoutButtonPro
     } catch (error) {
       console.error('Logout failed', error);
     } finally {
-      window.location.href = '/auth/login';
+      window.location.href = '/auth/login?logged_out=true';
     }
   };
 

@@ -75,9 +75,18 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // 2. Auth pages — if already logged in, go to /home (except profile completion)
+  // 2. Auth pages — if already logged in, go to /home (except callbacks, reset-password, forgot-password, and profile completion)
+  const isAuthCallback = pathname.startsWith('/auth/callback')
+  const isResetPassword = pathname.startsWith('/auth/reset-password')
+  const isForgotPassword = pathname.startsWith('/auth/forgot-password')
   const isProfileCompletion = pathname === '/auth/complete-profile'
-  if (isAuthPage && user && !isProfileCompletion) {
+  const isExplicitLogout = request.nextUrl.searchParams.has('logged_out')
+
+  if (isExplicitLogout) {
+    response.cookies.set('mg_demo_session', '', { path: '/', maxAge: 0, expires: new Date(0) })
+  }
+
+  if (isAuthPage && !isAuthCallback && !isResetPassword && !isForgotPassword && user && !isProfileCompletion && !isExplicitLogout) {
     const redirectRes = NextResponse.redirect(new URL('/home', request.url))
     response.cookies.getAll().forEach((c) => {
       redirectRes.cookies.set(c.name, c.value, c)

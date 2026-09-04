@@ -2,22 +2,44 @@ import { createClient } from './client';
 
 /**
  * Initiates the Google OAuth sign-in flow.
- * Note: Provide an absolute redirect URL if necessary, else Supabase uses its default site url configuration.
+ * Directs through /auth/callback so PKCE exchange and session cookies are set correctly.
  */
-export async function signInWithGoogle(redirectTo?: string) {
+export async function signInWithGoogle(nextRoute: string = '/home') {
   const supabase = createClient();
-  const redirectUrl = redirectTo 
-    ? `${window.location.origin}${redirectTo}`
-    : `${window.location.origin}/auth/callback`;
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextRoute)}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: redirectUrl,
+      redirectTo: callbackUrl,
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
       },
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+/**
+ * Initiates the GitHub OAuth sign-in flow.
+ * Directs through /auth/callback so PKCE exchange and session cookies are set correctly.
+ */
+export async function signInWithGithub(nextRoute: string = '/home') {
+  const supabase = createClient();
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextRoute)}`;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+    options: {
+      redirectTo: callbackUrl,
+      scopes: 'read:user user:email',
     },
   });
 

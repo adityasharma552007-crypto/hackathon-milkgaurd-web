@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Shield, Eye, EyeOff, Loader2, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { Shield, Eye, EyeOff, Loader2, Sparkles, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
+import { signInWithGithub } from '@/lib/supabase/authUtils';
 
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,12 +22,19 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Read status messages from query params
+  const paramError = searchParams.get('error');
+  const paramReset = searchParams.get('reset');
+  const paramLoggedOut = searchParams.get('logged_out');
+  const paramVerified = searchParams.get('verified');
 
   const {
     register,
@@ -45,7 +53,7 @@ export default function LoginPage() {
     setIsLoading(true);
     setError(null);
 
-    // If demo login requested
+    // If explicit demo login requested
     if (values.email === 'demo@milkguard.com') {
       setDemoSessionCookie();
       router.push('/home');
@@ -60,44 +68,37 @@ export default function LoginPage() {
       });
 
       if (authError) {
-        if (authError.message?.includes('fetch') || authError.message?.includes('Network') || authError.message?.includes('AbortError')) {
-          // Fall back to demo session when Supabase network is unreachable
-          setDemoSessionCookie();
-          router.push('/home');
-          router.refresh();
-          return;
-        } else {
-          setError(authError.message);
-        }
+        setError(authError.message);
         setIsLoading(false);
         return;
       }
 
       if (authData?.user) {
+        // Ensure profiles table has this user
         const { data: profile } = await supabase
           .from('profiles')
-          .select('*')
+          .select('id')
           .eq('id', authData.user.id)
           .single();
 
         if (!profile) {
-          // Auto-create basic profile if missing
           await supabase.from('profiles').insert([{
             id: authData.user.id,
-            full_name: authData.user.email?.split('@')[0] || 'MilkGuard User',
+            full_name: authData.user.user_metadata?.full_name || authData.user.email?.split('@')[0] || 'MilkGuard User',
             city: 'Jaipur',
             role: 'consumer'
-          }]);
+          }]).select();
         }
       }
+
+      // Ensure demo session cookie is cleared for authentic Supabase session
+      document.cookie = "mg_demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
       router.push('/home');
       router.refresh();
     } catch (err: any) {
-      // Fallback on unexpected network error
-      setDemoSessionCookie();
-      router.push('/home');
-      router.refresh();
+      setError(err?.message || 'An unexpected error occurred. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -111,19 +112,11 @@ export default function LoginPage() {
   };
 
   const handleGithubLogin = async () => {
+    setError(null);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'read:user user:email'
-        },
-      });
-      if (error) {
-        setError(error.message || 'GitHub sign in failed.');
-      }
+      await signInWithGithub('/home');
     } catch (err: any) {
-      setError('Unable to initialize GitHub OAuth.');
+      setError(err?.message || 'Unable to initialize GitHub OAuth.');
     }
   };
 
@@ -145,6 +138,35 @@ export default function LoginPage() {
             <h1 className="text-xl font-extrabold text-[#001d36]">Welcome Back</h1>
             <p className="text-xs font-semibold text-[#3e484f] mt-1">Sign in to view your spectral scans & safety reports</p>
           </div>
+
+          {/* Status Banners from Query Params */}
+          {paramReset === 'success' && (
+            <div className="w-full mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2.5 text-xs text-emerald-800 font-bold animate-in fade-in">
+              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+              <span>Password reset successful! Please sign in with your new password.</span>
+            </div>
+          )}
+
+          {paramLoggedOut === 'true' && (
+            <div className="w-full mb-4 p-3 bg-blue-50 border border-blue-200 rounded-2xl flex items-center gap-2 text-xs text-blue-800 font-semibold animate-in fade-in">
+              <CheckCircle2 size={16} className="text-blue-600 shrink-0" />
+              <span>You have been signed out successfully.</span>
+            </div>
+          )}
+
+          {paramVerified === 'true' && (
+            <div className="w-full mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-2 text-xs text-emerald-800 font-semibold animate-in fade-in">
+              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+              <span>Email verified! You can now sign in to your account.</span>
+            </div>
+          )}
+
+          {paramError && (
+            <div className="w-full mb-4 p-3.5 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-2.5 text-xs text-red-700 font-semibold animate-in fade-in">
+              <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
+              <span>{paramError}</span>
+            </div>
+          )}
 
           {/* Quick Demo Button */}
           <button
@@ -176,8 +198,8 @@ export default function LoginPage() {
             <div className="space-y-1 relative">
               <div className="flex justify-between items-center px-1">
                 <label className="text-xs font-bold text-[#001d36]">Password</label>
-                <Link href="#" className="text-xs font-semibold text-[#00668a] hover:underline">
-                  Forgot?
+                <Link href="/auth/forgot-password" className="text-xs font-semibold text-[#00668a] hover:underline">
+                  Forgot password?
                 </Link>
               </div>
               <div className="relative">
@@ -223,7 +245,7 @@ export default function LoginPage() {
             </div>
 
             <div className="space-y-3">
-              <GoogleSignInButton redirectTo="/home" />
+              <GoogleSignInButton buttonText="Continue with Google" />
 
               <Button
                 type="button"
@@ -249,5 +271,17 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#00668a]" size={32} />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

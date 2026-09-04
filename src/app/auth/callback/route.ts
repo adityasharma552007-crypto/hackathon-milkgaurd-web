@@ -1,32 +1,104 @@
-import { createClient } from "@/lib/supabase/server"
-import { NextResponse } from "next/server"
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get("code")
-  const next = searchParams.get("next") ?? "/home"
+/**
+ * GET /auth/callback
+ * Authoritative OAuth & Password Recovery callback handler.
+ * Exchanges authorization code for Supabase user session, securely binds cookies,
+ * auto-provisions profiles, and forwards to destination.
+ */
+export async function GET(request: NextRequest) {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') ?? '/home'
+  const error = requestUrl.searchParams.get('error')
+  const errorDescription = requestUrl.searchParams.get('error_description')
+
+  // Check if provider returned an error directly
+  if (error) {
+    console.error('[OAuth Callback Provider Error]', error, errorDescription)
+    return NextResponse.redirect(
+      new URL(`/auth/login?error=${encodeURIComponent(errorDescription || error)}`, request.url)
+    )
+  }
 
   if (code) {
-    const supabase = createClient()
-    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
+    const cookieStore = cookies()
+    const targetUrl = new URL(next, request.url)
+    const response = NextResponse.redirect(targetUrl)
 
-    if (!error && data?.user) {
-      // Check if profile is complete
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('profile_complete')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (profile && !profile.profile_complete) {
-        // Redirect to profile completion if not explicitly complete
-        return NextResponse.redirect(`${origin}/auth/complete-profile`)
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options })
+            response.cookies.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.set({ name, value: '', ...options })
+            response.cookies.set({ name, value: '', ...options })
+          },
+        },
+      }
+    )
+
+    const { error: exchangeError, data } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!exchangeError && data?.user) {
+      // Clear demo session cookie when real authenticated session is established
+      response.cookies.set('mg_demo_session', '', {
+        path: '/',
+        maxAge: 0,
+        expires: new Date(0),
+      })
+
+      // Ensure user profile exists in public.profiles
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id, profile_complete')
+          .eq('id', data.user.id)
+          .maybeSingle()
+
+        if (!profile) {
+          const userMeta = data.user.user_metadata || {}
+          const fullName = userMeta.full_name || 
+                           userMeta.name || 
+                           data.user.email?.split('@')[0] || 
+                           'MilkGuard User'
+          await supabase.from('profiles').insert([{
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName,
+            city: 'Jaipur',
+            role: 'consumer',
+            profile_complete: true
+          }])
+        }
+      } catch (profileErr) {
+        console.warn('[OAuth Callback] Profile sync note:', profileErr)
       }
 
-      return NextResponse.redirect(`${origin}${next}`)
+      // If user came from a password recovery link, direct to reset-password
+      if (next.includes('/auth/reset-password')) {
+        return response
+      }
+
+      return response
+    } else {
+      console.error('[OAuth Callback] exchangeCodeForSession failed:', exchangeError)
+      return NextResponse.redirect(
+        new URL(`/auth/login?error=${encodeURIComponent(exchangeError?.message || 'Authentication session exchange failed')}`, request.url)
+      )
     }
   }
 
-  // Failed to exchange code or user canceled
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`)
+  // No code parameter present in callback
+  return NextResponse.redirect(new URL('/auth/login?error=no_auth_code', request.url))
 }

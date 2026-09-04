@@ -18,7 +18,7 @@ export function SignOutButton() {
       console.error("Sign out error:", err)
     } finally {
       // Full page redirect clears Next.js App Router RSC cache, Zustand store, and browser memory
-      window.location.href = "/auth/login"
+      window.location.href = "/auth/login?logged_out=true"
     }
   }
 
