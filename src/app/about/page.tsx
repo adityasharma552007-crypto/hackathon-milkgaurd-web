@@ -21,7 +21,7 @@ const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'ARJUNAS',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://milkguard.vercel.app',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app',
   description: 'Developers building AI-powered food safety solutions for India',
   foundingDate: '2024',
   areaServed: 'IN',

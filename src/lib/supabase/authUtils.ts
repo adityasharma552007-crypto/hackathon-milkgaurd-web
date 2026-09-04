@@ -6,7 +6,9 @@ import { createClient } from './client';
  */
 export async function signInWithGoogle(nextRoute: string = '/home') {
   const supabase = createClient();
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = typeof window !== 'undefined' && window.location.origin
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app');
   const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextRoute)}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({
@@ -37,7 +39,9 @@ export async function signInWithGoogle(nextRoute: string = '/home') {
  */
 export async function signInWithGithub(nextRoute: string = '/home') {
   const supabase = createClient();
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = typeof window !== 'undefined' && window.location.origin
+    ? window.location.origin
+    : (process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app');
   const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextRoute)}`;
 
   const { data, error } = await supabase.auth.signInWithOAuth({

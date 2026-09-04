@@ -35,11 +35,11 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (values: ForgotFormValues) => {
     setIsLoading(true);
     setError(null);
-    setSentEmail(values.email);
-
     try {
-      const origin = typeof window !== 'undefined' ? window.location.origin : '';
-      const redirectUrl = `${origin}/auth/callback?next=/auth/reset-password`;
+      const origin = typeof window !== 'undefined' && window.location.origin
+        ? window.location.origin
+        : (process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app');
+      const redirectUrl = `${origin}/auth/reset-password`;
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(values.email, {
         redirectTo: redirectUrl,
@@ -51,6 +51,7 @@ export default function ForgotPasswordPage() {
         return;
       }
 
+      setSentEmail(values.email);
       setIsSuccess(true);
       setIsLoading(false);
     } catch (err: any) {

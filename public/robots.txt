@@ -11,7 +11,7 @@
 # =============================================================================
 
 # Sitemap location (update domain for production)
-Sitemap: https://milkguard.vercel.app/sitemap.xml
+Sitemap: https://hackathon-milkgaurd-web.vercel.app/sitemap.xml
 
 # =============================================================================
 # RULES FOR ALL SEARCH ENGINES

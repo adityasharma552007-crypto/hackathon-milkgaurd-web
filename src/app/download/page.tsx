@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { DownloadAPK } from '@/components/download/DownloadAPK'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://milkguard.vercel.app'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
 
 export const metadata: Metadata = {
   title: 'Download MilkGuard APK | Android App',

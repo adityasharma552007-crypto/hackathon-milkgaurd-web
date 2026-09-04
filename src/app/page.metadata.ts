@@ -9,7 +9,7 @@
 
 import { Metadata } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://milkguard.vercel.app'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
 
 // =============================================================================
 // HOME PAGE (/)

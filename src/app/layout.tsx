@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] });
 // TODO: Update NEXT_PUBLIC_SITE_URL in .env.local to your production domain
 // Example: NEXT_PUBLIC_SITE_URL=https://milkguard.vercel.app
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://milkguard.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hackathon-milkgaurd-web.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
