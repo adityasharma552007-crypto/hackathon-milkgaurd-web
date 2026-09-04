@@ -1,29 +1,46 @@
 "use client"
 
-import { LogOut } from "lucide-react"
+import { useState } from "react"
+import { LogOut, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
+import { signOut } from "@/lib/supabase/authUtils"
 
 export function SignOutButton() {
-  const router = useRouter()
-  const supabase = createClient()
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   async function handleSignOut() {
-    document.cookie = "mg_demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-    await supabase.auth.signOut().catch(() => {})
-    router.push("/auth/login")
-    router.refresh()
+    if (isSigningOut) return
+    setIsSigningOut(true)
+
+    try {
+      await signOut()
+    } catch (err) {
+      console.error("Sign out error:", err)
+    } finally {
+      // Full page redirect clears Next.js App Router RSC cache, Zustand store, and browser memory
+      window.location.href = "/auth/login"
+    }
   }
 
   return (
     <Button 
       variant="outline" 
       onClick={handleSignOut}
-      className="w-full h-14 rounded-full border border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 font-bold uppercase tracking-widest bg-transparent flex items-center justify-center gap-2"
+      disabled={isSigningOut}
+      className="w-full h-14 rounded-full border border-red-600 text-red-600 hover:bg-red-50 hover:text-red-700 focus:bg-red-50 font-bold uppercase tracking-widest bg-transparent flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
     >
-      <LogOut size={18} />
-      SIGN OUT
+      {isSigningOut ? (
+        <>
+          <Loader2 size={18} className="animate-spin" />
+          <span>SIGNING OUT...</span>
+        </>
+      ) : (
+        <>
+          <LogOut size={18} />
+          <span>SIGN OUT</span>
+        </>
+      )}
     </Button>
   )
 }
+

@@ -78,14 +78,22 @@ export async function middleware(request: NextRequest) {
   // 2. Auth pages — if already logged in, go to /home (except profile completion)
   const isProfileCompletion = pathname === '/auth/complete-profile'
   if (isAuthPage && user && !isProfileCompletion) {
-    return NextResponse.redirect(new URL('/home', request.url))
+    const redirectRes = NextResponse.redirect(new URL('/home', request.url))
+    response.cookies.getAll().forEach((c) => {
+      redirectRes.cookies.set(c.name, c.value, c)
+    })
+    return redirectRes
   }
 
   // 3. Protected dashboard routes — redirect to login if not authenticated
   const protectedPaths = ['/home', '/scan', '/chat', '/map', '/history', '/profile', '/learn', '/insights', '/verify', '/hardware']
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
   if (isProtected && !user) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+    const redirectRes = NextResponse.redirect(new URL('/auth/login', request.url))
+    response.cookies.getAll().forEach((c) => {
+      redirectRes.cookies.set(c.name, c.value, c)
+    })
+    return redirectRes
   }
 
   return response

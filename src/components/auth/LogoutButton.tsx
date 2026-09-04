@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { signOut } from '@/lib/supabase/authUtils';
-import { LogOut } from 'lucide-react';
+import { LogOut, Loader2 } from 'lucide-react';
 
 interface LogoutButtonProps {
   className?: string;
@@ -12,16 +11,18 @@ interface LogoutButtonProps {
 }
 
 export function LogoutButton({ className, variant = "outline" }: LogoutButtonProps) {
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogout = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+
     try {
-      document.cookie = "mg_demo_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      await signOut().catch(() => {});
-      router.push('/auth/login');
-      router.refresh();
+      await signOut();
     } catch (error) {
       console.error('Logout failed', error);
+    } finally {
+      window.location.href = '/auth/login';
     }
   };
 
@@ -29,10 +30,16 @@ export function LogoutButton({ className, variant = "outline" }: LogoutButtonPro
     <Button 
       variant={variant}
       onClick={handleLogout}
+      disabled={isLoading}
       className={`flex items-center gap-2 ${className || ''}`}
     >
-      <LogOut size={16} />
+      {isLoading ? (
+        <Loader2 size={16} className="animate-spin" />
+      ) : (
+        <LogOut size={16} />
+      )}
       <span>Sign out</span>
     </Button>
   );
 }
+

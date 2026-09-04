@@ -105,7 +105,7 @@ export async function checkAndLogRateLimit(
  */
 async function getSessionFromRequest(req: NextRequest) {
   try {
-    if (req.cookies.get('mg_demo_session')?.value === 'true' || process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('xogvlpwwwwjwjstypjlo')) {
+    if (req.cookies.get('mg_demo_session')?.value === 'true') {
       return { user: { id: 'demo-user-123' } } as any
     }
 
@@ -123,7 +123,7 @@ async function getSessionFromRequest(req: NextRequest) {
 async function getSessionFromHeaders() {
   try {
     const cookieStore = await cookies()
-    if (cookieStore.get('mg_demo_session')?.value === 'true' || process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('xogvlpwwwwjwjstypjlo')) {
+    if (cookieStore.get('mg_demo_session')?.value === 'true') {
       return { user: { id: 'demo-user-123' } } as any
     }
 
