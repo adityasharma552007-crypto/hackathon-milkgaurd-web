@@ -104,7 +104,7 @@ export function generateArticleJsonLd(params: {
       name: 'Team API Avengers',
       logo: {
         '@type': 'ImageObject',
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'}/brand/logo.png`,
       },
     },
   })

@@ -5,12 +5,14 @@
    - Does NOT cache private scan history or hardware Bluetooth operations
    ========================================================================== */
 
-const CACHE_NAME = 'milkguard-pwa-v1';
+const CACHE_NAME = 'milkguard-pwa-v2';
 
 // Critical core assets cached on install for offline shell
 const PRECACHE_ASSETS = [
   '/offline',
   '/manifest.json',
+  '/brand/logo.png',
+  '/brand/logo-icon.png',
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/apple-touch-icon.png',

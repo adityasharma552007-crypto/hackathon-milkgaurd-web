@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo';
 
 const forgotSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -71,8 +72,8 @@ export default function ForgotPasswordPage() {
           </Link>
 
           {/* Logo */}
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md mb-4">
-            <span className="material-symbols-outlined text-3xl">lock_reset</span>
+          <div className="mb-4 flex flex-col items-center">
+            <MilkGuardLogo variant="full" size={80} linkToHome priority />
           </div>
 
           <div className="text-center mb-6">

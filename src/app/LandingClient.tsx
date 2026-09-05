@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Download, ShieldCheck, Zap, Award, ArrowRight, Smartphone, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react'
 import { InstallButton } from '@/components/pwa/InstallButton'
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
 
 export default function LandingClient() {
   const router = useRouter()
@@ -19,12 +20,7 @@ export default function LandingClient() {
       <header className="sticky top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl border-b border-[#d1e4ff]/60 ambient-shadow">
         <div className="flex justify-between items-center px-4 md:px-10 h-16 w-full max-w-7xl mx-auto">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md">
-              <span className="material-symbols-outlined text-2xl">biotech</span>
-            </div>
-            <span className="text-xl font-extrabold text-[#00288e] tracking-tight">MilkGuard</span>
-          </Link>
+          <MilkGuardLogo variant="header" size="sm" linkToHome priority />
 
           {/* Navigation CTAs */}
           <div className="flex items-center gap-3">
@@ -192,12 +188,7 @@ export default function LandingClient() {
       {/* ── FOOTER ── */}
       <footer className="bg-[#001d36] text-white py-12 px-4 md:px-10">
         <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#00668a] flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-xl">biotech</span>
-            </div>
-            <span className="text-lg font-extrabold tracking-tight">MilkGuard</span>
-          </div>
+          <MilkGuardLogo variant="header" size="sm" linkToHome textClassName="text-white" />
 
           <div className="flex items-center gap-6 text-xs font-semibold text-[#c4e7ff]">
             <Link href="/about" className="hover:text-white transition-colors">About</Link>

@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo';
 
 const signupSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -137,10 +138,10 @@ export default function SignupPage() {
             <ArrowLeft size={20} />
           </Link>
           
-          <div className="w-20 h-20 mb-4 relative overflow-hidden">
-             <Image src="/logo.png" alt="MilkGuard Logo" width={80} height={80} style={{ objectFit: 'contain' }} priority />
+          <div className="mb-4 flex flex-col items-center">
+            <MilkGuardLogo variant="full" size={88} linkToHome priority />
           </div>
-          <h2 className="text-2xl font-bold text-[#60A5FA] mb-4">Create Account</h2>
+          <h2 className="text-2xl font-bold text-[#00288e] mb-4">Create Account</h2>
 
           {isSuccess ? (
             <div className="w-full text-center space-y-4 py-4 animate-in fade-in">

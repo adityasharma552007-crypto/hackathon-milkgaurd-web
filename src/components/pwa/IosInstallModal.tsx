@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { Share, PlusSquare, X } from 'lucide-react'
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
 
 interface IosInstallModalProps {
   isOpen: boolean
@@ -26,8 +27,8 @@ export function IosInstallModal({ isOpen, onClose }: IosInstallModalProps) {
           <X size={16} />
         </button>
 
-        <div className="w-12 h-12 rounded-2xl bg-[#e5efff] flex items-center justify-center text-[#00668a] mb-4">
-          <Share size={24} />
+        <div className="mb-4">
+          <MilkGuardLogo variant="icon" size={48} />
         </div>
 
         <h3 className="text-lg font-bold text-[#001d36] mb-1">

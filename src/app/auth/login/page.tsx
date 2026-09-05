@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -127,12 +128,9 @@ function LoginForm() {
         <CardContent className="p-6 sm:p-8 flex flex-col items-center">
           
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 mb-6 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md">
-              <span className="material-symbols-outlined text-3xl">biotech</span>
-            </div>
-            <span className="text-2xl font-black text-[#00288e] tracking-tight">MilkGuard</span>
-          </Link>
+          <div className="mb-4 flex flex-col items-center">
+            <MilkGuardLogo variant="full" size={88} linkToHome priority />
+          </div>
 
           <div className="text-center mb-6">
             <h1 className="text-xl font-extrabold text-[#001d36]">Welcome Back</h1>

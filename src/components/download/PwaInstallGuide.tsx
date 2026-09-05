@@ -23,6 +23,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { InstallButton } from '@/components/pwa/InstallButton'
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
 import { usePwaInstall } from '@/hooks/usePwaInstall'
 
 export function PwaInstallGuide() {
@@ -40,6 +41,10 @@ export function PwaInstallGuide() {
         
         {/* Header Hero */}
         <div className="text-center space-y-4">
+          <div className="flex justify-center mb-1">
+            <MilkGuardLogo variant="full" size={110} priority />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#e5efff] border border-[#c4e7ff] text-xs font-bold text-[#00668a]">
             <Zap size={14} />
             <span>Progressive Web App (PWA)</span>

@@ -167,7 +167,7 @@ const organizationJsonLd = {
   "@type": "Organization",
   name: "Team API Avengers",
   url: siteUrl,
-  logo: `${siteUrl}/logo.png`,
+  logo: `${siteUrl}/brand/logo.png`,
   description: "Developers building AI-powered food safety solutions for India",
   foundingDate: "2024",
   areaServed: "IN",

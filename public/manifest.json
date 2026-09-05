@@ -56,7 +56,7 @@
       "name": "Hardware BLE Scan",
       "short_name": "Hardware",
       "description": "Connect ESP32 sensor device",
-      "url": "/scan/hardware",
+      "url": "/hardware",
       "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
     },
     {

@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { InstallButton } from '@/components/pwa/InstallButton'
+import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
 
 export default async function DashboardLayout({
   children,
@@ -66,11 +67,8 @@ export default async function DashboardLayout({
       <header className="sticky top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl border-b border-[#d1e4ff]/60 ambient-shadow">
         <div className="flex justify-between items-center px-4 md:px-10 h-16 w-full max-w-7xl mx-auto">
           {/* Leading Brand */}
-          <Link href="/home" className="flex items-center gap-2 group active:scale-95 transition-transform p-1.5 rounded-xl hover:bg-[#e5efff]/60">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00668a] to-[#004c69] flex items-center justify-center text-white shadow-md">
-              <span className="material-symbols-outlined text-xl">biotech</span>
-            </div>
-            <span className="text-xl font-extrabold text-[#00288e] tracking-tight">MilkGuard</span>
+          <Link href="/home" className="flex items-center gap-2 group active:scale-95 transition-transform p-1 rounded-xl hover:bg-[#e5efff]/60">
+            <MilkGuardLogo variant="header" size="sm" priority />
           </Link>
 
           {/* Actions & Avatar */}
