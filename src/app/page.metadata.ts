@@ -247,19 +247,20 @@ export const historyMetadata: Metadata = {
 // HARDWARE PAGE (/hardware)
 // =============================================================================
 export const hardwareMetadata: Metadata = {
-  title: 'Connect Hardware | MilkGuard Pod Setup',
+  title: 'Scan from Hardware | MilkGuard ESP32 Bluetooth',
   description:
-    'Connect your MilkGuard Pod device for contactless milk testing. Setup guide, device pairing, troubleshooting, and firmware updates for your spectral analysis hardware.',
+    'Connect your MilkGuard ESP32 Bluetooth device for contactless milk testing. Live 14-signal spectroscopy telemetry, device pairing, and firmware reference.',
   keywords: [
-    'MilkGuard Pod setup',
-    'connect milk scanner',
+    'MilkGuard hardware scan',
+    'ESP32 bluetooth milk scanner',
+    'web bluetooth spectroscopy',
     'spectral device pairing',
     'hardware setup',
     'milk testing device',
   ].join(', '),
   openGraph: {
-    title: 'Connect Hardware | MilkGuard Pod',
-    description: 'Set up your MilkGuard Pod for contactless milk adulteration detection.',
+    title: 'Scan from Hardware | MilkGuard ESP32 Bluetooth',
+    description: 'Connect your MilkGuard ESP32 over Bluetooth for 14-channel spectroscopy milk testing.',
     url: `${siteUrl}/hardware`,
   },
   alternates: {
