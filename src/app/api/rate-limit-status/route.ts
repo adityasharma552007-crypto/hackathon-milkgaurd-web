@@ -9,6 +9,8 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getRateLimitStatus } from '@/lib/supabase/rateLimiting'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams

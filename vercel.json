@@ -22,19 +22,28 @@
       ]
     },
     {
-      "source": "/downloads/:path*",
+      "source": "/sw.js",
       "headers": [
         {
-          "key": "Content-Type",
-          "value": "application/vnd.android.package-archive"
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
         },
         {
-          "key": "Content-Disposition",
-          "value": "attachment; filename=\"MilkGuard.apk\""
-        },
+          "key": "Content-Type",
+          "value": "application/javascript; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json; charset=utf-8"
         }
       ]
     }

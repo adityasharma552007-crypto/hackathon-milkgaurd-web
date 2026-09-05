@@ -1,19 +1,19 @@
 import type { Metadata } from 'next'
-import { DownloadAPK } from '@/components/download/DownloadAPK'
+import { PwaInstallGuide } from '@/components/download/PwaInstallGuide'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
 
 export const metadata: Metadata = {
-  title: 'Download MilkGuard APK | Android App',
-  description: 'Download MilkGuard for Android - AI-powered milk adulteration detection app. Scan milk samples, get instant results, and protect your family from harmful contaminants.',
-  keywords: 'milkguard apk download, milk testing app, adulteration detection android, milk safety app',
+  title: 'Install MilkGuard App | Progressive Web App (PWA)',
+  description: 'Install MilkGuard directly on Android, iOS, and Desktop. Fast, secure AI-powered milk adulteration detection app without APK downloads.',
+  keywords: 'milkguard pwa, install milkguard, milk testing app, milk adulteration detection, food safety pwa',
   robots: {
     index: true,
     follow: true,
   },
   openGraph: {
-    title: 'Download MilkGuard APK | Android App',
-    description: 'Download MilkGuard for Android - AI-powered milk adulteration detection in 8 seconds',
+    title: 'Install MilkGuard App | Progressive Web App',
+    description: 'Install MilkGuard on Android, iOS, and Desktop with instant launch and AI-powered milk purity analysis.',
     url: `${siteUrl}/download`,
     siteName: 'MilkGuard',
     images: [
@@ -21,15 +21,15 @@ export const metadata: Metadata = {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'MilkGuard - AI-Powered Milk Adulteration Detection',
+        alt: 'MilkGuard - Install Progressive Web App',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Download MilkGuard APK',
-    description: 'AI-powered milk adulteration detection in your pocket',
+    title: 'Install MilkGuard App',
+    description: 'Instant AI-powered milk adulteration detection on your device',
     images: [`${siteUrl}/og-image.png`],
   },
   alternates: {
@@ -37,6 +37,6 @@ export const metadata: Metadata = {
   },
 }
 
-export default function DownloadPage() {
-  return <DownloadAPK />
+export default function InstallPage() {
+  return <PwaInstallGuide />
 }

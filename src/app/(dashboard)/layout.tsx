@@ -5,7 +5,7 @@ import { PageTransition } from '@/components/common/PageTransition'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { Smartphone, Download } from 'lucide-react'
+import { InstallButton } from '@/components/pwa/InstallButton'
 
 export default async function DashboardLayout({
   children,
@@ -75,14 +75,7 @@ export default async function DashboardLayout({
 
           {/* Actions & Avatar */}
           <div className="flex items-center gap-3">
-            <Link 
-              href="/download" 
-              className="hidden sm:flex items-center gap-1.5 bg-[#00668a] hover:bg-[#004c69] text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all"
-            >
-              <Smartphone size={14} />
-              <span>Get App</span>
-              <Download size={12} className="opacity-80" />
-            </Link>
+            <InstallButton variant="dashboard" label="Install App" />
 
             <Link href="/profile" className="flex items-center active:scale-95 transition-transform">
               <div className="w-10 h-10 rounded-full bg-[#dbe9ff] border border-[#bdc8d1] flex items-center justify-center hover:opacity-80 transition-opacity overflow-hidden">

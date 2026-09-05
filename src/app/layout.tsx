@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { PwaRegister } from "@/components/pwa/PwaRegister";
 import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -106,8 +107,11 @@ export const metadata: Metadata = {
 
   // ── ICONS ──────────────────────────────────────────────────────────────────
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
     apple: "/apple-touch-icon.png",
   },
 
@@ -127,7 +131,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#1A6B4A",
+  themeColor: "#00668a",
 };
 
 // =============================================================================
@@ -211,6 +215,7 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px #38bdf8, 0 0 5px #00668a"
         />
+        <PwaRegister />
         {children}
         <Toaster position="top-center" richColors />
       </body>

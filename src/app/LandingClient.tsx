@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Download, ShieldCheck, Zap, Award, ArrowRight, Smartphone, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react'
+import { InstallButton } from '@/components/pwa/InstallButton'
 
 export default function LandingClient() {
   const router = useRouter()
@@ -27,13 +28,7 @@ export default function LandingClient() {
 
           {/* Navigation CTAs */}
           <div className="flex items-center gap-3">
-            <button
-              onClick={goToDownload}
-              className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-[#00668a] bg-[#e5efff] hover:bg-[#c4e7ff] transition-all"
-            >
-              <Download size={15} />
-              <span>Download APK</span>
-            </button>
+            <InstallButton variant="header" />
             <button
               onClick={goToLogin}
               className="px-4 py-2 rounded-xl text-xs font-bold text-[#00668a] hover:bg-[#e5efff] transition-all"
@@ -81,13 +76,11 @@ export default function LandingClient() {
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
 
-              <button
-                onClick={goToDownload}
-                className="w-full sm:w-auto px-6 py-4 bg-white hover:bg-[#f8f9ff] border border-[#d1e4ff] text-[#001d36] font-bold text-sm rounded-2xl ambient-shadow transition-all flex items-center justify-center gap-2"
-              >
-                <Smartphone size={18} className="text-[#00668a]" />
-                <span>Get Mobile App</span>
-              </button>
+              <InstallButton
+                variant="hero"
+                label="Install App"
+                className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm"
+              />
             </div>
 
             {/* Trust Badges */}
@@ -210,7 +203,7 @@ export default function LandingClient() {
             <Link href="/about" className="hover:text-white transition-colors">About</Link>
             <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
             <Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link>
-            <Link href="/download" className="hover:text-white transition-colors">Download APK</Link>
+            <Link href="/download" className="hover:text-white transition-colors">Install App</Link>
           </div>
 
           <p className="text-xs text-[#8e9aa0]">

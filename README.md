@@ -90,44 +90,37 @@ MilkGuard compares all detected samples against **FSSAI (Food Safety and Standar
 
 ---
 
-## 📱 Android App
+## 📱 Progressive Web App (PWA)
 
-MilkGuard is available as an Android APK for on-the-go milk testing.
+MilkGuard is available as an installable Progressive Web App (PWA) across Android, iOS, Windows, and macOS.
 
-### Download
+### Install MilkGuard App
 
-Get the official APK from our download page:
-**[Download MilkGuard APK](https://milkguard.vercel.app/download)**
+Install directly to your home screen or desktop:
+**[Install MilkGuard App](https://hackathon-milkgaurd-web.vercel.app/download)**
 
-### System Requirements
+### Platform Support
 
-| Requirement | Specification |
-|-------------|---------------|
-| Android Version | 5.0 (API 21) or higher |
-| Storage | 50 MB free space |
-| Internet | Required for cloud sync and AI analysis |
+| Platform | Recommended Browser | Features Supported |
+|----------|---------------------|--------------------|
+| Android | Google Chrome, Samsung Internet | Standalone PWA, Web Bluetooth (BLE), Offline Shell |
+| iOS / iPadOS | Apple Safari | Standalone PWA (Add to Home Screen), Offline Shell |
+| Windows / macOS / Linux | Google Chrome, Microsoft Edge | Standalone PWA, Web Bluetooth (BLE), Offline Shell |
 
 ### Installation Steps
 
-1. **Download the APK** from the download page
-2. **Enable Unknown Sources**: Settings → Security → Enable "Install from Unknown Sources"
-3. **Install**: Open Downloads folder and tap `MilkGuard.apk`
-4. **Launch**: Tap "Open" after installation
+- **Android (Chrome)**: Tap "Install MilkGuard" on the site or select "Install app" from Chrome's menu (⋮).
+- **iOS (Safari)**: Tap the Share button in Safari → Select **"Add to Home Screen"** → Tap **"Add"**.
+- **Desktop (Chrome/Edge)**: Click the **Install** icon in the browser address bar.
 
-### Troubleshooting
+### Hardware Scanner Connectivity
 
-| Issue | Solution |
-|-------|----------|
-| Installation blocked | Enable "Unknown Sources" in Settings → Security |
-| App won't open | Ensure Android 5.0+ is installed |
-| Download fails | Check internet connection and retry |
-| Insufficient storage | Free up at least 50 MB of space |
+On Chromium-based browsers, MilkGuard communicates directly with ESP32 sensor hardware over **Web Bluetooth Low Energy (BLE)** without requiring external native bridge plugins.
 
-### Version Info
+---
 
-- **Current Version:** 1.0.0
-- **Build Date:** April 2026
-- **Target SDK:** Android 14 (API 34)
+MilkGuard © 2026 · Built for Food Safety 🇮🇳
+
 
 For support, contact: support@milkguard.app
 
