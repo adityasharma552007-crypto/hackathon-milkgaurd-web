@@ -290,9 +290,6 @@ export default function HowItWorksPage() {
             <a href="/faq" className="text-sm text-[#1A6B4A] hover:underline">
               FAQ
             </a>
-            <a href="/learn" className="text-sm text-[#1A6B4A] hover:underline">
-              Learn More
-            </a>
           </div>
         </footer>
       </div>

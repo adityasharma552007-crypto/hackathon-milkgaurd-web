@@ -198,12 +198,6 @@ export default function FAQPage() {
               About MilkGuard
             </a>
             <a
-              href="/learn"
-              className="text-sm text-[#3B82F6] bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              Learn About Adulteration
-            </a>
-            <a
               href="/scan"
               className="text-sm text-white bg-[#F5A623] px-4 py-2 rounded-lg hover:bg-amber-600 transition-colors"
             >

@@ -24,7 +24,6 @@ Allow: /$
 Allow: /about
 Allow: /how-it-works
 Allow: /faq
-Allow: /learn
 Allow: /auth/login
 Allow: /auth/signup
 

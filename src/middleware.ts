@@ -112,7 +112,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. Protected dashboard routes — redirect to login if not authenticated
-  const protectedPaths = ['/home', '/scan', '/chat', '/map', '/history', '/profile', '/learn', '/insights', '/verify', '/hardware']
+  const protectedPaths = ['/home', '/scan', '/chat', '/map', '/history', '/profile', '/insights', '/verify', '/hardware']
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
   if (isProtected && !user) {
     const redirectRes = NextResponse.redirect(new URL('/auth/login', request.url))

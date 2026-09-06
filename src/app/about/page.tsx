@@ -258,9 +258,6 @@ export default async function AboutPage() {
             <a href="/faq" className="text-sm text-[#3B82F6] hover:underline">
               FAQ
             </a>
-            <a href="/learn" className="text-sm text-[#3B82F6] hover:underline">
-              Learn More
-            </a>
           </div>
         </footer>
       </div>

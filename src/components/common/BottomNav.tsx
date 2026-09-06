@@ -13,25 +13,28 @@ import { usePathname } from 'next/navigation'
 import { Home, Scan, Map, History, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
+import { useTranslation } from '@/lib/i18n/useTranslation'
+
 // Navigation tabs with SEO-friendly link structure
-// Each href is a crawlable internal link that helps search engine discovery
 const tabs = [
-  { name: 'Home',     href: '/home',     icon: 'home',               label: 'Home' },
-  { name: 'Scan',     href: '/scan',     icon: 'qr_code_scanner',    label: 'Scan' },
-  { name: 'Reports',  href: '/history',  icon: 'analytics',          label: 'Reports' },
-  { name: 'Map',      href: '/map',      icon: 'map',                label: 'Map' },
-  { name: 'Verify',   href: '/verify',   icon: 'verified',           label: 'Verify' },
-  { name: 'Assistant', href: '/chat',    icon: 'smart_toy',          label: 'AI Chat' },
+  { name: 'Home',     key: 'nav_home',      href: '/home',     icon: 'home' },
+  { name: 'Scan',     key: 'nav_scan',      href: '/scan',     icon: 'qr_code_scanner' },
+  { name: 'Reports',  key: 'nav_reports',   href: '/history',  icon: 'analytics' },
+  { name: 'Map',      key: 'nav_map',       href: '/map',      icon: 'map' },
+  { name: 'Verify',   key: 'nav_verify',    href: '/verify',   icon: 'verified' },
+  { name: 'Assistant', key: 'nav_assistant', href: '/chat',    icon: 'smart_toy' },
 ]
 
 export function BottomNav() {
   const pathname = usePathname()
+  const { t } = useTranslation()
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none p-3 pb-safe">
       <nav className="bg-[#f8f9ff]/90 backdrop-blur-xl border border-[#d1e4ff] ambient-shadow rounded-full h-16 w-full max-w-xl flex items-center justify-around px-3 pointer-events-auto">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href || (tab.href !== '/home' && pathname?.startsWith(tab.href))
+          const label = t(tab.key, tab.name)
 
           return (
             <Link
@@ -51,7 +54,7 @@ export function BottomNav() {
                 {tab.icon}
               </span>
               <span className="text-[10px] font-medium tracking-tight leading-none mt-0.5">
-                {tab.name}
+                {label}
               </span>
             </Link>
           )

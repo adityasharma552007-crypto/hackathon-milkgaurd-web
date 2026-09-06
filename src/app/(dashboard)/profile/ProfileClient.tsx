@@ -1,13 +1,40 @@
 "use client"
 
+import React, { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { Settings, MapPin, Bell, Globe, Shield, Info, BookOpen, FileText, ChevronRight } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  MapPin,
+  Bell,
+  Globe,
+  Shield,
+  Info,
+  BookOpen,
+  FileText,
+  ChevronDown,
+  User as UserIcon,
+  Phone,
+  Building2,
+  CheckCircle2,
+  AlertTriangle,
+  Activity,
+  Edit3,
+  X,
+  Save,
+  Loader2,
+  Lock,
+  Sparkles,
+  ShieldCheck,
+  Check,
+  Cpu,
+  QrCode
+} from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { SignOutButton } from "./SignOutButton"
-import { BottomSheet } from "@/components/ui/BottomSheet"
+import { toast } from "sonner"
+import Link from "next/link"
 
 interface ProfileClientProps {
   user: {
@@ -35,376 +62,918 @@ interface ProfileClientProps {
   }>
 }
 
+const LANGUAGES = [
+  { id: 'English', label: 'English', native: 'English', flag: '🇬🇧' },
+  { id: 'Hindi', label: 'Hindi', native: 'हिंदी', flag: '🇮🇳' },
+  { id: 'Punjabi', label: 'Punjabi', native: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { id: 'Marathi', label: 'Marathi', native: 'मराठी', flag: '🇮🇳' },
+  { id: 'Gujarati', label: 'Gujarati', native: 'ગુજરાતી', flag: '🇮🇳' },
+]
+
+import { useTranslation } from "@/lib/i18n/useTranslation"
+import { type SupportedLanguage } from "@/store/useLanguageStore"
+
 export default function ProfileClient({ user, reports }: ProfileClientProps) {
   const router = useRouter()
   const supabase = createClient()
-  
+  const { t, language, setLanguage } = useTranslation()
+
   // States
   const [isEditing, setIsEditing] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isResettingPassword, setIsResettingPassword] = useState(false)
   const [editForm, setEditForm] = useState({
     fullName: user.fullName || "",
     phone: user.phone || "",
     city: user.city || "",
     area: user.area || ""
   })
-  
-  const [sheetOpen, setSheetOpen] = useState<'notifications' | 'language' | 'privacy' | 'about' | 'fssai' | null>(null)
-  
-  // Sheet States
-  const [notifPrefs, setNotifPrefs] = useState({
-    area: true,
-    scan: true,
-    fssai: true
-  })
-  const [language, setLanguage] = useState('English')
 
-  // Calculated values
+  // Which option card is currently popped up / expanded inline
+  const [expandedOption, setExpandedOption] = useState<'notifications' | 'language' | 'privacy' | 'about' | 'fssai' | null>(null)
+
+  // Preferences
+  const [notifPrefs, setNotifPrefs] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('notif_prefs')
+        if (saved) return JSON.parse(saved)
+      } catch { /* fallback */ }
+    }
+    return { area: true, scan: true, fssai: true }
+  })
+
+  // Calculations
   const initials = user.fullName
     ? user.fullName
         .split(' ')
+        .filter(Boolean)
         .map(n => n[0])
         .join('')
         .toUpperCase()
         .slice(0, 2)
     : user.email[0]?.toUpperCase() ?? 'U'
 
+  const purityRate = user.totalScans > 0
+    ? Math.round((user.safeScans / user.totalScans) * 100)
+    : 100
+
+  // Gauge calculation for purity circle
+  const strokeDashoffset = 283 - (283 * (purityRate / 100))
+
+  // Toggle option expansion
+  const toggleOption = (option: 'notifications' | 'language' | 'privacy' | 'about' | 'fssai') => {
+    setExpandedOption(prev => prev === option ? null : option)
+  }
+
   // Handlers
   const handleSaveProfile = async () => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ 
-        full_name: editForm.fullName,
-        phone: editForm.phone, 
-        city: editForm.city, 
-        area: editForm.area 
-      })
-      .eq('id', user.id)
-    
-    if (error) {
-      alert("Error saving profile")
-    } else {
-      alert("Profile updated ✅")
-      setIsEditing(false)
-      router.refresh()
+    setIsSaving(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editForm.fullName,
+          phone: editForm.phone,
+          city: editForm.city,
+          area: editForm.area
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        toast.error(error.message || "Failed to update profile")
+      } else {
+        toast.success("Profile updated successfully")
+        setIsEditing(false)
+        router.refresh()
+      }
+    } catch (err: any) {
+      toast.error(err.message || "An unexpected error occurred")
+    } finally {
+      setIsSaving(false)
     }
   }
 
   const handleResetPassword = async () => {
-    await supabase.auth.resetPasswordForEmail(
-      user.email,
-      { redirectTo: window.location.origin + '/auth/reset-password' }
-    )
-    alert("Reset link sent to your email ✅")
+    setIsResettingPassword(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        user.email,
+        { redirectTo: window.location.origin + '/auth/reset-password' }
+      )
+      if (error) {
+        toast.error(error.message || "Failed to send reset link")
+      } else {
+        toast.success("Password reset link sent to your email")
+      }
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred")
+    } finally {
+      setIsResettingPassword(false)
+    }
+  }
+
+  const updateNotifPref = (key: 'area' | 'scan' | 'fssai', value: boolean) => {
+    const updated = { ...notifPrefs, [key]: value }
+    setNotifPrefs(updated)
+    try {
+      localStorage.setItem('notif_prefs', JSON.stringify(updated))
+    } catch { /* ignore */ }
+    toast.success("Notification preferences updated")
+  }
+
+  const selectLanguage = (langId: string) => {
+    setLanguage(langId as SupportedLanguage)
+    toast.success(`Language set to ${langId}`)
   }
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] pb-32">
-      {/* Header Bar */}
-      <header className="flex items-center justify-center p-6 pb-4 bg-[#F7F9F8]">
-        <h1 className="text-lg font-bold text-[#60A5FA]">My Profile</h1>
-      </header>
+    <div className="max-w-4xl mx-auto space-y-6 pb-24">
 
-      <main className="px-4 space-y-4">
-        {/* Profile Card */}
-        <Card className="rounded-[40px] border-none shadow-sm pt-8 pb-8 text-center bg-white flex flex-col items-center">
+      {/* ── Top Hero Profile Bento Card ── */}
+      <Card className="relative overflow-hidden rounded-3xl border border-[#c4e7ff] bg-gradient-to-br from-[#eef4ff] via-white to-[#f0fdf4] ambient-shadow p-6 sm:p-8">
+        {/* Soft Radial Ambient Auras */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#38bdf8]/15 rounded-full blur-3xl pointer-events-none -mr-24 -mt-24" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#30c5b3]/15 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20" />
+
+        <div className="relative z-10">
           {isEditing ? (
-            <div className="w-full px-6 flex flex-col gap-3 text-left">
-              <h3 className="font-bold text-slate-900 mb-2">Edit Profile</h3>
-              <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#60A5FA] focus:outline-none"
-                placeholder="Full Name" 
-                value={editForm.fullName} 
-                onChange={e => setEditForm({...editForm, fullName: e.target.value})} 
-              />
-              <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#60A5FA] focus:outline-none"
-                placeholder="Phone" 
-                value={editForm.phone} 
-                onChange={e => setEditForm({...editForm, phone: e.target.value})} 
-              />
-              <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#60A5FA] focus:outline-none"
-                placeholder="City" 
-                value={editForm.city} 
-                onChange={e => setEditForm({...editForm, city: e.target.value})} 
-              />
-              <input 
-                className="w-full h-12 px-4 rounded-xl border border-slate-200 text-sm focus:border-[#60A5FA] focus:outline-none"
-                placeholder="Area" 
-                value={editForm.area} 
-                onChange={e => setEditForm({...editForm, area: e.target.value})} 
-              />
-              <div className="flex gap-2 mt-4">
-                <button 
+            /* ── Inline Edit Form ── */
+            <div className="space-y-5">
+              <div className="flex items-center justify-between pb-3 border-b border-[#d1e4ff]">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#00668a]/10 text-[#00668a] flex items-center justify-center">
+                    <Edit3 size={16} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-[#001d36] tracking-tight">{t('edit_profile', 'Edit Profile')}</h2>
+                    <p className="text-xs text-[#51666d]">Update your contact and regional delivery details</p>
+                  </div>
+                </div>
+                <button
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors"
-                >Cancel</button>
-                <button 
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#51666d] flex items-center gap-1.5">
+                    <UserIcon size={13} className="text-[#00668a]" /> {t('full_name', 'Full Name')}
+                  </label>
+                  <input
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#d1e4ff] bg-white text-sm text-[#001d36] font-semibold focus:border-[#00668a] focus:ring-2 focus:ring-[#00668a]/15 focus:outline-none transition-all"
+                    placeholder="e.g. Aditya Sharma"
+                    value={editForm.fullName}
+                    onChange={e => setEditForm({ ...editForm, fullName: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#51666d] flex items-center gap-1.5">
+                    <Phone size={13} className="text-[#00668a]" /> {t('phone_number', 'Phone Number')}
+                  </label>
+                  <input
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#d1e4ff] bg-white text-sm text-[#001d36] font-semibold focus:border-[#00668a] focus:ring-2 focus:ring-[#00668a]/15 focus:outline-none transition-all"
+                    placeholder="e.g. +91 98765 43210"
+                    value={editForm.phone}
+                    onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#51666d] flex items-center gap-1.5">
+                    <Building2 size={13} className="text-[#00668a]" /> {t('city', 'City')}
+                  </label>
+                  <input
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#d1e4ff] bg-white text-sm text-[#001d36] font-semibold focus:border-[#00668a] focus:ring-2 focus:ring-[#00668a]/15 focus:outline-none transition-all"
+                    placeholder="e.g. Jaipur"
+                    value={editForm.city}
+                    onChange={e => setEditForm({ ...editForm, city: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-[#51666d] flex items-center gap-1.5">
+                    <MapPin size={13} className="text-[#00668a]" /> {t('area', 'Area / Sector')}
+                  </label>
+                  <input
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#d1e4ff] bg-white text-sm text-[#001d36] font-semibold focus:border-[#00668a] focus:ring-2 focus:ring-[#00668a]/15 focus:outline-none transition-all"
+                    placeholder="e.g. Malviya Nagar"
+                    value={editForm.area}
+                    onChange={e => setEditForm({ ...editForm, area: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  disabled={isSaving}
+                  className="px-5 py-2.5 rounded-xl border border-[#d1e4ff] text-slate-600 font-bold text-xs hover:bg-slate-50 transition-colors"
+                >
+                  {t('cancel', 'Cancel')}
+                </button>
+                <button
                   onClick={handleSaveProfile}
-                  className="flex-1 py-3 rounded-xl bg-[#60A5FA] text-white font-bold hover:bg-[#3B82F6] transition-colors"
-                >Save</button>
+                  disabled={isSaving}
+                  className="px-6 py-2.5 rounded-xl bg-[#00668a] text-white font-bold text-xs hover:bg-[#004c69] transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save size={14} />
+                      <span>{t('save_changes', 'Save Changes')}</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           ) : (
-            <>
-              <div className="w-[64px] h-[64px] rounded-full bg-[#60A5FA] text-white flex items-center justify-center font-bold text-xl tracking-wider shadow-md">
-                {initials}
-              </div>
-              <h2 className="text-[20px] font-bold text-slate-900 mt-4 leading-tight">
-                {user.fullName || "MilkGuard User"}
-              </h2>
-              <p className="text-[13px] text-slate-500 font-medium mt-1">
-                {user.email}
-              </p>
-              {(user.city || user.area) && (
-                <div className="flex items-center justify-center gap-1 mt-2 text-[#60A5FA]">
-                  <MapPin size={13} className="fill-[#60A5FA] text-white" />
-                  <span className="text-[13px] uppercase font-bold tracking-widest text-[#60A5FA]">
-                    {[user.area, user.city].filter(Boolean).join(", ")}
-                  </span>
+            /* ── Profile Presentation Mode ── */
+            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                {/* Monogram Avatar */}
+                <div className="relative shrink-0">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-[#00668a] via-[#0284c7] to-[#38bdf8] text-white flex items-center justify-center font-black text-2xl sm:text-3xl shadow-md border-2 border-white ring-4 ring-[#00668a]/10">
+                    {initials}
+                  </div>
+                  <div
+                    className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-[#10b981] border-2 border-white flex items-center justify-center text-white shadow-sm"
+                    title="Verified Active Guardian"
+                  >
+                    <ShieldCheck size={14} />
+                  </div>
                 </div>
-              )}
-              <button 
+
+                {/* Identity & Metadata */}
+                <div className="space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-black text-[#001d36] tracking-tight">
+                      {user.fullName || "MilkGuard Consumer"}
+                    </h1>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333] text-[11px] font-bold border border-[#a8dab5]">
+                      <Sparkles size={11} />
+                      <span>{t('consumer_guardian', 'Family Guardian')}</span>
+                    </span>
+                  </div>
+
+                  <p className="text-xs font-semibold text-[#51666d]">
+                    {user.email}
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
+                    {(user.city || user.area) && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/90 text-[#001d36] text-xs font-bold border border-[#c4e7ff] shadow-sm">
+                        <MapPin size={12} className="text-[#00668a]" />
+                        <span>{[user.area, user.city].filter(Boolean).join(", ")}</span>
+                      </span>
+                    )}
+
+                    {user.phone && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/90 text-[#001d36] text-xs font-bold border border-[#c4e7ff] shadow-sm">
+                        <Phone size={12} className="text-[#00668a]" />
+                        <span>{user.phone}</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <button
                 onClick={() => setIsEditing(true)}
-                className="mt-6 px-6 py-2 rounded-full border border-[#60A5FA] text-[#60A5FA] text-[13px] font-bold tracking-wide hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-white text-[#00668a] text-xs font-bold hover:bg-[#e5efff] transition-all border border-[#c4e7ff] shadow-sm active:scale-95 shrink-0"
               >
-                Edit Profile
+                <Edit3 size={13} />
+                <span>{t('edit_profile', 'Edit Profile')}</span>
               </button>
-            </>
+            </div>
           )}
+        </div>
+      </Card>
+
+      {/* ── Middle Metrics & Safety Score Grid ── */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        
+        {/* Purity Gauge Card (5 cols on md) */}
+        <Card className="md:col-span-5 rounded-3xl border border-[#c4e7ff] bg-white p-6 ambient-shadow flex flex-col items-center justify-center text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#30c5b3]/10 rounded-full blur-2xl pointer-events-none" />
+
+          <p className="text-[11px] font-black uppercase tracking-wider text-[#51666d] mb-3">
+            {t('overall_safety', 'Overall Milk Safety Score')}
+          </p>
+
+          {/* SVG Circular Gauge */}
+          <div className="relative w-36 h-36 flex items-center justify-center my-1">
+            <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+              {/* Track */}
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="transparent"
+                stroke="#e2e8f0"
+                strokeWidth="7"
+              />
+              {/* Progress Bar */}
+              <circle
+                cx="50"
+                cy="50"
+                r="45"
+                fill="transparent"
+                stroke="#10b981"
+                strokeWidth="7"
+                strokeDasharray="283"
+                strokeDashoffset={strokeDashoffset}
+                strokeLinecap="round"
+                className="transition-all duration-1000 ease-out"
+              />
+            </svg>
+
+            <div className="absolute flex flex-col items-center justify-center text-center">
+              <span className="text-3xl font-black text-[#001d36] tracking-tight">{purityRate}%</span>
+              <span className="text-[10px] font-bold text-[#10b981] uppercase tracking-wider">
+                {purityRate >= 80 ? t('purity_verified', 'Purity Verified') : t('risk_detected', 'Risk Detected')}
+              </span>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-500 font-medium mt-3 max-w-xs">
+            {user.safeScans} of {user.totalScans} milk batches tested passed all national FSSAI purity standards.
+          </p>
         </Card>
 
-        {/* Scan Stats Strip */}
-        <div className="flex justify-between gap-3 pt-2">
-          <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
-            <span className="text-[22px] font-black text-slate-900 leading-none">{user.totalScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">TOTAL SCANS</span>
+        {/* 3 Metric Summary Cards (7 cols on md) */}
+        <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* Total Scans Card */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white p-4 sm:p-5 ambient-shadow flex flex-col justify-between hover:border-[#00668a] transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#51666d]">{t('total_tests', 'Total Tests')}</span>
+              <div className="w-8 h-8 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center">
+                <Activity size={16} />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-[#001d36] tracking-tight">{user.totalScans}</span>
+              <p className="text-[11px] text-slate-500 font-medium mt-1">14-channel NIR spectroscopy</p>
+            </div>
           </Card>
-          <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
-            <span className="text-[22px] font-black text-[#60A5FA] leading-none">{user.safeScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">SAFE</span>
+
+          {/* Safe Samples Card */}
+          <Card className="rounded-2xl border border-[#a8dab5] bg-gradient-to-b from-white to-[#f0fdf4] p-4 sm:p-5 ambient-shadow flex flex-col justify-between hover:border-[#10b981] transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#137333]">{t('pure_milk', 'Pure Milk')}</span>
+              <div className="w-8 h-8 rounded-xl bg-[#dcfce7] text-[#16a34a] flex items-center justify-center">
+                <CheckCircle2 size={16} />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-[#15803d] tracking-tight">{user.safeScans}</span>
+              <p className="text-[11px] text-[#15803d]/80 font-medium mt-1">Zero hazardous chemicals</p>
+            </div>
           </Card>
-          <Card className="flex-1 rounded-[24px] border-none shadow-sm py-5 flex flex-col items-center justify-center bg-white">
-            <span className="text-[22px] font-black text-[#D32F2F] leading-none">{user.unsafeScans}</span>
-            <span className="text-[9px] uppercase font-black text-slate-900 tracking-widest mt-2">UNSAFE</span>
+
+          {/* Adulteration Blocked Card */}
+          <Card className="rounded-2xl border border-[#fecaca] bg-gradient-to-b from-white to-[#fff5f5] p-4 sm:p-5 ambient-shadow flex flex-col justify-between hover:border-[#ef4444] transition-all">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-black uppercase tracking-wider text-[#991b1b]">{t('threats_blocked', 'Threats Blocked')}</span>
+              <div className="w-8 h-8 rounded-xl bg-[#fee2e2] text-[#dc2626] flex items-center justify-center">
+                <AlertTriangle size={16} />
+              </div>
+            </div>
+            <div>
+              <span className="text-3xl font-black text-[#dc2626] tracking-tight">{user.unsafeScans}</span>
+              <p className="text-[11px] text-[#b91c1c]/80 font-medium mt-1">Harmful milk prevented</p>
+            </div>
           </Card>
         </div>
+      </div>
 
-        {/* FSSAI Reports */}
-        <section className="mt-8">
-          <div className="flex items-center justify-between px-2 mb-4">
-            <h3 className="font-bold text-slate-900 text-lg">My FSSAI Reports 📋</h3>
-            <button className="text-[13px] font-bold text-[#60A5FA] hover:underline">View All</button>
+      {/* ── FSSAI Official Reports Section ── */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-[#00668a]/10 text-[#00668a] flex items-center justify-center">
+              <FileText size={14} />
+            </div>
+            <h2 className="text-base font-black text-[#001d36] tracking-tight">
+              {t('official_reports', 'Official FSSAI Complaint Records')}
+            </h2>
           </div>
-          <div className="space-y-3">
-            {reports.length === 0 ? (
-              <Card className="rounded-[24px] border-none shadow-sm p-8 flex flex-col items-center justify-center bg-white text-center">
-                <div className="w-[52px] h-[52px] bg-[#F7F9F8] rounded-full flex items-center justify-center mb-4 border border-slate-100">
-                  <Shield size={26} className="text-slate-400" />
+          <span className="text-xs font-bold text-[#00668a] bg-[#e5efff] px-2.5 py-1 rounded-full border border-[#c4e7ff]">
+            {reports.length} {reports.length === 1 ? 'Report' : 'Reports'}
+          </span>
+        </div>
+
+        {reports.length === 0 ? (
+          <Card className="rounded-2xl border border-dashed border-[#c4e7ff] p-6 sm:p-8 flex flex-col items-center justify-center bg-white text-center ambient-shadow">
+            <div className="w-12 h-12 bg-[#f8faff] rounded-2xl flex items-center justify-center mb-3 text-[#00668a] border border-[#d1e4ff]">
+              <ShieldCheck size={24} />
+            </div>
+            <h3 className="font-extrabold text-sm text-[#001d36] mb-1">{t('no_reports', 'No Active Hazard Reports')}</h3>
+            <p className="text-xs text-[#51666d] max-w-sm leading-relaxed mb-4">
+              When hazardous adulterants (such as urea, detergent, or formalin) are detected during a scan, an official FSSAI complaint dossier is automatically generated here.
+            </p>
+            <Link
+              href="/scan"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#00668a] text-white text-xs font-bold rounded-xl hover:bg-[#004c69] transition-all shadow-sm active:scale-95"
+            >
+              <span>{t('test_sample_now', 'Test Milk Sample Now')}</span>
+              <QrCode size={14} />
+            </Link>
+          </Card>
+        ) : (
+          <div className="space-y-2.5">
+            {reports.map((report) => (
+              <Card
+                key={report.id}
+                className="rounded-2xl border border-[#d1e4ff] p-4 flex items-center justify-between bg-white hover:border-[#00668a] transition-all ambient-shadow"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                      report.status === 'resolved'
+                        ? 'bg-[#dcfce7] text-[#16a34a]'
+                        : 'bg-[#fff7ed] text-[#ea580c]'
+                    }`}
+                  >
+                    {report.status === 'resolved' ? (
+                      <ShieldCheck size={20} />
+                    ) : (
+                      <FileText size={20} />
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-black text-xs text-[#001d36]">
+                      {report.complaint_ref || `MG-2026-${report.id.slice(0, 5)}`}
+                    </p>
+                    <p className="text-xs text-slate-500 font-medium">
+                      {report.vendors?.name ?? 'Unregistered Vendor'} · {report.vendors?.area || 'Local Dairy'}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                      Filed on {new Date(report.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
                 </div>
-                <p className="font-bold text-[15px] text-slate-900 mb-1">No reports filed yet</p>
-                <p className="text-[12px] text-slate-500 font-medium px-4">
-                  Reports are auto-created for hazardous scans
-                </p>
+
+                <Badge
+                  className={`border-none font-bold text-[10px] uppercase tracking-wider px-2.5 py-1 ${
+                    report.status === 'submitted'
+                      ? 'bg-amber-100 text-amber-800'
+                      : report.status === 'under_review'
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-emerald-100 text-emerald-800'
+                  }`}
+                >
+                  {report.status.replace('_', ' ')}
+                </Badge>
               </Card>
-            ) : (
-              reports.map(report => (
-                <Card key={report.id} className="rounded-[24px] border-none shadow-sm p-4 flex items-center justify-between bg-white">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-[52px] h-[52px] rounded-[18px] flex items-center justify-center ${report.status === 'resolved' ? 'bg-[#3ff790] text-[#60A5FA]' : 'bg-amber-100 text-amber-600'}`}>
-                      {report.status === 'resolved' ? <Shield size={24} className="fill-[#60A5FA] text-[#3ff790]" /> : <FileText size={24} className="fill-amber-600 text-amber-100" />}
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── Interactive Pop-Up Accordion Cards (Hidden Inside Options) ── */}
+      <section className="space-y-3">
+        <div className="flex items-center gap-2 px-1">
+          <div className="w-6 h-6 rounded-lg bg-[#00668a]/10 text-[#00668a] flex items-center justify-center">
+            <Lock size={14} />
+          </div>
+          <div>
+            <h2 className="text-base font-black text-[#001d36] tracking-tight">
+              {t('settings_title', 'Preferences & Regulatory Standards')}
+            </h2>
+            <p className="text-xs text-slate-500">{t('settings_sub', 'Tap any option to pop open its details right inside')}</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+
+          {/* ── 1. Notifications & Alerts Card ── */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white overflow-hidden ambient-shadow transition-all">
+            <button
+              onClick={() => toggleOption('notifications')}
+              className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[#f8faff] transition-colors"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+                  <Bell size={19} />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm text-[#001d36] block">{t('notifications', 'Notifications & Alerts')}</span>
+                  <span className="text-xs text-slate-500 font-medium">Contamination warnings, daily scan reminders</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200 hidden sm:inline">
+                  {Object.values(notifPrefs).filter(Boolean).length} Active
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`text-slate-400 transition-transform duration-300 ${expandedOption === 'notifications' ? 'rotate-180 text-[#00668a]' : ''}`}
+                />
+              </div>
+            </button>
+
+            {/* Pop-Up Card Hidden Inside */}
+            <AnimatePresence initial={false}>
+              {expandedOption === 'notifications' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 pt-1 bg-[#f8faff] border-t border-[#e5efff] space-y-3">
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                      <div>
+                        <span className="font-bold text-sm text-[#001d36] block">Area Adulteration Alerts</span>
+                        <span className="text-xs text-slate-500">Get notified when contaminated milk is detected in your neighborhood</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.area}
+                        onChange={e => updateNotifPref('area', e.target.checked)}
+                        className="w-4 h-4 rounded text-[#00668a] focus:ring-[#00668a] cursor-pointer"
+                      />
                     </div>
-                    <div>
-                      <p className="font-bold text-[15px] text-[#60A5FA]">{report.complaint_ref || `MG-2026-${report.id.slice(0,5)}`}</p>
-                      <p className="text-[12px] text-slate-500 font-medium">
-                        {report.vendors?.name ?? 'Unknown vendor'} · {report.vendors?.area || 'Unknown area'}
+
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                      <div>
+                        <span className="font-bold text-sm text-[#001d36] block">Scan Reminder</span>
+                        <span className="text-xs text-slate-500">Daily morning reminder to test your household milk packet</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.scan}
+                        onChange={e => updateNotifPref('scan', e.target.checked)}
+                        className="w-4 h-4 rounded text-[#00668a] focus:ring-[#00668a] cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-3.5 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                      <div>
+                        <span className="font-bold text-sm text-[#001d36] block">FSSAI Safety Bulletins</span>
+                        <span className="text-xs text-slate-500">Official food safety notifications and local vendor advisories</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={notifPrefs.fssai}
+                        onChange={e => updateNotifPref('fssai', e.target.checked)}
+                        className="w-4 h-4 rounded text-[#00668a] focus:ring-[#00668a] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+
+          {/* ── 2. App Language Selection Card ── */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white overflow-hidden ambient-shadow transition-all">
+            <button
+              onClick={() => toggleOption('language')}
+              className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[#f8faff] transition-colors"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#00668a] flex items-center justify-center shrink-0 border border-blue-100">
+                  <Globe size={19} />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm text-[#001d36] block">{t('app_language', 'App Language')}</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('app_language_sub', 'Select preferred regional display language')}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#00668a] bg-[#e5efff] px-2.5 py-1 rounded-full border border-[#c4e7ff]">
+                  {language}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`text-slate-400 transition-transform duration-300 ${expandedOption === 'language' ? 'rotate-180 text-[#00668a]' : ''}`}
+                />
+              </div>
+            </button>
+
+            {/* Pop-Up Card Hidden Inside */}
+            <AnimatePresence initial={false}>
+              {expandedOption === 'language' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 pt-1 bg-[#f8faff] border-t border-[#e5efff]">
+                    <p className="text-xs text-slate-500 mb-3">Choose your native language for test results and explanations:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {LANGUAGES.map(lang => {
+                        const isSelected = language === lang.id
+                        return (
+                          <div
+                            key={lang.id}
+                            onClick={() => selectLanguage(lang.id)}
+                            className={`flex items-center justify-between p-3.5 rounded-2xl border cursor-pointer transition-all ${
+                              isSelected
+                                ? "bg-[#e5efff] border-[#00668a] text-[#00668a] shadow-sm font-bold ring-2 ring-[#00668a]/10"
+                                : "bg-white border-slate-200 text-slate-800 hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-xl">{lang.flag}</span>
+                              <div>
+                                <span className="text-sm font-bold block">{lang.label}</span>
+                                <span className="text-xs text-slate-500 font-medium">{lang.native}</span>
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <div className="w-5 h-5 rounded-full bg-[#00668a] text-white flex items-center justify-center">
+                                <Check size={12} />
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+
+          {/* ── 3. Privacy & Password Card ── */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white overflow-hidden ambient-shadow transition-all">
+            <button
+              onClick={() => toggleOption('privacy')}
+              className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[#f8faff] transition-colors"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                  <Shield size={19} />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm text-[#001d36] block">{t('privacy_security', 'Privacy & Security')}</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('privacy_sub', 'Data encryption, password reset')}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#137333] bg-[#e6f4ea] px-2 py-0.5 rounded-full border border-[#a8dab5] hidden sm:inline">
+                  Encrypted
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`text-slate-400 transition-transform duration-300 ${expandedOption === 'privacy' ? 'rotate-180 text-[#00668a]' : ''}`}
+                />
+              </div>
+            </button>
+
+            {/* Pop-Up Card Hidden Inside */}
+            <AnimatePresence initial={false}>
+              {expandedOption === 'privacy' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 pt-1 bg-[#f8faff] border-t border-[#e5efff] space-y-4">
+                    <div className="p-4 rounded-2xl bg-[#e6f4ea] border border-[#a8dab5] text-[#137333]">
+                      <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider mb-1">
+                        <ShieldCheck size={16} /> End-to-End Encrypted Data
+                      </div>
+                      <p className="text-xs text-[#137333]/90 leading-relaxed font-medium">
+                        MilkGuard stores spectral testing records and device telemetry securely on Supabase. Your family testing data is completely private and never sold to commercial advertisers.
                       </p>
-                      <p className="text-[11px] text-slate-400 font-medium mt-0.5">
-                        {new Date(report.created_at).toLocaleDateString('en-IN')}
+                    </div>
+
+                    <div className="space-y-3 bg-white p-4 rounded-2xl border border-[#d1e4ff] shadow-sm">
+                      <h4 className="font-black text-sm text-[#001d36]">Account Security Credentials</h4>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-slate-500 block">Registered Email</label>
+                        <input
+                          readOnly
+                          value={user.email}
+                          className="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-medium focus:outline-none"
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleResetPassword}
+                        disabled={isResettingPassword}
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#00668a] text-white font-bold text-xs hover:bg-[#004c69] transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                      >
+                        {isResettingPassword ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            <span>Sending Reset Link...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock size={14} />
+                            <span>Send Password Reset Email</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+
+          {/* ── 4. FSSAI Safety Standards Card ── */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white overflow-hidden ambient-shadow transition-all">
+            <button
+              onClick={() => toggleOption('fssai')}
+              className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[#f8faff] transition-colors"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100">
+                  <BookOpen size={19} />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm text-[#001d36] block">{t('fssai_standards', 'FSSAI Safety Standards')}</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('fssai_sub', 'Official permissible limits for common adulterants')}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200 hidden sm:inline">
+                  2025-26 Rules
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`text-slate-400 transition-transform duration-300 ${expandedOption === 'fssai' ? 'rotate-180 text-[#00668a]' : ''}`}
+                />
+              </div>
+            </button>
+
+            {/* Pop-Up Card Hidden Inside */}
+            <AnimatePresence initial={false}>
+              {expandedOption === 'fssai' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 pt-1 bg-[#f8faff] border-t border-[#e5efff] space-y-4">
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Permissible regulatory limits defined by the Food Safety and Standards Authority of India (FSSAI) for milk adulterants:
+                    </p>
+
+                    <div className="overflow-x-auto rounded-2xl border border-[#d1e4ff] bg-white shadow-sm">
+                      <table className="w-full text-left text-xs">
+                        <thead className="bg-[#f8f9ff] text-slate-600 font-extrabold border-b border-[#d1e4ff]">
+                          <tr>
+                            <th className="p-3">Adulterant</th>
+                            <th className="p-3">Permissible Limit</th>
+                            <th className="p-3">Health Risk Level</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-slate-800 font-medium">
+                          <tr>
+                            <td className="p-3 font-semibold">Added Water</td>
+                            <td className="p-3">&lt; 3.0% dilution</td>
+                            <td className="p-3 text-amber-600 font-bold">Substandard Quality</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Urea</td>
+                            <td className="p-3">&lt; 0.07% (Naturally occurring)</td>
+                            <td className="p-3 text-rose-600 font-bold">Kidney Damage</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Detergent / Soap</td>
+                            <td className="p-3">Zero (0%) Tolerance</td>
+                            <td className="p-3 text-red-600 font-bold">Severe Gastric Distress</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Formalin</td>
+                            <td className="p-3">Zero (0%) Tolerance</td>
+                            <td className="p-3 text-red-700 font-bold">Classified Carcinogen</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Starch / Flour</td>
+                            <td className="p-3">Zero (0%) Tolerance</td>
+                            <td className="p-3 text-slate-600 font-bold">Misbranded Product</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Neutralizers</td>
+                            <td className="p-3">&lt; 0.05%</td>
+                            <td className="p-3 text-rose-600 font-bold">Digestive Hazard</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 font-semibold">Fat Content</td>
+                            <td className="p-3">&ge; 3.5% Cow / &ge; 6.5% Buffalo</td>
+                            <td className="p-3 text-amber-600 font-bold">Nutritional Deficit</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-white border border-[#d1e4ff] text-center shadow-sm">
+                      <span className="text-[11px] text-slate-500 font-medium block">
+                        National Food Safety Helpline:
+                      </span>
+                      <span className="text-xs font-black text-[#00668a]">
+                        Toll-Free 1800-112-100 · FSSAI Food Safety Connect
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Card>
+
+          {/* ── 5. About MilkGuard Card ── */}
+          <Card className="rounded-2xl border border-[#d1e4ff] bg-white overflow-hidden ambient-shadow transition-all">
+            <button
+              onClick={() => toggleOption('about')}
+              className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-[#f8faff] transition-colors"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 border border-indigo-100">
+                  <Info size={19} />
+                </div>
+                <div>
+                  <span className="font-extrabold text-sm text-[#001d36] block">{t('about_milkguard', 'About MilkGuard AI')}</span>
+                  <span className="text-xs text-slate-500 font-medium">{t('about_sub', 'Platform architecture, NIR sensors, and team credits')}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200 hidden sm:inline">
+                  v1.0.0
+                </span>
+                <ChevronDown
+                  size={18}
+                  className={`text-slate-400 transition-transform duration-300 ${expandedOption === 'about' ? 'rotate-180 text-[#00668a]' : ''}`}
+                />
+              </div>
+            </button>
+
+            {/* Pop-Up Card Hidden Inside */}
+            <AnimatePresence initial={false}>
+              {expandedOption === 'about' && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 pt-1 bg-[#f8faff] border-t border-[#e5efff] space-y-4">
+                    <p className="text-xs text-[#51666d] leading-relaxed">
+                      MilkGuard is an instant, contactless milk purity detection platform using near-infrared (NIR) optical spectroscopy and AI to identify adulterants in under 8 seconds.
+                    </p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                      <div className="p-3 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Hardware</span>
+                        <span className="text-xs font-black text-[#001d36]">14-Channel NIR</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">AI Engine</span>
+                        <span className="text-xs font-black text-[#001d36]">Groq LLaMA-3.3</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Cloud Data</span>
+                        <span className="text-xs font-black text-[#001d36]">Supabase Postgres</span>
+                      </div>
+                      <div className="p-3 rounded-xl bg-white border border-[#d1e4ff] shadow-sm">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Standards</span>
+                        <span className="text-xs font-black text-[#001d36]">FSSAI 2026 Compliant</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-white border border-[#d1e4ff] text-center shadow-sm">
+                      <p className="text-xs font-bold text-[#00668a]">
+                        Built by Team API Avengers 🇮🇳 · Protecting families from milk adulteration
                       </p>
                     </div>
                   </div>
-                  <Badge className={`border-none font-bold text-[10px] uppercase tracking-widest px-3 py-1 ${
-                    report.status === 'submitted' ? 'bg-amber-100 text-amber-800 hover:bg-amber-100' :
-                    report.status === 'under_review' ? 'bg-blue-100 text-blue-800 hover:bg-blue-100' :
-                    'bg-[#3ff790] text-[#60A5FA] hover:bg-[#3ff790]'
-                  }`}>
-                    {report.status.replace('_', ' ')}
-                  </Badge>
-                </Card>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Account Settings */}
-        <section className="mt-10">
-          <div className="flex items-center px-6 py-2 mb-2">
-            <h3 className="font-bold text-slate-900 text-lg">Account Settings ⚙️</h3>
-          </div>
-          <Card className="rounded-[32px] border-none shadow-sm bg-white overflow-hidden pb-2 mx-1">
-            <div className="flex flex-col pt-2">
-              <div onClick={() => setSheetOpen('notifications')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <Bell size={20} className="text-slate-700 fill-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">Notifications</span>
-                </div>
-                <ChevronRight size={18} className="text-slate-300" />
-              </div>
-              <div onClick={() => setSheetOpen('language')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <Globe size={20} className="text-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">Language</span>
-                </div>
-                <div className="flex items-center gap-2 bg-[#EAF8F1] px-3 py-1 rounded-full">
-                  <span className="text-[#60A5FA] text-[12px] font-bold">{language}</span>
-                </div>
-              </div>
-              <div onClick={() => setSheetOpen('privacy')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <Shield size={20} className="text-slate-700 fill-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">Privacy & Security</span>
-                </div>
-                <ChevronRight size={18} className="text-slate-300" />
-              </div>
-              <div onClick={() => setSheetOpen('about')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <Info size={20} className="text-slate-700 fill-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">About MilkGuard</span>
-                </div>
-                <ChevronRight size={18} className="text-slate-300" />
-              </div>
-              <div onClick={() => setSheetOpen('fssai')} className="flex items-center justify-between px-6 py-4 border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-4">
-                  <BookOpen size={20} className="text-slate-700 fill-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">FSSAI Guidelines</span>
-                </div>
-                <ChevronRight size={18} className="text-slate-300" />
-              </div>
-              <div onClick={() => router.push('/learn')} className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-slate-50 transition-colors mb-2">
-                <div className="flex items-center gap-4">
-                  <BookOpen size={20} className="text-slate-700" />
-                  <span className="font-bold text-[15px] text-slate-900">EduGuard Learning Center</span>
-                </div>
-                <div className="w-6 h-6 rounded flex items-center justify-center border border-slate-200 bg-slate-50 hover:bg-slate-100">
-                   <ChevronRight size={14} className="text-slate-400" />
-                </div>
-              </div>
-            </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
-        </section>
 
-        {/* Sign Out Button */}
-        <div className="mt-8 mb-8 pb-4">
-          <SignOutButton />
         </div>
+      </section>
 
-      </main>
+      {/* ── Sign Out Button ── */}
+      <div className="pt-2">
+        <SignOutButton />
+      </div>
 
-      {/* BOTTOM SHEETS */}
-      <BottomSheet isOpen={sheetOpen === 'notifications'} onClose={() => setSheetOpen(null)} title="Notifications">
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-900">Area adulteration alerts</span>
-            <input type="checkbox" checked={notifPrefs.area} onChange={e => {setNotifPrefs({...notifPrefs, area: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, area: e.target.checked}))}} className="w-5 h-5 accent-[#60A5FA]" />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-900">Scan reminders</span>
-            <input type="checkbox" checked={notifPrefs.scan} onChange={e => {setNotifPrefs({...notifPrefs, scan: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, scan: e.target.checked}))}} className="w-5 h-5 accent-[#60A5FA]" />
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-900">FSSAI report updates</span>
-            <input type="checkbox" checked={notifPrefs.fssai} onChange={e => {setNotifPrefs({...notifPrefs, fssai: e.target.checked}); localStorage.setItem('notif_prefs', JSON.stringify({...notifPrefs, fssai: e.target.checked}))}} className="w-5 h-5 accent-[#60A5FA]" />
-          </div>
-        </div>
-      </BottomSheet>
-
-      <BottomSheet isOpen={sheetOpen === 'language'} onClose={() => setSheetOpen(null)} title="Select Language">
-        <div className="space-y-4">
-           {['English', 'हिंदी (Hindi)', 'ਪੰਜਾਬੀ (Punjabi)', 'मराठी (Marathi)'].map(lang => (
-             <div 
-               key={lang} 
-               onClick={() => {
-                 setLanguage(lang.split(' ')[0])
-                 localStorage.setItem('app_language', lang.split(' ')[0])
-                 alert("Language preference saved")
-                 setSheetOpen(null)
-               }}
-               className="p-4 rounded-xl border border-slate-200 text-[#60A5FA] font-bold hover:bg-blue-50 hover:border-green-300 cursor-pointer transition-colors"
-             >
-               🇮🇳 {lang}
-             </div>
-           ))}
-        </div>
-      </BottomSheet>
-
-      <BottomSheet isOpen={sheetOpen === 'privacy'} onClose={() => setSheetOpen(null)} title="Privacy & Security">
-        <div className="space-y-6">
-          <div>
-            <h4 className="font-bold text-slate-900 mb-2">Your Data</h4>
-            <p className="text-sm text-slate-500 leading-relaxed">
-              MilkGuard stores your scan history securely in Supabase. Your data is never shared with third parties.
-            </p>
-          </div>
-          <div className="pt-6 border-t border-slate-100">
-            <h4 className="font-bold text-slate-900 mb-3">Change Password</h4>
-            <div className="flex flex-col gap-3">
-              <input readOnly value={user.email} className="w-full h-12 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm focus:outline-none" />
-              <button onClick={handleResetPassword} className="w-full h-12 rounded-xl bg-[#60A5FA] text-white font-bold tracking-wide hover:bg-[#3B82F6] transition-colors">
-                Send Reset Link
-              </button>
-            </div>
-          </div>
-        </div>
-      </BottomSheet>
-
-      <BottomSheet isOpen={sheetOpen === 'about'} onClose={() => setSheetOpen(null)} title="About MilkGuard">
-        <div className="flex flex-col items-center text-center space-y-4 pt-4">
-          <div className="w-20 h-20 bg-[#60A5FA] rounded-full flex items-center justify-center shadow-md">
-            <Shield className="text-white" size={40} />
-          </div>
-          <div>
-            <h3 className="text-xl font-black text-[#60A5FA]">MilkGuard</h3>
-            <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Version 1.0.0 (Hackathon Edition)</p>
-          </div>
-          <p className="text-[15px] text-slate-600 leading-relaxed px-4 py-2">
-            MilkGuard is a contactless milk adulteration detection system using NIR spectral analysis and AI.
-          </p>
-          <div className="bg-slate-50 w-full py-4 rounded-xl border border-slate-100 mt-2">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Built with</p>
-            <p className="text-sm font-bold text-slate-800">Next.js 14 | Supabase | Vercel</p>
-          </div>
-          <p className="text-sm font-bold text-[#60A5FA] pt-4 leading-relaxed">
-            Protecting families from adulterated milk — one scan at a time. 🥛
-          </p>
-        </div>
-      </BottomSheet>
-
-      <BottomSheet isOpen={sheetOpen === 'fssai'} onClose={() => setSheetOpen(null)} title="FSSAI Safety Standards 📋">
-        <div className="space-y-4">
-          <table className="w-full text-left text-[13px]">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-500">
-                <th className="py-3 font-bold">Adulterant</th>
-                <th className="py-3 font-bold">Safe Limit</th>
-                <th className="py-3 font-bold">Risk Level</th>
-              </tr>
-            </thead>
-            <tbody className="text-slate-800">
-              <tr className="border-b border-slate-50"><td className="py-3">Water Addition</td><td>&lt; 3.0%</td><td className="text-amber-600 font-bold">Substandard</td></tr>
-              <tr className="border-b border-slate-50"><td className="py-3">Urea</td><td>&lt; 0.07%</td><td className="text-red-500 font-bold">Unsafe</td></tr>
-              <tr className="border-b border-slate-50"><td className="py-3">Detergent</td><td>Zero</td><td className="text-red-600 font-bold">Hazardous</td></tr>
-              <tr className="border-b border-slate-50"><td className="py-3">Formalin</td><td>Zero</td><td className="text-red-600 font-bold">Hazardous</td></tr>
-              <tr className="border-b border-slate-50"><td className="py-3">Starch</td><td>Zero</td><td className="text-slate-600 font-bold">Misbranded</td></tr>
-              <tr className="border-b border-slate-50"><td className="py-3">Neutralizers</td><td>&lt; 0.05%</td><td className="text-red-500 font-bold">Unsafe</td></tr>
-              <tr><td className="py-3">Fat Content</td><td>&ge; 3.5%</td><td className="text-amber-600 font-bold">Substandard</td></tr>
-            </tbody>
-          </table>
-          <p className="text-[11px] text-slate-400 font-medium pt-4 text-center border-t border-slate-100">
-            FSSAI Food Safety Standards 2025-26<br/>For reporting call 1800-112-100
-          </p>
-        </div>
-      </BottomSheet>
     </div>
   )
 }

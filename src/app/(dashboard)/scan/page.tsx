@@ -32,25 +32,19 @@ import Link from 'next/link'
 import { trackTestInitiation } from '@/components/analytics/GoogleAnalytics'
 import BlockchainConfirmation from '@/components/BlockchainConfirmation'
 import { PrototypeScannerModal } from '@/components/scanner/PrototypeScannerModal'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const SCAN_DURATION = 7500 // 7.5 seconds
-
-const MILK_TYPES = [
-  { id: 'cow', label: 'Cow Milk', icon: '🥛', desc: 'Standard 3.5% fat' },
-  { id: 'buffalo', label: 'Buffalo Milk', icon: '🐃', desc: 'High fat 6.5%' },
-  { id: 'toned', label: 'Packaged / Toned', icon: '📦', desc: 'FSSAI certified' },
-  { id: 'raw', label: 'Farm Direct / Raw', icon: '🌾', desc: 'Unpasteurized' },
-]
 
 export default function ScanPage() {
   const router = useRouter()
   const { user } = useUserStore()
+  const { t } = useTranslation()
   const [isScanning, setIsScanning] = useState(false)
   const [progress, setProgress] = useState(0)
   const [status, setStatus] = useState<'idle' | 'scanning' | 'analyzing' | 'error'>('idle')
   const [currentPhase, setCurrentPhase] = useState('Initializing Sensors...')
   const [error, setError] = useState<string | null>(null)
-  const [selectedType, setSelectedType] = useState('cow')
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingScanId, setPendingScanId] = useState<string | null>(null)
   const [showPrototypeModal, setShowPrototypeModal] = useState(false)
@@ -73,15 +67,15 @@ export default function ScanPage() {
   useEffect(() => {
     if (!isScanning) return
     if (progress < 22) {
-      setCurrentPhase('Calibrating NIR Optical Array (410nm - 940nm)...')
+      setCurrentPhase(t('phase_calibrating', 'Calibrating NIR Optical Array (410nm - 940nm)...'))
     } else if (progress < 50) {
-      setCurrentPhase('Sampling 14 Spectroscopy Channels...')
+      setCurrentPhase(t('phase_sampling', 'Sampling 14 Spectroscopy Channels...'))
     } else if (progress < 80) {
-      setCurrentPhase('AI Computing Adulterant Fingerprint (Groq LLaMA)...')
+      setCurrentPhase(t('phase_computing', 'AI Computing Adulterant Fingerprint (Groq LLaMA)...'))
     } else {
-      setCurrentPhase('Validating FSSAI Safety Standards...')
+      setCurrentPhase(t('phase_validating', 'Validating FSSAI Safety Standards...'))
     }
-  }, [isScanning, progress])
+  }, [isScanning, progress, t])
 
   // Progress Bar Animation
   useEffect(() => {
@@ -198,8 +192,8 @@ export default function ScanPage() {
             <Bluetooth size={13} />
             <span>
               {isConnected
-                ? (bleDevice?.name || 'MilkGuard-ESP32 Online')
-                : 'Pod Offline · Connect BLE'}
+                ? (bleDevice?.name || t('pod_online', 'MilkGuard-ESP32 Online'))
+                : t('pod_offline', 'Pod Offline · Connect BLE')}
             </span>
           </span>
           <ChevronRight size={12} className="opacity-60" />
@@ -211,7 +205,7 @@ export default function ScanPage() {
           className="text-xs font-bold text-[#00668a] hover:bg-[#e5efff] px-3 py-1.5 bg-[#e5efff]/80 rounded-full border border-[#c4e7ff] transition-all flex items-center gap-1.5 shadow-sm"
         >
           <Sliders size={13} />
-          <span className="hidden sm:inline">Hardware Sim</span>
+          <span className="hidden sm:inline">{t('sim_btn', 'Hardware Sim')}</span>
           <span className="sm:hidden">Sim</span>
         </button>
       </div>
@@ -225,48 +219,18 @@ export default function ScanPage() {
 
         <h1 className="text-3xl sm:text-4xl font-black text-[#001d36] tracking-tight">
           {status === 'idle'
-            ? 'Milk Purity Scanner'
+            ? t('scanner_title', 'Milk Purity Scanner')
             : status === 'scanning'
-            ? 'Scanning Milk Sample...'
-            : 'AI Computing Fingerprint...'}
+            ? t('scanner_scanning', 'Scanning Milk Sample...')
+            : t('scanner_analyzing', 'AI Computing Fingerprint...')}
         </h1>
 
         <p className="text-xs sm:text-sm font-medium text-[#51666d] max-w-md mx-auto">
           {status === 'idle'
-            ? 'Insert the MilkGuard sensor pod into your milk sample and initiate scan'
+            ? t('scanner_idle_desc', 'Insert the MilkGuard sensor pod into your milk sample and initiate scan')
             : currentPhase}
         </p>
       </div>
-
-      {/* ── Sample Type Context Selector (When Idle) ── */}
-      {status === 'idle' && (
-        <div className="w-full max-w-md mt-4 z-10">
-          <p className="text-[11px] font-black uppercase tracking-wider text-[#64748b] text-center mb-2">
-            Select Milk Sample Context
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {MILK_TYPES.map((type) => {
-              const active = selectedType === type.id
-              return (
-                <button
-                  key={type.id}
-                  onClick={() => setSelectedType(type.id)}
-                  className={cn(
-                    "flex flex-col items-center justify-center p-2.5 rounded-2xl border text-center transition-all",
-                    active
-                      ? "bg-white border-[#00668a] text-[#00668a] shadow-md ring-2 ring-[#00668a]/20 font-bold"
-                      : "bg-white/70 border-[#d1e4ff] text-[#51666d] hover:bg-white hover:border-[#9ecaff]"
-                  )}
-                >
-                  <span className="text-xl mb-1">{type.icon}</span>
-                  <span className="text-[11px] font-bold leading-tight">{type.label}</span>
-                  <span className="text-[9px] text-[#8e9aa0] mt-0.5">{type.desc}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      )}
 
       {/* ── Center Animated Spectroscopy Scanner ── */}
       <div className="relative flex items-center justify-center w-72 h-72 sm:w-80 sm:h-80 my-4 sm:my-6 z-10">
@@ -340,7 +304,7 @@ export default function ScanPage() {
                 <Shield size={32} className="text-white" />
               </div>
               <span className="text-[11px] font-extrabold tracking-wider uppercase text-white/90">
-                Sensor Ready
+                {t('sensor_ready', 'Sensor Ready')}
               </span>
               <span className="text-[10px] font-mono text-cyan-200 bg-white/10 px-2 py-0.5 rounded-full">
                 14 Bands
@@ -352,9 +316,9 @@ export default function ScanPage() {
                 <Bluetooth size={28} className="text-white/80" />
               </div>
               <span className="text-[11px] font-black tracking-wider uppercase text-white/90">
-                Pod Standby
+                {t('pod_standby', 'Pod Standby')}
               </span>
-              <span className="text-[10px] text-slate-200">Connect to Test</span>
+              <span className="text-[10px] text-slate-200">{t('connect_to_test', 'Connect to Test')}</span>
             </div>
           )}
         </motion.div>
@@ -382,7 +346,7 @@ export default function ScanPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-bold text-[#9a3412]">
                     <Bluetooth size={16} />
-                    <span>Hardware Sensor Pod Not Linked</span>
+                    <span>{t('hardware_not_linked', 'Hardware Sensor Pod Not Linked')}</span>
                   </div>
                   <span className="text-[10px] font-mono text-[#c2410c] bg-amber-100 px-2 py-0.5 rounded-md font-bold">
                     BLE V1
@@ -390,7 +354,7 @@ export default function ScanPage() {
                 </div>
                 
                 <p className="text-xs text-[#51666d]">
-                  Connect your MilkGuard ESP32 device over Web Bluetooth or test using the hardware simulation engine.
+                  {t('hardware_not_linked_desc', 'Connect your MilkGuard ESP32 device over Web Bluetooth or test using the hardware simulation engine.')}
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
@@ -400,7 +364,7 @@ export default function ScanPage() {
                   >
                     <Link href="/hardware">
                       <Bluetooth size={15} />
-                      <span>Pair Device (BLE)</span>
+                      <span>{t('pair_device', 'Pair Device (BLE)')}</span>
                     </Link>
                   </Button>
 
@@ -410,7 +374,7 @@ export default function ScanPage() {
                     className="h-12 border-[#c4e7ff] text-[#00668a] hover:bg-[#e5efff] font-bold text-xs rounded-xl flex items-center justify-center gap-1.5"
                   >
                     <Sparkles size={14} className="text-amber-500" />
-                    <span>Test Sim Scan</span>
+                    <span>{t('test_sim_scan', 'Test Sim Scan')}</span>
                   </Button>
                 </div>
               </div>
@@ -422,7 +386,7 @@ export default function ScanPage() {
                 className="w-full h-16 bg-gradient-to-r from-[#00668a] via-[#004c69] to-[#0284c7] hover:from-[#004c69] hover:to-[#003448] text-white font-black text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all uppercase tracking-tight flex items-center justify-center gap-2.5 active:scale-98"
               >
                 <Play size={22} fill="white" />
-                <span>Start Pure Analysis</span>
+                <span>{t('btn_start_scan', 'Start Pure Analysis')}</span>
               </Button>
 
               <p className="text-[11px] text-center text-[#51666d] font-medium">
@@ -469,21 +433,21 @@ export default function ScanPage() {
         <div className="flex items-center justify-center gap-6 text-[#51666d] pt-3 border-t border-[#d1e4ff]/80">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#006b5f]">
             <CheckCircle2 size={15} />
-            <span>FSSAI Standards</span>
+            <span>{t('fssai_standards_badge', 'FSSAI Standards')}</span>
           </div>
 
           <div className="w-1 h-1 rounded-full bg-slate-300" />
 
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#00668a]">
             <Shield size={14} />
-            <span>Polygon On-Chain</span>
+            <span>{t('polygon_onchain_badge', 'Polygon On-Chain')}</span>
           </div>
 
           <div className="w-1 h-1 rounded-full bg-slate-300" />
 
           <div className="flex items-center gap-1.5 text-xs font-bold text-[#0284c7]">
             <Layers size={14} />
-            <span>14 Channels</span>
+            <span>{t('channels_badge', '14 Channels')}</span>
           </div>
         </div>
       </div>

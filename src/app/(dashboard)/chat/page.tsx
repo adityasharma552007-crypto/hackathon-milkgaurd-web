@@ -16,17 +16,21 @@ import {
 import ReactMarkdown from 'react-markdown'
 import GroqSetupGuide, { type GroqKeyReason } from '@/components/GroqSetupGuide'
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-type Role = 'user' | 'assistant'
-interface Message {
-  id: string
-  role: Role
-  content: string
-  error?: boolean
-}
+import { useChatStore, type ChatMessage, type Role } from '@/store/useChatStore'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 function uid() {
   return Math.random().toString(36).slice(2)
+}
+
+// ─── Format Time ─────────────────────────────────────────────────────────────
+function formatTime(timestamp?: number) {
+  if (!timestamp) return ''
+  try {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  } catch {
+    return ''
+  }
 }
 
 // ─── Groq status check ────────────────────────────────────────────────────────
@@ -39,7 +43,6 @@ async function checkGroqStatus(): Promise<{ ok: boolean; reason: GroqKeyReason; 
     return { ok: false, reason: 'connection_error' }
   }
 }
-
 
 async function streamChat(
   messages: { role: Role; content: string }[],
@@ -95,7 +98,7 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-// ─── Typing Indicator ─────────────────────────────────────────────────────────
+// ─── Typing Dots ─────────────────────────────────────────────────────────────
 function TypingDots() {
   return (
     <div className="flex items-center gap-1 py-1">
@@ -112,7 +115,7 @@ function TypingDots() {
 }
 
 // ─── Message Bubble ───────────────────────────────────────────────────────────
-function Bubble({ msg, onRetry }: { msg: Message; onRetry?: () => void }) {
+function Bubble({ msg, onRetry }: { msg: ChatMessage; onRetry?: () => void }) {
   const isUser = msg.role === 'user'
   return (
     <motion.div
@@ -135,13 +138,23 @@ function Bubble({ msg, onRetry }: { msg: Message; onRetry?: () => void }) {
           : 'bg-slate-100 text-slate-800 rounded-bl-sm'
       }`}>
         {isUser ? (
-          <p className="whitespace-pre-wrap">{msg.content}</p>
+          <div>
+            <p className="whitespace-pre-wrap">{msg.content}</p>
+            {msg.timestamp && (
+              <p className="text-[10px] text-blue-100 text-right mt-1 opacity-80">
+                {formatTime(msg.timestamp)}
+              </p>
+            )}
+          </div>
         ) : msg.content ? (
           <div className="group relative">
             <div className="prose prose-sm prose-slate max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:mb-2 [&>ul>li]:mb-0.5 [&_strong]:font-bold [&_strong]:text-slate-900">
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
-            <div className="flex justify-end mt-1.5">
+            <div className="flex items-center justify-between mt-2 pt-1 border-t border-slate-200/60">
+              <span className="text-[10px] text-slate-400">
+                {formatTime(msg.timestamp)}
+              </span>
               <CopyButton text={msg.content} />
             </div>
           </div>
@@ -169,8 +182,17 @@ const suggestions = [
 
 // ─── Main Chat Page ───────────────────────────────────────────────────────────
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
+  const messages = useChatStore((s) => s.messages)
+  const input = useChatStore((s) => s.inputDraft)
+  const addMessage = useChatStore((s) => s.addMessage)
+  const appendToMessage = useChatStore((s) => s.appendToMessage)
+  const updateMessage = useChatStore((s) => s.updateMessage)
+  const removeMessage = useChatStore((s) => s.removeMessage)
+  const setInput = useChatStore((s) => s.setInputDraft)
+  const clearChatStore = useChatStore((s) => s.clearChat)
+  const hasHydrated = useChatStore((s) => s._hasHydrated)
+  const { t } = useTranslation()
+
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -200,11 +222,12 @@ export default function ChatPage() {
     setRecheckLoading(false)
   }, [])
 
-
+  // Auto-scroll on new messages or loading
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, loading])
 
+  // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto'
@@ -216,11 +239,12 @@ export default function ChatPage() {
     const content = (text ?? input).trim()
     if (!content || loading || groqStatus.ok === false) return
 
-    const userMsg: Message = { id: uid(), role: 'user', content }
+    const userMsg: ChatMessage = { id: uid(), role: 'user', content, timestamp: Date.now() }
     const aiId = uid()
-    const aiMsg: Message = { id: aiId, role: 'assistant', content: '' }
+    const aiMsg: ChatMessage = { id: aiId, role: 'assistant', content: '', timestamp: Date.now() }
 
-    setMessages(prev => [...prev, userMsg, aiMsg])
+    addMessage(userMsg)
+    addMessage(aiMsg)
     setInput('')
     setLoading(true)
 
@@ -232,19 +256,19 @@ export default function ChatPage() {
     abortRef.current = new AbortController()
     try {
       await streamChat(history, chunk => {
-        setMessages(prev => prev.map(m => m.id === aiId ? { ...m, content: m.content + chunk } : m))
+        appendToMessage(aiId, chunk)
       }, abortRef.current.signal)
     } catch (err: any) {
       if (err.name === 'AbortError') return
-      setMessages(prev => prev.map(m => m.id === aiId
-        ? { ...m, content: err.message || 'Something went wrong. Please try again.', error: true }
-        : m
-      ))
+      updateMessage(aiId, {
+        content: err.message || 'Something went wrong. Please try again.',
+        error: true,
+      })
     } finally {
       setLoading(false)
       abortRef.current = null
     }
-  }, [input, loading, messages, groqStatus.ok])
+  }, [input, loading, messages, groqStatus.ok, addMessage, appendToMessage, updateMessage, setInput])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() }
@@ -252,7 +276,7 @@ export default function ChatPage() {
 
   const clearChat = () => {
     abortRef.current?.abort()
-    setMessages([])
+    clearChatStore()
     setLoading(false)
   }
 
@@ -270,7 +294,7 @@ export default function ChatPage() {
             <span className="material-symbols-outlined text-2xl">smart_toy</span>
           </div>
           <div>
-            <h1 className="font-extrabold text-base tracking-tight leading-tight">MilkGuard AI Assistant</h1>
+            <h1 className="font-extrabold text-base tracking-tight leading-tight">{t('assistant_title', 'MilkGuard AI Assistant')}</h1>
             <p className="text-xs text-[#c4e7ff] font-medium mt-0.5">
               {isChecking
                 ? '● Connecting to Groq…'
@@ -278,7 +302,7 @@ export default function ChatPage() {
                 ? '● Setup Required'
                 : loading
                 ? '● Computing spectral response…'
-                : `● Online · Groq AI Analyst`}
+                : `● ${t('analyst_online', 'Online · Groq AI Analyst')}`}
             </p>
           </div>
         </div>
@@ -300,9 +324,14 @@ export default function ChatPage() {
               {groqStatus.model?.split('/').pop() || 'Groq AI'}
             </span>
           )}
-          {messages.length > 0 && !isDisabled && (
-            <button onClick={clearChat} className="p-2 hover:bg-white/20 rounded-full transition-colors text-white/80 hover:text-white" title="Clear chat">
-              <Trash2 size={16} />
+          {hasHydrated && messages.length > 0 && !isDisabled && (
+            <button
+              onClick={clearChat}
+              className="px-2.5 py-1 hover:bg-white/20 rounded-lg transition-colors text-white/90 hover:text-white flex items-center gap-1.5 text-xs font-semibold border border-white/20"
+              title="Clear chat history"
+            >
+              <Trash2 size={13} />
+              <span className="hidden sm:inline">{t('clear_chat', 'Clear Chat')}</span>
             </button>
           )}
         </div>
@@ -332,7 +361,7 @@ export default function ChatPage() {
             className="flex flex-col items-center justify-center h-full pb-10 text-center"
           >
             <Loader2 size={32} className="animate-spin text-[#00668a] mb-3" />
-            <p className="text-xs text-[#3e484f] font-semibold uppercase tracking-wider">Connecting to AI Analyst Engine...</p>
+            <p className="text-xs text-[#3e484f] font-semibold uppercase tracking-wider">{t('connecting_analyst', 'Connecting to AI Analyst Engine...')}</p>
           </motion.div>
         )}
 
@@ -347,9 +376,9 @@ export default function ChatPage() {
               <WifiOff size={28} />
             </div>
             <div>
-              <p className="font-extrabold text-[#001d36] text-base mb-1">AI Service Disconnected</p>
+              <p className="font-extrabold text-[#001d36] text-base mb-1">{t('ai_disconnected', 'AI Service Disconnected')}</p>
               <p className="text-[#3e484f] text-xs max-w-xs leading-relaxed">
-                Provide your Groq API key to unlock instant milk safety analysis and spectral breakdown explanations.
+                {t('ai_disconnected_desc', 'Provide your Groq API key to unlock instant milk safety analysis and spectral breakdown explanations.')}
               </p>
             </div>
             <button
@@ -357,13 +386,13 @@ export default function ChatPage() {
               className="flex items-center gap-2 px-5 py-2.5 bg-[#00668a] text-white rounded-xl font-bold text-xs hover:bg-[#004c69] transition-colors shadow-sm"
             >
               <Sparkles size={14} className="text-[#30c5b3]" />
-              Open Setup Guide
+              {t('open_setup_guide', 'Open Setup Guide')}
             </button>
           </motion.div>
         )}
 
         {/* Normal empty state */}
-        {!isChecking && !isDisabled && messages.length === 0 && (
+        {!isChecking && !isDisabled && hasHydrated && messages.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -372,9 +401,9 @@ export default function ChatPage() {
             <div className="w-14 h-14 bg-[#e5efff] rounded-2xl flex items-center justify-center mb-3 text-[#00668a]">
               <span className="material-symbols-outlined text-3xl">psychology</span>
             </div>
-            <h2 className="font-extrabold text-[#001d36] text-xl tracking-tight mb-1">Ask MilkGuard AI Analyst</h2>
+            <h2 className="font-extrabold text-[#001d36] text-xl tracking-tight mb-1">{t('ask_analyst', 'Ask MilkGuard AI Analyst')}</h2>
             <p className="text-[#3e484f] text-xs max-w-sm leading-relaxed mb-6">
-              Get instant scientific explanations about your milk purity tests, adulterants, FSSAI regulatory standards, or health risks.
+              {t('analyst_desc', 'Get instant scientific explanations about your milk purity tests, adulterants, FSSAI regulatory standards, or health risks.')}
             </p>
 
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
@@ -397,7 +426,7 @@ export default function ChatPage() {
               key={msg.id}
               msg={msg}
               onRetry={msg.error && lastUserMsg
-                ? () => { setMessages(p => p.filter(m => m.id !== msg.id)); sendMessage(lastUserMsg.content) }
+                ? () => { removeMessage(msg.id); sendMessage(lastUserMsg.content) }
                 : undefined
               }
             />
@@ -424,7 +453,7 @@ export default function ChatPage() {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isChecking ? 'Connecting…' : 'Ask about your test result or milk safety standards...'}
+              placeholder={isChecking ? 'Connecting…' : t('chat_input_ph', 'Ask about your test result or milk safety standards...')}
               disabled={loading || isChecking || isDisabled}
               className="flex-1 resize-none bg-transparent text-xs text-[#001d36] placeholder:text-[#6e7980] focus:outline-none disabled:opacity-40 leading-relaxed font-semibold"
             />

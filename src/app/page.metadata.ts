@@ -268,29 +268,7 @@ export const hardwareMetadata: Metadata = {
   },
 }
 
-// =============================================================================
-// LEARN PAGE (/learn)
-// =============================================================================
-export const learnMetadata: Metadata = {
-  title: 'Learn | Milk Safety Education & Resources',
-  description:
-    'Educational resources about milk safety, adulteration types, health impacts, and FSSAI regulations. Learn about common adulterants and how to protect your family.',
-  keywords: [
-    'milk safety education',
-    'adulteration types',
-    'FSSAI regulations',
-    'milk health impacts',
-    'food safety resources',
-  ].join(', '),
-  openGraph: {
-    title: 'Learn | Milk Safety Education',
-    description: 'Educational resources about milk adulteration and food safety.',
-    url: `${siteUrl}/learn`,
-  },
-  alternates: {
-    canonical: `${siteUrl}/learn`,
-  },
-}
+
 
 // =============================================================================
 // MAP PAGE (/map)

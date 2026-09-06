@@ -5,8 +5,11 @@ import { LogOut, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { signOut } from "@/lib/supabase/authUtils"
 
+import { useTranslation } from "@/lib/i18n/useTranslation"
+
 export function SignOutButton() {
   const [isSigningOut, setIsSigningOut] = useState(false)
+  const { t } = useTranslation()
 
   async function handleSignOut() {
     if (isSigningOut) return
@@ -32,12 +35,12 @@ export function SignOutButton() {
       {isSigningOut ? (
         <>
           <Loader2 size={18} className="animate-spin" />
-          <span>SIGNING OUT...</span>
+          <span>{t('signing_out', 'SIGNING OUT...')}</span>
         </>
       ) : (
         <>
           <LogOut size={18} />
-          <span>SIGN OUT</span>
+          <span>{t('sign_out', 'SIGN OUT')}</span>
         </>
       )}
     </Button>

@@ -59,7 +59,6 @@ const routes: RouteConfig[] = [
   { path: '/about', priority: 0.7, changeFrequency: 'monthly', includeInSitemap: true },
   { path: '/how-it-works', priority: 0.7, changeFrequency: 'monthly', includeInSitemap: true },
   { path: '/faq', priority: 0.7, changeFrequency: 'monthly', includeInSitemap: true },
-  { path: '/learn', priority: 0.7, changeFrequency: 'weekly', includeInSitemap: true },
   { path: '/map', priority: 0.7, changeFrequency: 'weekly', includeInSitemap: true },
   { path: '/chat', priority: 0.7, changeFrequency: 'weekly', includeInSitemap: true },
   { path: '/profile', priority: 0.6, changeFrequency: 'weekly', includeInSitemap: true },
