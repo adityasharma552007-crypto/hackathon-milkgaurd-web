@@ -17,6 +17,7 @@ import {
 import Link from "next/link"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { Breadcrumbs } from "@/components/common/Breadcrumbs"
 
 import SpectralChart from "@/components/SpectralChart"
 import FSSAIReportModal from "@/components/FSSAIReportModal"
@@ -156,6 +157,14 @@ export default async function ScanResultPage({
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Scan History', href: '/history' },
+          { label: displayScanId, href: `/history/${scan.id}` }
+        ]}
+      />
+
       {/* Top Banner */}
       <div className={cn("p-8 rounded-3xl relative overflow-hidden ambient-shadow text-center", tierBanners[scan.result_tier as keyof typeof tierBanners])}>
         <div className="relative z-10 space-y-4">

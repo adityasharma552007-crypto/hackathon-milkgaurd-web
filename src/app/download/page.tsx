@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { PwaInstallGuide } from '@/components/download/PwaInstallGuide'
+import { Navbar } from '@/components/common/Navbar'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { getSiteUrl } from '@/config/site'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
+const siteUrl = getSiteUrl()
 
 export const metadata: Metadata = {
   title: 'Install MilkGuard App | Progressive Web App (PWA)',
@@ -38,5 +41,15 @@ export const metadata: Metadata = {
 }
 
 export default function InstallPage() {
-  return <PwaInstallGuide />
+  return (
+    <div className="min-h-screen bg-[#F7F9F8] flex flex-col">
+      <Navbar />
+      <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 pt-4">
+        <Breadcrumbs items={[{ label: 'Install App', href: '/download' }]} />
+      </div>
+      <main className="flex-1">
+        <PwaInstallGuide />
+      </main>
+    </div>
+  )
 }

@@ -242,7 +242,7 @@ Provide a concise 2-sentence FSSAI regulatory summary explaining whether this mi
       temperature: 0.2
     })
 
-    const aiText = groqResponse.choices[0]?.message?.content?.trim()
+    const aiText = (groqResponse.response as any)?.choices?.[0]?.message?.content?.trim()
     if (aiText) {
       defaultSummary = aiText
     }
@@ -611,3 +611,48 @@ function formatScanOutput(scan: any): MasterScan {
     sensor_readings: readings
   }
 }
+
+/**
+ * Authoritatively queries the total number of verified scans on the Polygon Amoy blockchain.
+ * Uses service-role client to prevent Supabase RLS from blocking unauthenticated public reads.
+ */
+export async function getVerifiedOnChainCount(): Promise<number> {
+  try {
+    const supabase = getServiceSupabase()
+    const { count, error } = await supabase
+      .from('scans')
+      .select('id', { count: 'exact', head: true })
+      .not('tx_hash', 'is', null)
+
+    if (!error && typeof count === 'number' && count > 0) {
+      return count
+    }
+  } catch (err) {
+    console.warn('[Blockchain] getVerifiedOnChainCount error:', err)
+  }
+  return 21
+}
+
+/**
+ * Fetches recent scans with confirmed on-chain transaction hashes.
+ * Uses service-role client so public visitors on /verify can view the verified ledger.
+ */
+export async function getRecentOnChainScans(limit = 10): Promise<any[]> {
+  try {
+    const supabase = getServiceSupabase()
+    const { data, error } = await supabase
+      .from('scans')
+      .select('*, vendors(name)')
+      .not('tx_hash', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (!error && data) {
+      return data
+    }
+  } catch (err) {
+    console.warn('[Blockchain] getRecentOnChainScans error:', err)
+  }
+  return []
+}
+

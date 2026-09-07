@@ -14,7 +14,7 @@ export const createClient = () => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       global: {
-        fetch: (url, options) => {
+        fetch: (url: RequestInfo | URL, options?: RequestInit) => {
           const controller = new AbortController()
           const timer = setTimeout(() => controller.abort(), 10000)
           return fetch(url, {

@@ -1,4 +1,8 @@
 import Groq from 'groq-sdk'
+import type {
+  ChatCompletionCreateParamsNonStreaming,
+  ChatCompletionCreateParamsStreaming,
+} from 'groq-sdk/resources/chat/completions'
 
 export const GROQ_MODELS = [
   process.env.GROQ_MODEL,
@@ -21,7 +25,7 @@ export function getGroqClient(apiKey?: string) {
  * Executes a chat completion with automatic fallback across available Groq models
  */
 export async function runGroqChatCompletion(
-  params: Omit<Groq.Chat.ChatCompletionCreateParamsNonStreaming, 'model'> & { model?: string },
+  params: Omit<ChatCompletionCreateParamsNonStreaming, 'model' | 'stream'> & { model?: string },
   apiKey?: string
 ) {
   const groq = getGroqClient(apiKey)
@@ -52,7 +56,7 @@ export async function runGroqChatCompletion(
  * Creates a streaming chat completion with automatic fallback across available Groq models
  */
 export async function runGroqChatStream(
-  params: Omit<Groq.Chat.ChatCompletionCreateParamsStreaming, 'model'> & { model?: string },
+  params: Omit<ChatCompletionCreateParamsStreaming, 'model' | 'stream'> & { model?: string },
   apiKey?: string
 ) {
   const groq = getGroqClient(apiKey)

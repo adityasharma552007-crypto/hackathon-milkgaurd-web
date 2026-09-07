@@ -26,12 +26,12 @@
  */
 
 import { MetadataRoute } from 'next'
+import { getSiteUrl } from '@/config/site'
 
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
-// TODO: Replace with your production domain
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
+const siteUrl = getSiteUrl()
 
 // =============================================================================
 // ROUTE CONFIGURATION

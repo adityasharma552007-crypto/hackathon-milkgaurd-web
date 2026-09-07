@@ -8,8 +8,9 @@
  */
 
 import { Metadata } from 'next'
+import { getSiteUrl } from '@/config/site'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
+const siteUrl = getSiteUrl()
 
 // =============================================================================
 // HOME PAGE (/)

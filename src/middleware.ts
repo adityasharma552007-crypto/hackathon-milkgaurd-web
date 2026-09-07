@@ -2,13 +2,15 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers)
+  const { pathname } = request.nextUrl
+  requestHeaders.set('x-pathname', pathname)
+
   let response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   })
-
-  const { pathname } = request.nextUrl
 
   // 1. Never intercept OAuth callback handler — let the route handler exchange the code
   if (pathname.startsWith('/auth/callback')) {
@@ -44,7 +46,7 @@ export async function middleware(request: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
           global: {
-            fetch: (url, options) => {
+            fetch: (url: RequestInfo | URL, options?: RequestInit) => {
               const controller = new AbortController()
               const timer = setTimeout(() => controller.abort(), 8000)
               return fetch(url, {
@@ -61,14 +63,14 @@ export async function middleware(request: NextRequest) {
             set(name: string, value: string, options: CookieOptions) {
               request.cookies.set({ name, value, ...options })
               response = NextResponse.next({
-                request: { headers: request.headers },
+                request: { headers: requestHeaders },
               })
               response.cookies.set({ name, value, ...options })
             },
             remove(name: string, options: CookieOptions) {
               request.cookies.set({ name, value: '', ...options })
               response = NextResponse.next({
-                request: { headers: request.headers },
+                request: { headers: requestHeaders },
               })
               response.cookies.set({ name, value: '', ...options })
             },
@@ -112,7 +114,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. Protected dashboard routes — redirect to login if not authenticated
-  const protectedPaths = ['/home', '/scan', '/chat', '/map', '/history', '/profile', '/insights', '/verify', '/hardware']
+  // /scan, /hardware, and /verify are accessible in Guest Demo Mode & public ledger
+  const isGuestAllowedRoute = pathname.startsWith('/scan') || pathname.startsWith('/hardware') || pathname.startsWith('/verify')
+  if (isGuestAllowedRoute && !user) {
+    requestHeaders.set('x-demo-user', 'true')
+    const guestResponse = NextResponse.next({
+      request: { headers: requestHeaders },
+    })
+    guestResponse.cookies.set('mg_demo_session', 'true', { path: '/', maxAge: 86400, httpOnly: false })
+    return guestResponse
+  }
+
+  const protectedPaths = ['/home', '/chat', '/map', '/history', '/profile', '/insights']
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
   if (isProtected && !user) {
     const redirectRes = NextResponse.redirect(new URL('/auth/login', request.url))

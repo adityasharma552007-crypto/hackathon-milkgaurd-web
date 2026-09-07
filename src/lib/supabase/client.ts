@@ -18,7 +18,7 @@ export const createClient = () => {
       {
         cookies: {},
         global: {
-          fetch: (url, options) => {
+          fetch: (url: RequestInfo | URL, options?: RequestInit) => {
             const controller = new AbortController()
             const timer = setTimeout(() => controller.abort(), 10000)
             return fetch(url, {

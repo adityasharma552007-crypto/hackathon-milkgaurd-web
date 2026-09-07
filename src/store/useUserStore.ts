@@ -11,6 +11,7 @@ export type Profile = {
   total_scans: number
   safe_scans: number
   created_at: string
+  avatar_url?: string | null
 }
 
 interface UserState {

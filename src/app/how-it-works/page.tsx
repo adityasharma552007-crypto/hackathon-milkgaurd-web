@@ -13,6 +13,8 @@ import { PageTitle, PageSubtitle } from '@/components/seo/PageTitle'
 import { SEOParagraph } from '@/components/seo/MetaDescription'
 import { generateHowToJsonLd } from '@/components/seo/SEOHead'
 import { Zap, Shield, Activity, Cpu, Droplets, BarChart3 } from 'lucide-react'
+import { Navbar } from '@/components/common/Navbar'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 
 export const metadata: Metadata = howItWorksMetadata
 
@@ -43,7 +45,13 @@ export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] pb-24">
-      <div className="max-w-md mx-auto bg-white shadow-xl">
+      <Navbar />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-4">
+        <Breadcrumbs items={[{ label: 'How It Works', href: '/how-it-works' }]} />
+      </div>
+
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-3xl overflow-hidden my-4 border border-slate-100">
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -51,7 +59,7 @@ export default function HowItWorksPage() {
         />
 
         {/* ── HERO SECTION ────────────────────────────────────────────────── */}
-        <header className="bg-gradient-to-b from-[#1A6B4A] to-[#134f37] text-white py-12 px-6">
+        <header className="bg-gradient-to-b from-[#1A6B4A] to-[#134f37] text-white py-12 px-6 sm:px-10">
           <PageTitle as="h1" className="text-white mb-2">How MilkGuard Works</PageTitle>
           <PageSubtitle className="text-green-200">
             NIR Spectral Analysis + AI Detection

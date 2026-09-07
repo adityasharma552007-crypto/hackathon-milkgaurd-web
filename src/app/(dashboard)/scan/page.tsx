@@ -91,8 +91,10 @@ export default function ScanPage() {
     return () => clearInterval(interval)
   }, [isScanning, progress])
 
+  const isGuest = !user || user.id === 'demo-user-123' || (typeof document !== 'undefined' && document.cookie.includes('mg_demo_session=true'))
+
   const handleStartScan = async () => {
-    if (!user) return
+    const scanUserId = user?.id || 'demo-user-123'
 
     // Track conversion event for Google Analytics
     trackTestInitiation('hardware')
@@ -110,7 +112,7 @@ export default function ScanPage() {
     setTimeout(async () => {
       setStatus('analyzing')
       try {
-        const result = await runScan({ userId: user.id })
+        const result = await runScan({ userId: scanUserId })
         if (result.success) {
           blockchainPromiseRef.current = recordScanOnChain(
             result.scanId,
@@ -147,6 +149,33 @@ export default function ScanPage() {
       {/* Background Radial Glow */}
       <div className="absolute -top-24 -left-24 w-80 h-80 bg-[#38bdf8]/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-[#30c5b3]/15 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Guest Demo Mode Notification Banner */}
+      {isGuest && (
+        <div className="w-full z-30 mb-3 p-3 bg-gradient-to-r from-[#e5efff] via-[#c4e7ff]/60 to-[#e5efff] border border-[#38bdf8]/40 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-[#00668a] text-white flex items-center justify-center shrink-0">
+              <Sparkles size={16} className="text-[#30c5b3]" />
+            </div>
+            <div>
+              <p className="text-xs font-black text-[#001d36] flex items-center gap-1.5">
+                <span>Guest Demo Mode</span>
+                <span className="px-1.5 py-0.5 rounded bg-[#30c5b3] text-[9px] text-[#004d44] uppercase font-extrabold tracking-wider">Active</span>
+              </p>
+              <p className="text-[11px] text-[#3e484f] font-medium">
+                Testing MilkGuard with live 14-signal optical simulation. No sign-in required!
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/auth/signup"
+            className="shrink-0 px-3.5 py-1.5 rounded-xl bg-[#00668a] hover:bg-[#004c69] text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1"
+          >
+            <span>Sign Up Free</span>
+            <ChevronRight size={12} />
+          </Link>
+        </div>
+      )}
 
       {/* Legacy Prototype Modal */}
       <PrototypeScannerModal isOpen={showPrototypeModal} onClose={() => setShowPrototypeModal(false)} />

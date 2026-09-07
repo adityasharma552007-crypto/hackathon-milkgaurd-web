@@ -33,6 +33,8 @@ interface SEOHeadProps {
  * Generate metadata object for a specific page
  * Use this in your page's export const metadata
  */
+import { getSiteUrl } from '@/config/site'
+
 export function generatePageMetadata({
   title,
   description,
@@ -41,7 +43,7 @@ export function generatePageMetadata({
   keywords,
   noIndex = false,
 }: SEOHeadProps): Metadata {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app'
+  const siteUrl = getSiteUrl()
   const fullCanonicalUrl = canonicalUrl || siteUrl
 
   return {

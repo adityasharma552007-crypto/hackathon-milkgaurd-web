@@ -13,6 +13,8 @@ import { generateFAQJsonLd } from '@/components/seo/SEOHead'
 import { PageTitle, PageSubtitle } from '@/components/seo/PageTitle'
 import { SEOParagraph } from '@/components/seo/MetaDescription'
 import { HelpCircle, ChevronDown } from 'lucide-react'
+import { Navbar } from '@/components/common/Navbar'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 
 export const metadata: Metadata = faqMetadata
 
@@ -74,7 +76,13 @@ export default function FAQPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] pb-24">
-      <div className="max-w-md mx-auto bg-white shadow-xl">
+      <Navbar />
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-4">
+        <Breadcrumbs items={[{ label: 'FAQ', href: '/faq' }]} />
+      </div>
+
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-3xl overflow-hidden my-4 border border-slate-100">
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -82,7 +90,7 @@ export default function FAQPage() {
         />
 
         {/* ── HERO SECTION ────────────────────────────────────────────────── */}
-        <header className="bg-gradient-to-b from-[#60A5FA] to-[#3B82F6] text-white py-12 px-6">
+        <header className="bg-gradient-to-b from-[#60A5FA] to-[#3B82F6] text-white py-12 px-6 sm:px-10">
           <PageTitle as="h1" className="text-white mb-2">
             Frequently Asked Questions
           </PageTitle>

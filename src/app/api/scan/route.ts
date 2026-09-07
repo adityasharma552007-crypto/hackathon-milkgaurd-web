@@ -254,12 +254,17 @@ export async function POST(req: NextRequest) {
     const blockchainTxHash = `0x${crypto.randomBytes(32).toString('hex')}`
     const verifiedAt = new Date().toISOString()
 
+    const isUuid = (val: any) => typeof val === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val)
+    const validUserId = activeUserId && isUuid(activeUserId) ? activeUserId : null
+    const validVendorId = vendorId && isUuid(vendorId) ? vendorId : null
+    const validDeviceId = isUuid(device?.id) && device.id !== '00000000-0000-0000-0000-000000000001' ? device.id : null
+
     // Insert scan with master architecture columns + backwards compatibility
     const insertPayload: any = {
       scan_id: scanId,
-      user_id: activeUserId,
-      vendor_id: vendorId || null,
-      device_id: device.id !== '00000000-0000-0000-0000-000000000001' ? device.id : null,
+      user_id: validUserId,
+      vendor_id: validVendorId,
+      device_id: validDeviceId,
       status: 'completed',
       analysis_result: analysisResult,
       analysis_confidence: aiConfidence,
@@ -275,7 +280,7 @@ export async function POST(req: NextRequest) {
       wavelength_data: wavelengthAnalysis,
       baseline_data: BASELINE,
       tx_hash: blockchainTxHash,
-      source_hardware_id: 'MG-DEVICE-001'
+      source_hardware_id: null
     }
 
     let scan: any = null
@@ -292,8 +297,8 @@ export async function POST(req: NextRequest) {
       const { data: fallbackScan, error: fallbackErr } = await supabaseService
         .from('scans')
         .insert({
-          user_id: activeUserId,
-          vendor_id: vendorId || null,
+          user_id: validUserId,
+          vendor_id: validVendorId,
           safety_score: safetyScore,
           result_tier: resultTier,
           ai_confidence: aiConfidence,
@@ -301,7 +306,7 @@ export async function POST(req: NextRequest) {
           wavelength_data: wavelengthAnalysis,
           baseline_data: BASELINE,
           tx_hash: blockchainTxHash,
-          source_hardware_id: 'MG-DEVICE-001'
+          source_hardware_id: null
         })
         .select()
         .single()
@@ -313,44 +318,58 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert exact 14 sensor readings into sensor_readings
-    await supabaseService.from('sensor_readings').insert({
-      scan_id: scan.id,
-      signal_01: wavelengths[0],
-      signal_02: wavelengths[1],
-      signal_03: wavelengths[2],
-      signal_04: wavelengths[3],
-      signal_05: wavelengths[4],
-      signal_06: wavelengths[5],
-      signal_07: wavelengths[6],
-      signal_08: wavelengths[7],
-      signal_09: wavelengths[8],
-      signal_10: wavelengths[9],
-      signal_11: wavelengths[10],
-      signal_12: wavelengths[11],
-      signal_13: wavelengths[12],
-      signal_14: wavelengths[13]
-    }).catch(() => {})
+    try {
+      await supabaseService.from('sensor_readings').insert({
+        scan_id: scan.id,
+        signal_01: wavelengths[0],
+        signal_02: wavelengths[1],
+        signal_03: wavelengths[2],
+        signal_04: wavelengths[3],
+        signal_05: wavelengths[4],
+        signal_06: wavelengths[5],
+        signal_07: wavelengths[6],
+        signal_08: wavelengths[7],
+        signal_09: wavelengths[8],
+        signal_10: wavelengths[9],
+        signal_11: wavelengths[10],
+        signal_12: wavelengths[11],
+        signal_13: wavelengths[12],
+        signal_14: wavelengths[13]
+      })
+    } catch {
+      // Non-blocking auxiliary insert
+    }
 
     // Insert adulterants
     if (adulterants?.length > 0) {
-      const adulterantRows = adulterants.map(a => ({
-        scan_id: scan.id,
-        name: a.name,
-        detected_value: a.detectedValue,
-        safe_limit: a.safeLimit,
-        unit: a.unit,
-        status: a.status,
-        quantity_500ml: a.quantity500ml,
-        analogy: a.analogy
-      }))
-      await supabaseService.from('adulterant_results').insert(adulterantRows).catch(() => {})
+      try {
+        const adulterantRows = adulterants.map(a => ({
+          scan_id: scan.id,
+          name: a.name,
+          detected_value: a.detectedValue,
+          safe_limit: a.safeLimit,
+          unit: a.unit,
+          status: a.status,
+          quantity_500ml: a.quantity500ml,
+          analogy: a.analogy
+        }))
+        await supabaseService.from('adulterant_results').insert(adulterantRows)
+      } catch {
+        // Non-blocking auxiliary insert
+      }
     }
 
     // Increment user stats RPC
-    await supabaseService.rpc('increment_user_scans', {
-      p_user_id: activeUserId,
-      p_is_safe: safetyScore >= 85
-    }).catch(() => {})
+    if (validUserId) {
+      try {
+        await supabaseService.rpc('increment_user_scans', {
+          p_user_id: validUserId,
+          p_is_safe: safetyScore >= 85
+        })
+      } catch {
+        // Non-blocking RPC
+      }
+    }
 
     return NextResponse.json({
       success: true,

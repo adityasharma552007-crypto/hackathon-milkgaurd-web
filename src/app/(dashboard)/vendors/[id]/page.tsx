@@ -87,7 +87,7 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
       {/* Header */}
       <header className="p-6 pb-4 pt-12 flex items-center justify-between sticky top-0 bg-[#F7F9F8]/80 backdrop-blur-md z-10">
         <div className="flex items-center gap-4">
-          <Link href="javascript:history.back()" className="p-2 bg-white rounded-full shadow-sm hover:scale-105 transition-transform">
+          <Link href="/map" aria-label="Back to Map" className="p-2 bg-white rounded-full shadow-sm hover:scale-105 transition-transform">
             <ChevronLeft size={20} className="text-slate-600" />
           </Link>
           <div>

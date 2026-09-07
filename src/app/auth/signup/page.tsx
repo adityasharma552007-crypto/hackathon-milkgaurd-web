@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Shield, Eye, EyeOff, Loader2, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
+import { Shield, Eye, EyeOff, Loader2, ArrowLeft, Mail, CheckCircle2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
@@ -295,6 +295,16 @@ export default function SignupPage() {
                   Sign in
                 </Link>
               </p>
+
+              <div className="pt-2 text-center">
+                <Link
+                  href="/scan"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00668a] hover:text-[#004c69] transition-colors"
+                >
+                  <Sparkles size={14} className="text-[#30c5b3]" />
+                  <span>Or try instant Guest Demo Mode for /scan</span>
+                </Link>
+              </div>
             </form>
           )}
         </CardContent>

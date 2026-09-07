@@ -30,11 +30,15 @@ import {
   Radio,
   BarChart3,
   Terminal,
+  BookOpen,
+  Cable,
+  Box,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useBleHardwareStore } from '@/store/useBleHardwareStore'
 import { SPECTROSCOPY_CHANNELS } from '@/lib/hardware/hardwareTypes'
 import { Button } from '@/components/ui/button'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 
 export default function HardwareScanPage() {
   const {
@@ -57,7 +61,7 @@ export default function HardwareScanPage() {
     resetScan,
   } = useBleHardwareStore()
 
-  const [activeTab, setActiveTab] = useState<'scan' | 'telemetry' | 'firmware'>('scan')
+  const [activeTab, setActiveTab] = useState<'docs' | 'scan' | 'telemetry' | 'firmware'>('docs')
   const [copiedCode, setCopiedCode] = useState(false)
   const [showRawPayload, setShowRawPayload] = useState(false)
 
@@ -89,18 +93,19 @@ export default function HardwareScanPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f9ff] text-[#001d36] pb-24 md:pb-12 max-w-4xl mx-auto px-4 md:px-6">
-      
+      <Breadcrumbs items={[{ label: 'Hardware Documentation & Connectivity', href: '/hardware', current: true }]} className="pt-4" />
+
       {/* ── Top Header & Title ── */}
-      <div className="pt-6 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#d1e4ff]">
+      <div className="pt-3 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#d1e4ff]">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-gradient-to-br from-[#00668a] to-[#004c69] text-white shadow-sm">
               <Cpu size={20} />
             </span>
             <div>
-              <h1 className="text-2xl font-black text-[#001d36] tracking-tight">Scan from Hardware</h1>
+              <h1 className="text-2xl font-black text-[#001d36] tracking-tight">Hardware Documentation & Scanner</h1>
               <p className="text-xs font-semibold text-[#51666d]">
-                ESP32 Multispectral Sensor Pod · Bluetooth Low Energy (V1)
+                ESP32 Multispectral Sensor Pod · 14 Optical Channels · Bluetooth Low Energy V1
               </p>
             </div>
           </div>
@@ -142,16 +147,17 @@ export default function HardwareScanPage() {
       </div>
 
       {/* ── Mode Navigation Tabs ── */}
-      <div className="flex gap-2 mt-4 bg-white p-1 rounded-2xl border border-[#d1e4ff] ambient-shadow">
+      <div className="flex gap-2 mt-4 bg-white p-1 rounded-2xl border border-[#d1e4ff] ambient-shadow overflow-x-auto">
         {[
-          { id: 'scan', label: 'Hardware Workflow', icon: Radio },
+          { id: 'docs', label: 'Architecture & Specs', icon: BookOpen },
+          { id: 'scan', label: 'BLE Workflow & Scan', icon: Radio },
           { id: 'telemetry', label: '14-Signal Telemetry', icon: BarChart3 },
           { id: 'firmware', label: 'ESP32 Firmware Code', icon: Code2 },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
               activeTab === tab.id
                 ? 'bg-[#00668a] text-white shadow-sm'
                 : 'text-[#51666d] hover:bg-[#e5efff]/60'
@@ -224,6 +230,166 @@ export default function HardwareScanPage() {
             Dismiss
           </button>
         </motion.div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/* ── TAB 0: HARDWARE DOCUMENTATION & SYSTEM ARCHITECTURE ── */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {activeTab === 'docs' && (
+        <div className="mt-5 space-y-6">
+          {/* Architecture Hero Card */}
+          <div className="bg-white rounded-3xl p-6 md:p-8 border border-[#d1e4ff] ambient-shadow space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#e5efff] text-[#00668a] text-xs font-bold">
+              <Cpu size={14} />
+              <span>MilkGuard Pod V1 Hardware Architecture</span>
+            </div>
+            <h2 className="text-xl md:text-2xl font-black text-[#001d36] tracking-tight">
+              Contactless Near-Infrared (NIR) Spectroscopy Architecture
+            </h2>
+            <p className="text-xs md:text-sm text-[#3e484f] leading-relaxed font-medium">
+              The MilkGuard physical hardware prototype is a standalone, battery-powered optical sensing pod. It integrates an <strong>ESP32 microcontroller</strong> with an <strong>AS7265x tri-spectral sensor array</strong> (410nm to 940nm across 18 distinct optical bands, calibrated down to 14 active milk absorption channels).
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div className="p-4 rounded-2xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1.5">
+                <div className="w-8 h-8 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                  <span className="material-symbols-outlined text-lg">microchip</span>
+                </div>
+                <h3 className="text-xs font-extrabold text-[#001d36]">ESP32 Controller</h3>
+                <p className="text-[11px] text-[#51666d]">Dual-core 240MHz MCU with Bluetooth 5.0 Low Energy GATT telemetry.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1.5">
+                <div className="w-8 h-8 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                  <span className="material-symbols-outlined text-lg">biotech</span>
+                </div>
+                <h3 className="text-xs font-extrabold text-[#001d36]">AS7265x Tri-Spectra</h3>
+                <p className="text-[11px] text-[#51666d]">18 optical wavelengths with 16-bit ADC resolving chemical absorbance.</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1.5">
+                <div className="w-8 h-8 rounded-xl bg-[#e5efff] text-[#00668a] flex items-center justify-center font-bold">
+                  <span className="material-symbols-outlined text-lg">view_in_ar</span>
+                </div>
+                <h3 className="text-xs font-extrabold text-[#001d36]">Dark-Chamber Cradle</h3>
+                <p className="text-[11px] text-[#51666d]">3D-printable 10mm optical path cuvette holder preventing ambient light bleed.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 14 Spectral Channels Table */}
+          <div className="bg-white rounded-3xl p-6 border border-[#d1e4ff] ambient-shadow space-y-4">
+            <div>
+              <h3 className="text-base font-black text-[#001d36]">14-Channel Spectroscopy Calibration Matrix</h3>
+              <p className="text-xs text-[#51666d]">How each calibrated wavelength detects adulteration in cow and buffalo milk.</p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="border-b border-[#d1e4ff] bg-[#f8f9ff]">
+                    <th className="py-2.5 px-3 font-extrabold text-[#001d36]">Channel</th>
+                    <th className="py-2.5 px-3 font-extrabold text-[#001d36]">Wavelength</th>
+                    <th className="py-2.5 px-3 font-extrabold text-[#001d36]">Spectral Region</th>
+                    <th className="py-2.5 px-3 font-extrabold text-[#001d36]">Target Chemical / Adulterant</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f0f4f8]">
+                  {[
+                    { ch: 'Signal 01 - 02', wl: '415 nm - 445 nm', reg: 'Visible (Violet/Blue)', target: 'Natural riboflavin (Vit B2) baseline & synthetic coloring dyes' },
+                    { ch: 'Signal 03 - 04', wl: '480 nm - 515 nm', reg: 'Visible (Cyan/Green)', target: 'Detergent surfactant emulsification & soap foam contaminants' },
+                    { ch: 'Signal 05 - 06', wl: '555 nm - 590 nm', reg: 'Visible (Yellow/Amber)', target: 'Urea nitrogen absorption peak & neutralizer alkaline salts' },
+                    { ch: 'Signal 07 - 08', wl: '630 nm - 680 nm', reg: 'Visible (Red)', target: 'Starch polysaccharide scattering & flour thickening agents' },
+                    { ch: 'Signal 09', wl: '855 nm', reg: 'Near-Infrared (NIR)', target: 'Water addition dilution peak (OH bond vibrational overtone)' },
+                    { ch: 'Signal 10', wl: 'CLEAR', reg: 'Broadband Reference', target: 'Total turbidity, opacity, and milk fat globule scatter' },
+                    { ch: 'Signal 11 - 14', wl: 'Auxiliary (NIR-II)', reg: 'Deep Infrared Bands', target: 'Formalin preservative, maltodextrin, and lipid backbone calibration' },
+                  ].map((row, i) => (
+                    <tr key={i} className="hover:bg-[#f8f9ff]/80 transition-colors">
+                      <td className="py-2.5 px-3 font-mono font-bold text-[#00668a]">{row.ch}</td>
+                      <td className="py-2.5 px-3 font-mono font-semibold text-[#001d36]">{row.wl}</td>
+                      <td className="py-2.5 px-3 text-[#51666d]">{row.reg}</td>
+                      <td className="py-2.5 px-3 font-semibold text-[#001d36]">{row.target}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Schematic & Pinout Specs */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Wiring Pinouts */}
+            <div className="bg-white rounded-3xl p-6 border border-[#d1e4ff] ambient-shadow space-y-3">
+              <h3 className="text-sm font-black text-[#001d36] flex items-center gap-2">
+                <Cable size={16} className="text-[#00668a]" />
+                <span>ESP32 Hardware Pinout (I2C)</span>
+              </h3>
+              <div className="space-y-2 text-xs">
+                {[
+                  { pin: 'ESP32 3V3', conn: 'AS7265x VCC', desc: 'Regulated 3.3V Power' },
+                  { pin: 'ESP32 GND', conn: 'AS7265x GND', desc: 'Common Ground' },
+                  { pin: 'ESP32 GPIO 21', conn: 'AS7265x SDA', desc: 'I2C Serial Data (4.7kΩ pull-up)' },
+                  { pin: 'ESP32 GPIO 22', conn: 'AS7265x SCL', desc: 'I2C Serial Clock (400 kHz Fast)' },
+                  { pin: 'ESP32 GPIO 2', conn: 'Active LED', desc: 'Flashing indicator during test scan' },
+                ].map((p, idx) => (
+                  <div key={idx} className="flex justify-between p-2.5 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff]">
+                    <div>
+                      <span className="font-mono font-bold text-[#00668a]">{p.pin}</span>
+                      <span className="mx-2 text-[#8e9aa0]">→</span>
+                      <span className="font-mono font-bold text-[#001d36]">{p.conn}</span>
+                    </div>
+                    <span className="text-[11px] text-[#51666d]">{p.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Optical Enclosure & Cuvette Specs */}
+            <div className="bg-white rounded-3xl p-6 border border-[#d1e4ff] ambient-shadow space-y-3">
+              <h3 className="text-sm font-black text-[#001d36] flex items-center gap-2">
+                <Box size={16} className="text-[#00668a]" />
+                <span>3D Enclosure & Optics Specs</span>
+              </h3>
+              <div className="space-y-2 text-xs text-[#3e484f]">
+                <div className="p-3 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1">
+                  <p className="font-extrabold text-[#001d36]">Material & Infill</p>
+                  <p className="text-[11px] text-[#51666d]">Matte Black PETG or PLA (100% infill recommended to avoid ambient optical leakage).</p>
+                </div>
+                <div className="p-3 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1">
+                  <p className="font-extrabold text-[#001d36]">Cuvette Cradle Dimensions</p>
+                  <p className="text-[11px] text-[#51666d]">Accommodates standard 12.5mm × 12.5mm × 45mm spectrophotometer cuvettes (optical path: 10mm).</p>
+                </div>
+                <div className="p-3 rounded-xl bg-[#f8f9ff] border border-[#d1e4ff] space-y-1">
+                  <p className="font-extrabold text-[#001d36]">Power System</p>
+                  <p className="text-[11px] text-[#51666d]">3.7V 1200mAh Li-Po battery with onboard TP4056 USB-C charging module. Average consumption: 120mA active, 15mA BLE idle.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Action Navigation Buttons */}
+          <div className="p-5 rounded-2xl bg-gradient-to-r from-[#e5efff] via-[#c4e7ff]/60 to-[#e5efff] border border-[#38bdf8]/40 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+            <div>
+              <p className="text-xs font-black text-[#001d36]">Ready to pair your ESP32 or flash firmware?</p>
+              <p className="text-[11px] text-[#51666d]">Switch tabs to run live Web BLE pairing, inspect telemetry, or copy Arduino code.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setActiveTab('scan')}
+                className="bg-[#00668a] hover:bg-[#004c69] text-white font-bold text-xs rounded-xl h-9 shadow-sm"
+              >
+                Launch BLE Workflow
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('firmware')}
+                className="border-[#00668a] text-[#00668a] hover:bg-[#e5efff] font-bold text-xs rounded-xl h-9 bg-white"
+              >
+                View Source Code
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════════════════════════════ */}

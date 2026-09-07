@@ -135,7 +135,7 @@ async function getSuspiciousIPs(supabase: any, limit: number = 10) {
     .from('rate_limit_config')
     .select('endpoint, limit_count')
 
-  const configMap = new Map(configData?.map((c: any) => [c.endpoint, c.limit_count]) || [])
+  const configMap = new Map<string, number>(configData?.map((c: any) => [c.endpoint, Number(c.limit_count)]) || [])
 
   // Analyze for suspicious activity
   const ipAnalysis = new Map<string, {
@@ -147,7 +147,7 @@ async function getSuspiciousIPs(supabase: any, limit: number = 10) {
   }>()
 
   rateLimitedData.forEach((row: any) => {
-    const limit = configMap.get(row.endpoint) || 10
+    const limit = Number(configMap.get(row.endpoint)) || 10
     const usageRatio = row.request_count / limit
 
     const existing = ipAnalysis.get(row.ip_address)
@@ -208,11 +208,11 @@ async function getRecentViolations(supabase: any, limit: number = 20) {
     .from('rate_limit_config')
     .select('endpoint, limit_count')
 
-  const configMap = new Map(configData?.map((c: any) => [c.endpoint, c.limit_count]) || [])
+  const configMap = new Map<string, number>(configData?.map((c: any) => [c.endpoint, Number(c.limit_count)]) || [])
 
   return data
     .map((row: any) => {
-      const limit = configMap.get(row.endpoint) || 10
+      const limit = Number(configMap.get(row.endpoint)) || 10
       return {
         id: row.id,
         userId: row.user_id,
@@ -226,7 +226,7 @@ async function getRecentViolations(supabase: any, limit: number = 20) {
         isViolating: row.request_count >= limit
       }
     })
-    .filter(row => row.usagePercent >= 50) // Only show entries at 50%+ usage
+    .filter((row: any) => row.usagePercent >= 50) // Only show entries at 50%+ usage
     .slice(0, limit)
 }
 

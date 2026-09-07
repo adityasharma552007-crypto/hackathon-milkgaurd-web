@@ -11,38 +11,42 @@ import { Metadata } from 'next'
 import { aboutMetadata } from '@/app/page.metadata'
 import { PageTitle, PageSubtitle } from '@/components/seo/PageTitle'
 import { SEOParagraph } from '@/components/seo/MetaDescription'
-import { Shield, Zap, Users, Target, Heart, Award, Link2, ShieldCheck } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { Shield, Zap, Users, Target, Heart, Award, Link2, ShieldCheck, ArrowRight } from 'lucide-react'
+import { getVerifiedOnChainCount } from '@/lib/supabase/masterScanService'
+import { getSiteUrl } from '@/config/site'
+import { Navbar } from '@/components/common/Navbar'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import Link from 'next/link'
 
 export const metadata: Metadata = aboutMetadata
 
 // JSON-LD for Organization
+const siteUrl = getSiteUrl()
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'ARJUNAS',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://hackathon-milkgaurd-web.vercel.app',
+  name: 'Team API Avengers',
+  url: siteUrl,
   description: 'Developers building AI-powered food safety solutions for India',
   foundingDate: '2024',
   areaServed: 'IN',
   sameAs: [
-    // TODO: Add your social media links
-    'https://github.com/your-org',
+    'https://github.com/adityasharma552007-crypto/hackathon-milkgaurd-web',
   ],
 }
 
 export default async function AboutPage() {
-  // Fetch total on-chain verified scan count server-side
-  const supabase = createClient()
-  const { count: onChainCount } = await supabase
-    .from('scans')
-    .select('id', { count: 'exact', head: true })
-    .not('tx_hash', 'is', null)
+  // Fetch authoritative verified scan count
+  const totalScans = await getVerifiedOnChainCount()
 
-  const totalScans = onChainCount ?? 0
   return (
-    <div className="min-h-screen bg-[#F7F9F8] pb-24">
-      <div className="max-w-md mx-auto bg-white shadow-xl">
+    <div className="min-h-screen bg-[#f8f9ff] text-[#001d36] pb-24">
+      <Navbar />
+      
+      <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 pb-12">
+        <Breadcrumbs items={[{ label: 'About MilkGuard', href: '/about', current: true }]} className="mb-4" />
+
+        <div className="bg-white rounded-3xl shadow-sm border border-[#d1e4ff] overflow-hidden">
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
@@ -260,6 +264,7 @@ export default async function AboutPage() {
             </a>
           </div>
         </footer>
+        </div>
       </div>
     </div>
   )

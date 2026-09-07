@@ -5,16 +5,14 @@ import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { PwaRegister } from "@/components/pwa/PwaRegister";
 import NextTopLoader from "nextjs-toploader";
+import { getSiteUrl } from "@/config/site";
 
 const inter = Inter({ subsets: ["latin"] });
 
 // =============================================================================
 // SEO METADATA CONFIGURATION
 // =============================================================================
-// TODO: Update NEXT_PUBLIC_SITE_URL in .env.local to your production domain
-// Example: NEXT_PUBLIC_SITE_URL=https://milkguard.vercel.app
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://hackathon-milkgaurd-web.vercel.app";
+const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
