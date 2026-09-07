@@ -13,7 +13,6 @@ import { PageTitle, PageSubtitle } from '@/components/seo/PageTitle'
 import { SEOParagraph } from '@/components/seo/MetaDescription'
 import { generateHowToJsonLd } from '@/components/seo/SEOHead'
 import { Zap, Shield, Activity, Cpu, Droplets, BarChart3 } from 'lucide-react'
-import { Navbar } from '@/components/common/Navbar'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 
 export const metadata: Metadata = howItWorksMetadata
@@ -45,8 +44,6 @@ export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] pb-24">
-      <Navbar />
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-4">
         <Breadcrumbs items={[{ label: 'How It Works', href: '/how-it-works' }]} />
       </div>

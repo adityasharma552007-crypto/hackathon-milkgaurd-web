@@ -1,11 +1,9 @@
 import Link from "next/link"
-import { Navbar } from "@/components/common/Navbar"
 import { ShieldAlert, ArrowLeft, ScanLine, Cpu, Search } from "lucide-react"
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <Navbar />
 
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="max-w-lg w-full bg-white rounded-3xl p-8 sm:p-10 shadow-xl border border-slate-100 text-center relative overflow-hidden">

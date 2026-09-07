@@ -7,8 +7,6 @@ import { Download, ShieldCheck, Zap, Award, ArrowRight, Smartphone, Sparkles, Ch
 import { InstallButton } from '@/components/pwa/InstallButton'
 import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
 
-import { Navbar } from '@/components/common/Navbar'
-
 export default function LandingClient() {
   const router = useRouter()
 
@@ -19,7 +17,30 @@ export default function LandingClient() {
   return (
     <main className="min-h-screen bg-[#f8f9ff] text-[#001d36] font-sans antialiased overflow-x-hidden">
       {/* ── TOP NAV BAR ── */}
-      <Navbar />
+      <header className="sticky top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl border-b border-[#d1e4ff]/60 ambient-shadow">
+        <div className="flex justify-between items-center px-4 md:px-10 h-16 w-full max-w-7xl mx-auto">
+          {/* Logo */}
+          <MilkGuardLogo variant="header" size="sm" linkToHome priority />
+
+          {/* Navigation CTAs */}
+          <div className="flex items-center gap-3">
+            <InstallButton variant="header" />
+            <button
+              onClick={goToLogin}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-[#00668a] hover:bg-[#e5efff] transition-all"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={goToSignup}
+              className="px-5 py-2.5 rounded-xl text-xs font-extrabold text-white bg-[#00668a] hover:bg-[#004c69] shadow-sm transition-all flex items-center gap-1"
+            >
+              <span>Get Started</span>
+              <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+      </header>
 
       {/* ── HERO SECTION ── */}
       <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 px-4 md:px-10 bg-gradient-to-b from-[#f8f9ff] via-[#e5efff]/40 to-[#f8f9ff] overflow-hidden">

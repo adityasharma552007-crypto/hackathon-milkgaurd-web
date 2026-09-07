@@ -14,7 +14,6 @@ import { SEOParagraph } from '@/components/seo/MetaDescription'
 import { Shield, Zap, Users, Target, Heart, Award, Link2, ShieldCheck, ArrowRight } from 'lucide-react'
 import { getVerifiedOnChainCount } from '@/lib/supabase/masterScanService'
 import { getSiteUrl } from '@/config/site'
-import { Navbar } from '@/components/common/Navbar'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import Link from 'next/link'
 
@@ -41,8 +40,6 @@ export default async function AboutPage() {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] text-[#001d36] pb-24">
-      <Navbar />
-      
       <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 pb-12">
         <Breadcrumbs items={[{ label: 'About MilkGuard', href: '/about', current: true }]} className="mb-4" />
 

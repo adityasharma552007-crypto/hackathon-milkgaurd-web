@@ -7,7 +7,6 @@ import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import { InstallButton } from '@/components/pwa/InstallButton'
 import { MilkGuardLogo } from '@/components/brand/MilkGuardLogo'
-import { Navbar } from '@/components/common/Navbar'
 
 export default async function DashboardLayout({
   children,
@@ -67,8 +66,30 @@ export default async function DashboardLayout({
     <div className="min-h-screen bg-[#f8f9ff] text-[#001d36] font-sans antialiased pb-24 md:pb-8">
       <UserHydrator user={user} profile={profile} />
       
-      {/* Top Navigation Bar */}
-      <Navbar />
+      {/* Stitch TopAppBar */}
+      <header className="sticky top-0 w-full z-50 bg-[#f8f9ff]/90 backdrop-blur-xl border-b border-[#d1e4ff]/60 ambient-shadow">
+        <div className="flex justify-between items-center px-4 md:px-10 h-16 w-full max-w-7xl mx-auto">
+          {/* Leading Brand */}
+          <Link href="/home" className="flex items-center gap-2 group active:scale-95 transition-transform p-1 rounded-xl hover:bg-[#e5efff]/60">
+            <MilkGuardLogo variant="header" size="sm" priority />
+          </Link>
+
+          {/* Actions & Avatar */}
+          <div className="flex items-center gap-3">
+            <InstallButton variant="dashboard" label="Install App" />
+
+            <Link href="/profile" className="flex items-center active:scale-95 transition-transform">
+              <div className="w-10 h-10 rounded-full bg-[#dbe9ff] border border-[#bdc8d1] flex items-center justify-center hover:opacity-80 transition-opacity overflow-hidden">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="material-symbols-outlined text-[#3e484f]">person</span>
+                )}
+              </div>
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content Area */}
       <div className="w-full max-w-7xl mx-auto px-4 md:px-10 pt-6 pb-12">
