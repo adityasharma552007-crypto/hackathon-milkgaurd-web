@@ -125,5 +125,5 @@ MilkGuard © 2026 · Built for Food Safety 🇮🇳
 For support, contact: support@milkguard.app
 
 ---
-
+Verified and Tested on Code Rabbit.
 Built with ❤️ for a Healthier India 🇮🇳
