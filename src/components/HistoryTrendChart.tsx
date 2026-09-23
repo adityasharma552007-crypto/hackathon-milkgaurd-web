@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   AreaChart,
   Area,
@@ -12,14 +12,30 @@ import {
 } from 'recharts'
 
 interface HistoryTrendChartProps {
-  data: any[]
+  data?: any[]
 }
 
 export default function HistoryTrendChart({ data }: HistoryTrendChartProps) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const safeData = Array.isArray(data) ? data : []
+
+  if (!mounted) {
+    return (
+      <div className="h-40 w-full flex items-center justify-center bg-white/5 rounded-xl">
+        <span className="text-[10px] text-[#c4e7ff]/60 uppercase tracking-widest font-bold">Loading Trend Analytics...</span>
+      </div>
+    )
+  }
+
   return (
     <div className="h-40 w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+        <AreaChart data={safeData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#F5A623" stopOpacity={0.4}/>
@@ -60,3 +76,4 @@ export default function HistoryTrendChart({ data }: HistoryTrendChartProps) {
     </div>
   )
 }
+

@@ -123,12 +123,26 @@ export function HistoryClient({ scans, trendData }: HistoryClientProps) {
 
         {filteredScans && filteredScans.length > 0 ? (
           filteredScans.map((scan) => {
-            const displayScanId = scan.scan_id || (scan.id?.length > 15 ? `MG-${scan.id.slice(0, 8).toUpperCase()}` : scan.id)
-            const deviceName = scan.devices?.device_name || (scan.devices?.device_uid ? `Hardware Pod (${scan.devices.device_uid})` : (scan.source_hardware_id ? `Hardware Pod (${scan.source_hardware_id})` : (scan.vendors?.name || 'MilkGuard Test Unit')))
+            const rawId = scan.scan_id || scan.id
+            const displayScanId = rawId ? (String(rawId).startsWith('MG-') ? String(rawId) : (String(rawId).length > 15 ? `MG-${String(rawId).slice(0, 8).toUpperCase()}` : String(rawId))) : 'MG-TEST'
+            const device = Array.isArray(scan.devices) ? scan.devices[0] : scan.devices
+            const deviceName = device?.device_name || (device?.device_uid ? `Hardware Pod (${device.device_uid})` : (scan.source_hardware_id ? `Hardware Pod (${scan.source_hardware_id})` : (scan.vendors?.name || 'MilkGuard Test Unit')))
             const isSafe = (scan.analysis_result || scan.result_tier) === 'safe'
             const score = scan.safety_score ?? (scan.analysis_confidence ? Math.round(Number(scan.analysis_confidence)) : 95)
             const txHash = scan.blockchain_tx_hash || scan.tx_hash
             const bStatus = scan.blockchain_status || (txHash ? 'confirmed' : 'pending')
+
+            let scanDate = 'Recent'
+            try {
+              if (scan.created_at) {
+                const d = new Date(scan.created_at)
+                if (!isNaN(d.getTime())) {
+                  scanDate = format(d, 'dd MMM yyyy, HH:mm')
+                }
+              }
+            } catch {
+              scanDate = 'Recent'
+            }
 
             return (
               <Link href={`/history/${scan.id}`} key={scan.id} className="block group">
@@ -160,7 +174,7 @@ export function HistoryClient({ scans, trendData }: HistoryClientProps) {
                         </p>
 
                         <p className="text-[11px] text-slate-400 font-medium">
-                          {scan.created_at ? format(new Date(scan.created_at), 'PPP p') : 'Recent'}
+                          {scanDate}
                         </p>
                       </div>
                     </div>

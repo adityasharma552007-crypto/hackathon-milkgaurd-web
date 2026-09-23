@@ -94,9 +94,10 @@ export default function ReportVendorSheet({
                 id="issueType" 
                 name="issueType"
                 required
+                defaultValue=""
                 className="w-full h-12 bg-slate-50 border-none rounded-2xl px-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-[#60A5FA] appearance-none"
               >
-                <option value="" disabled selected>Choose an issue...</option>
+                <option value="" disabled>Choose an issue...</option>
                 {ISSUE_OPTIONS.map(opt => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
